@@ -21,12 +21,17 @@ import net.pedroricardo.content.Appledrness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+
 public class AppleDrMod implements DedicatedServerModInitializer {
 	public static final String MOD_ID = "appledrmod";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+	private static HashMap<PlayerEntity, Appledrness> playersDrness;
+
 	@Override
 	public void onInitializeServer() {
+
 		Registry.register(Appledrness.REGISTRY, Identifier.of(MOD_ID, "being_appledr"), (world, player) -> player.getName().getString().equals("AppleDr") ? 100 : 0);
 		Registry.register(Appledrness.REGISTRY, Identifier.of(MOD_ID, "having_apples_in_inventory"), (world, player) -> player.getInventory().count(Items.APPLE));
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -41,4 +46,5 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 							})));
 		});
 	}
+
 }
