@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "appledrmod",
+	"version": "${version}",
+	"name": "AppleDr Mod",
+	"description": "Adds AppleDr utils like Appledrness",
+	"authors": [
+		"Pedro Ricardo",
+		"Domenic Dvojmoc"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/appledrmod/icon.png",
+	"environment": "server",
+	"entrypoints": {
+		"server": [
+          "net.pedroricardo.AppleDrMod"
+		]
+	},
+	"mixins": [
+		{
+			"config": "appledrmod.mixins.json",
+			"environment": "server"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.15.11",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
