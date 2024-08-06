@@ -1,4 +1,4 @@
-package net.pedroricardo.content;
+package net.pedroricardo.appledrness;
 
 import com.mojang.serialization.Lifecycle;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
