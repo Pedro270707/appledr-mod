@@ -23,6 +23,10 @@ public class Appledrness {
         return appledrness;
     }
 
+    public static AppledrnessProvider register(String id, AppledrnessProvider provider) {
+        return Registry.register(REGISTRY, Identifier.of(AppleDrMod.MOD_ID, id), provider);
+    }
+
     /*
 
     private int levelOfDrness;

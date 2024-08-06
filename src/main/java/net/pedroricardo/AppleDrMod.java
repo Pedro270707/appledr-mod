@@ -31,8 +31,8 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 
 	@Override
 	public void onInitializeServer() {
-		Registry.register(Appledrness.REGISTRY, Identifier.of(MOD_ID, "being_appledr"), (world, player) -> player.getName().getString().equals("AppleDr") ? 100 : 0);
-		Registry.register(Appledrness.REGISTRY, Identifier.of(MOD_ID, "having_apples_in_inventory"), (world, player) -> player.getInventory().count(Items.APPLE));
+		Appledrness.register("being_appledr", (world, player) -> player.getName().getString().equals("AppleDr") ? 100 : 0);
+		Appledrness.register("having_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE));
 		// Lambda of CommandRegistrationCallback: void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment).
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appledrness")
