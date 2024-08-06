@@ -19,8 +19,8 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.pedroricardo.appledrness.Appledrness;
-import net.pedroricardo.appledrness.loot.AppleDrLootConditions;
-import net.pedroricardo.appledrness.loot.AppledrnessLootConditionType;
+import net.pedroricardo.loot.AppleDrLootConditions;
+import net.pedroricardo.loot.AppledrnessLootConditionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

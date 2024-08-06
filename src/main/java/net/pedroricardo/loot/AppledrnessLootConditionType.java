@@ -1,4 +1,4 @@
-package net.pedroricardo.appledrness.loot;
+package net.pedroricardo.loot;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;

@@ -1,4 +1,4 @@
-package net.pedroricardo.appledrness.loot;
+package net.pedroricardo.loot;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.loot.condition.LootCondition;
