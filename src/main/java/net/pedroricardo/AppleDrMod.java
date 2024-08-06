@@ -31,9 +31,9 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 
 	@Override
 	public void onInitializeServer() {
-
 		Registry.register(Appledrness.REGISTRY, Identifier.of(MOD_ID, "being_appledr"), (world, player) -> player.getName().getString().equals("AppleDr") ? 100 : 0);
 		Registry.register(Appledrness.REGISTRY, Identifier.of(MOD_ID, "having_apples_in_inventory"), (world, player) -> player.getInventory().count(Items.APPLE));
+		// Lambda of CommandRegistrationCallback: void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment).
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appledrness")
 					.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("player", EntityArgumentType.player())
@@ -45,6 +45,9 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 								return Command.SINGLE_SUCCESS;
 							})));
 		});
-	}
 
+		ServerTickEvents.START_SERVER_TICK.register(server -> {
+			for (PlayerEntity player : server.getPlayerManager().getPlayerList()) player.sendMessage(Text.literal(String.valueOf(Appledrness.getAppledrness(player.getWorld(), player))));
+		});
+	}
 }
