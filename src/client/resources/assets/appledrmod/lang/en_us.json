@@ -1,4 +1,8 @@
 {
+  "appledrmod.appledr_the_appledrful": "AppleDr, the Appledrful",
+  "appledrmod.appledrness.default": "%s: Your Appledrness is %s. You should work to become the Appledrmaster!",
+  "appledrmod.appledrness.high": "%s: My my! Oh la la. You have %s Appledrness! You are truly Appledrtastic!",
+  "appledrmod.appledrness.very_high": "%s: Wow, you truly exceeded my expectations. %s Appledrness! That is so Appledrcool!",
   "item.appledrmod.rotten_apple": "Rotten Apple",
   "item.appledrmod.apple_greathelm": "Apple Greathelm",
   "item.appledrmod.apple_greathelm.desc": "An apple a day keeps the doctor away!",
