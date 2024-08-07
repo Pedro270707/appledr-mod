@@ -10,6 +10,7 @@ import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.entry.EmptyEntry;
@@ -19,6 +20,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.pedroricardo.appledrness.Appledrness;
+import net.pedroricardo.content.AppleDrItems;
 import net.pedroricardo.loot.AppleDrLootConditions;
 import net.pedroricardo.loot.AppledrnessLootConditionType;
 import org.slf4j.Logger;
@@ -36,6 +38,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 	@Override
 	public void onInitializeServer() {
 		AppleDrLootConditions.init();
+		AppleDrItems.init();
 
 		LootTableEvents.MODIFY.register((key, builder, source) -> {
 			if (source.isBuiltin() && key == EntityType.PLAYER.getLootTableId()) {
@@ -44,13 +47,21 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 						.conditionally(AppledrnessLootConditionType.builder(NumberRange.IntRange.atLeast(300), AppledrnessLootConditionType.Source.THIS))
 								.conditionally(AppledrnessLootConditionType.builder(NumberRange.IntRange.atMost(-100), AppledrnessLootConditionType.Source.ATTACKING_ENTITY)))
 						.with(EmptyEntry.builder().weight(10));
+				LootPool.Builder rottenApplePool = LootPool.builder()
+						.with(ItemEntry.builder(AppleDrItems.ROTTEN_APPLE).weight(1)
+								.conditionally(AppledrnessLootConditionType.builder(NumberRange.IntRange.atMost(-300), AppledrnessLootConditionType.Source.THIS))
+								.conditionally(AppledrnessLootConditionType.builder(NumberRange.IntRange.atLeast(100), AppledrnessLootConditionType.Source.ATTACKING_ENTITY)))
+						.with(EmptyEntry.builder().weight(10));
+
 				builder.pool(applePool);
+				builder.pool(rottenApplePool);
 			}
 		});
 
-		Appledrness.register("having_apple_in_name", (world, player) -> player.getName().getString().toLowerCase(Locale.ROOT).contains("apple") ? 100 : 0);
+		Appledrness.register("having_apple_in_name", (world, player) -> player.getName().getString().toLowerCase(Locale.ROOT).contains("apple") ? 50 : 0);
 		Appledrness.register("being_appledr", (world, player) -> player.getName().getString().equals("AppleDr") ? 100 : 0);
-		Appledrness.register("having_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE));
+		Appledrness.register("having_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE) * 5);
+		Appledrness.register("having_rotten_apples_in_inventory", (world, player) -> -player.getInventory().count(AppleDrItems.ROTTEN_APPLE) * 5);
 		// Lambda of CommandRegistrationCallback: void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment).
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appledrness")

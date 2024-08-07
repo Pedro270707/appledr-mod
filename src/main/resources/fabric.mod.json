@@ -5,8 +5,8 @@
 	"name": "AppleDr Mod",
 	"description": "Adds AppleDr utils like Appledrness",
 	"authors": [
-		"Pedro Ricardo",
-		"Domenic Dvojmoc"
+		"Domenic Dvojmoc",
+		"Pedro Ricardo"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
@@ -14,10 +14,13 @@
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/appledrmod/icon.png",
-	"environment": "server",
+	"environment": "*",
 	"entrypoints": {
+		"client": [
+			"net.pedroricardo.AppleDrModClient"
+		],
 		"server": [
-          "net.pedroricardo.AppleDrMod"
+			"net.pedroricardo.AppleDrMod"
 		]
 	},
 	"mixins": [
