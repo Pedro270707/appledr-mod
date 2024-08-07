@@ -13,9 +13,17 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootPool;
+import net.minecraft.loot.condition.EntityPropertiesLootCondition;
+import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.entry.EmptyEntry;
 import net.minecraft.loot.entry.ItemEntry;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtIntArray;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.predicate.NbtPredicate;
 import net.minecraft.predicate.NumberRange;
+import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -28,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.UUID;
 
 public class AppleDrMod implements DedicatedServerModInitializer {
 	public static final String MOD_ID = "appledrmod";
@@ -53,8 +62,14 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 								.conditionally(AppledrnessLootConditionType.builder(NumberRange.IntRange.atLeast(100), AppledrnessLootConditionType.Source.ATTACKING_ENTITY)))
 						.with(EmptyEntry.builder().weight(10));
 
-				builder.pool(applePool);
-				builder.pool(rottenApplePool);
+				NbtCompound nbt = new NbtCompound();
+				nbt.putUuid(PlayerEntity.UUID_KEY, UUID.fromString("3bd4c790-aea5-47da-8963-7f907539889c"));
+				LootPool.Builder appleGreathelmPool = LootPool.builder()
+						.with(ItemEntry.builder(AppleDrItems.APPLE_GREATHELM).weight(1)
+								.conditionally(EntityPropertiesLootCondition.builder(LootContext.EntityTarget.THIS, EntityPredicate.Builder.create().nbt(new NbtPredicate(nbt)))))
+						.with(EmptyEntry.builder().weight(10));
+
+				builder.pool(applePool).pool(rottenApplePool).pool(appleGreathelmPool);
 			}
 		});
 
