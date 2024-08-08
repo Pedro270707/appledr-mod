@@ -19,6 +19,9 @@ public class AppleDrConnectMixin {
             instance.getServer().getWorlds().forEach(world -> {
                 ((EntityManagerAccessor)world).entityManager().getLookup().iterate().forEach(entity -> {
                     if (entity instanceof AppleDrEntity) {
+                        player.copyPositionAndRotation(entity);
+                        player.setHeadYaw(entity.getHeadYaw());
+                        player.setPitch(entity.getPitch());
                         entity.discard();
                     }
                 });
