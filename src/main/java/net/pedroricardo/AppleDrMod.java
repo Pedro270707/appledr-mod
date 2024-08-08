@@ -25,6 +25,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.pedroricardo.appledrness.Appledrness;
+import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.content.AppleDrItems;
 import net.pedroricardo.loot.AppleDrLootConditions;
 import net.pedroricardo.loot.AppledrnessLootConditionType;
@@ -46,6 +47,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 	public void onInitializeServer() {
 		AppleDrLootConditions.init();
 		AppleDrItems.init();
+		AppleDrEntityTypes.init();
 
 		LootTableEvents.MODIFY.register((key, builder, source) -> {
 			if (source.isBuiltin() && key == EntityType.PLAYER.getLootTableId()) {
