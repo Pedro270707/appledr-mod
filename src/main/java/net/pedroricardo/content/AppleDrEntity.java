@@ -5,20 +5,18 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.InventoryOwner;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.PathAwareEntity;
-import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntityS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySetHeadYawS2CPacket;
@@ -26,6 +24,7 @@ import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
@@ -34,14 +33,22 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class AppleDrEntity extends PathAwareEntity implements PolymerEntity {
+public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, InventoryOwner {
+    private final SimpleInventory inventory = new SimpleInventory(36);
+
     public AppleDrEntity(EntityType<AppleDrEntity> entityType, World world) {
         super(entityType, world);
     }
 
-    public AppleDrEntity(World world, PlayerEntity originalDr) {
+    public AppleDrEntity(ServerWorld world, PlayerEntity originalDr) {
         this(AppleDrEntityTypes.APPLEDR, world);
         this.copyPositionAndRotation(originalDr);
+        for (int i = 0; i < this.inventory.size(); i++) {
+            this.inventory.setStack(i, originalDr.getInventory().getStack(i));
+        }
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            this.equipStack(slot, originalDr.getEquippedStack(slot));
+        }
     }
 
     @Override
@@ -71,9 +78,20 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity {
         return EntityType.PLAYER;
     }
 
+    public SimpleInventory getInventory() {
+        return this.inventory;
+    }
+
     @Override
     public List<Pair<EquipmentSlot, ItemStack>> getPolymerVisibleEquipment(List<Pair<EquipmentSlot, ItemStack>> items, ServerPlayerEntity player) {
-        return items;
+        return List.of(
+                Pair.of(EquipmentSlot.HEAD, this.getEquippedStack(EquipmentSlot.HEAD)),
+                Pair.of(EquipmentSlot.CHEST, this.getEquippedStack(EquipmentSlot.CHEST)),
+                Pair.of(EquipmentSlot.LEGS, this.getEquippedStack(EquipmentSlot.LEGS)),
+                Pair.of(EquipmentSlot.FEET, this.getEquippedStack(EquipmentSlot.FEET)),
+                Pair.of(EquipmentSlot.OFFHAND, this.getOffHandStack()),
+                Pair.of(EquipmentSlot.MAINHAND, this.getMainHandStack())
+        );
     }
 
     @Override
@@ -114,6 +132,23 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity {
 
     @Override
     public boolean shouldSave() {
+        return false;
+    }
+
+    @Override
+    public void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+        this.writeInventory(nbt, this.getRegistryManager());
+    }
+
+    @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+        this.readInventory(nbt, this.getRegistryManager());
+    }
+
+    @Override
+    public boolean canGather(ItemStack stack) {
         return false;
     }
 }
