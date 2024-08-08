@@ -4,7 +4,10 @@ import com.google.gson.*;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class AppleDrConfig {
     private static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();

@@ -8,7 +8,10 @@ import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.InventoryOwner;
-import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.ai.goal.LookAroundGoal;
+import net.minecraft.entity.ai.goal.LookAtEntityGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -48,6 +51,8 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     public AppleDrEntity(ServerWorld world, PlayerEntity originalDr) {
         this(AppleDrEntityTypes.APPLEDR, world);
         this.copyPositionAndRotation(originalDr);
+        this.setHeadYaw(originalDr.getHeadYaw());
+        this.setPitch(originalDr.getPitch());
         for (int i = 0; i < this.inventory.size(); i++) {
             this.inventory.setStack(i, originalDr.getInventory().getStack(i));
         }
