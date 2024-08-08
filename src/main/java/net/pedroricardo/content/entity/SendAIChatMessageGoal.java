@@ -4,9 +4,9 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SignedMessage;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.pedroricardo.AppleDrMod;
 import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.util.AppleDrAI;
@@ -55,7 +55,7 @@ public class SendAIChatMessageGoal extends Goal {
 
         this.messageBeingAnswered = answeredMessages.getLast();
         new Thread(() -> {
-            PlayerEntity player = this.mob.getServer().getPlayerManager().getPlayer(this.messageBeingAnswered.getSender());
+            ServerPlayerEntity player = this.mob.getServer().getPlayerManager().getPlayer(this.messageBeingAnswered.getSender());
             String name;
             if (player == null) {
                 name = "Unknown player: ";

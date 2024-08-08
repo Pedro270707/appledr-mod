@@ -11,6 +11,7 @@ import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.predicate.NumberRange;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.StringIdentifiable;
 import net.pedroricardo.appledrness.Appledrness;
 
@@ -29,11 +30,10 @@ public record AppledrnessLootConditionType(NumberRange.IntRange range, Source so
         }
 
         Entity entity = lootContext.get(LootContextParameters.THIS_ENTITY);
-        if (!(entity instanceof PlayerEntity player)) {
+        if (!(entity instanceof ServerPlayerEntity player)) {
             return false;
         }
         int appledrness = Appledrness.getAppledrness(lootContext.getWorld(), player);
-        System.out.println(appledrness);
         return this.range().test(appledrness);
     }
 

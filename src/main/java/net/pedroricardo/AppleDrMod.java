@@ -25,6 +25,8 @@ import net.minecraft.predicate.NbtPredicate;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.TypeFilter;
@@ -89,14 +91,16 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 			}
 			return 0;
 		});
+		Appledrness.register("eating_apples", (world, player) -> player.getStatHandler().getStat(Stats.USED, Items.APPLE));
 		Appledrness.register("having_rotten_apples_in_inventory", (world, player) -> -player.getInventory().count(AppleDrItems.ROTTEN_APPLE) * 5);
+		Appledrness.register("eating_rotten_apples", (world, player) -> -player.getStatHandler().getStat(Stats.USED, AppleDrItems.ROTTEN_APPLE));
 
 		// Lambda of CommandRegistrationCallback: void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment).
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appledrness")
 					.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("player", EntityArgumentType.player())
 							.executes(c -> {
-								PlayerEntity player = EntityArgumentType.getPlayer(c, "player");
+								ServerPlayerEntity player = EntityArgumentType.getPlayer(c, "player");
 								c.getSource().sendMessage(Text.literal("<AppleDr, the Appledrful> ").formatted(Formatting.RED)
 										.append(Text.literal("Appledrness: ").formatted(Formatting.WHITE)
 												.append(Text.literal(String.valueOf(Appledrness.getAppledrness(player.getWorld(), player))))));

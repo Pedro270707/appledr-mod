@@ -107,7 +107,8 @@ public class AppleDrAI {
 
     public enum MessageRole implements StringIdentifiable {
         SYSTEM("system"),
-        USER("user");
+        USER("user"),
+        ASSISTANT("assistant");
 
         private final String id;
 

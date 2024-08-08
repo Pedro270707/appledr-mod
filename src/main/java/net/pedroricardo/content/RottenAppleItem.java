@@ -4,7 +4,6 @@ import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -26,7 +25,7 @@ public class RottenAppleItem extends SimplePolymerItem {
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
         ItemStack itemStack = super.finishUsing(stack, world, user);
         int appledrness = 0;
-        if (user instanceof PlayerEntity player) {
+        if (user instanceof ServerPlayerEntity player) {
             appledrness = Appledrness.getAppledrness(world, player);
         }
         if (appledrness > -100) {
