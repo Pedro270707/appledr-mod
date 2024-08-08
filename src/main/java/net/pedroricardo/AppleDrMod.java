@@ -122,5 +122,14 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 				}
 			}
 		});
+
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appledr")
+					.requires(source -> source.isExecutedByPlayer() && source.hasPermissionLevel(2))
+					.executes(c -> {
+						c.getSource().getWorld().spawnEntity(new AppleDrEntity(c.getSource().getPlayer().getServerWorld(), c.getSource().getPlayer()));
+						return Command.SINGLE_SUCCESS;
+					}));
+		});
 	}
 }

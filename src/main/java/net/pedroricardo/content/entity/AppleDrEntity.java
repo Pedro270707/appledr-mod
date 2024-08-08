@@ -15,6 +15,9 @@ import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SimpleInventory;
@@ -34,23 +37,32 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import net.pedroricardo.AppleDrMod;
 import net.pedroricardo.content.AppleDrEntityTypes;
+import net.pedroricardo.mixin.PlayerModelPartsAccessor;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, InventoryOwner {
+    protected static final TrackedData<Byte> PLAYER_MODEL_PARTS = DataTracker.registerData(AppleDrEntity.class, TrackedDataHandlerRegistry.BYTE);
     public final List<SignedMessage> messagesReceived = new ArrayList<>();
+    private final GameProfile profile;
 
     private final SimpleInventory inventory = new SimpleInventory(36);
 
     public AppleDrEntity(EntityType<AppleDrEntity> entityType, World world) {
         super(entityType, world);
+        this.profile = new GameProfile(this.getUuid(), "AppleDr");
+        this.profile.getProperties().put("textures", new Property("textures",
+                "e3RleHR1cmVzOntTS0lOOnt1cmw6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmU2OTg4YWMzYzIzMGNhZDUzMDA4NjBlOTY1NjgxNWYyMzkwMDZkZmE3YzVmYzdhMmRkMjliODI2MzQzNWJiOSJ9fX0=",
+                "H6Y/64HDwOTZ1edMGpTOQ0CGKKGaHUiS/Wqmsxb/LEh53ZHS1qoc/qHicpq39s0p/YNlc06tEdGmncBq8zx9bFJ/ZT9WwdG05JiHCjBEC0IWZ3n+J5W5wTUEbpNMEL+gpFIERKdNdxsNWC4e1nbRMrdMqgDbt0wPR+8LzBXlEJ841g7Opb9vK5wctgNeMKSLxJjK5CdYbm3YAyLu+Jbz+O8by3eShkj83BUBvoraJ/qMGmX8mC4m8QOYnWIshd9b4X5mQLqMWkYHN7iiTTslJuljYrBMk8sxRU7yCfVTQYobprHn1b4d74YsxhedpRvADHyCYS9GhiU1OiSk5KOhpW2UeM1vaxuqpdvkj0Xogs4xbNcDd+vMkgGW1G6eSqYQD8qvxLgUY3oQkf3AQBDGCCtBQ9dNioTPH/d5VMLjbYAgz9wf1kzxqH+Z1GneWv0KO/0bb5ZEL+XKAq/NCzx7GNiTKKKArqNpaK0uC0HNKqk6c4Pt/newMorQrvdVqxzTp1sDO1AhbM74L+dsgh5zEqwUmrl+Gp/BgQx6fT1CIvVfHHVWbY9EVPaNHF1n/QCriGVsiuKEhPTzusPpDSsAP/Hgv9PQdCx1jdpmoNGRHJ0zmdfq4TpCJD4LddV1pCSUKdT34JibDrlJIIpxM72b2NULCTTeIa4Jx4GMUMducEg="
+        ));
     }
 
     public AppleDrEntity(ServerWorld world, PlayerEntity originalDr) {
-        this(AppleDrEntityTypes.APPLEDR, world);
+        super(AppleDrEntityTypes.APPLEDR, world);
         this.copyPositionAndRotation(originalDr);
         this.setHeadYaw(originalDr.getHeadYaw());
         this.setPitch(originalDr.getPitch());
@@ -60,6 +72,9 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             this.equipStack(slot, originalDr.getEquippedStack(slot));
         }
+        this.profile = new GameProfile(UUID.randomUUID(), originalDr.getGameProfile().getName());
+        this.profile.getProperties().putAll("textures", originalDr.getGameProfile().getProperties().get("textures"));
+        this.getDataTracker().set(PLAYER_MODEL_PARTS, originalDr.getDataTracker().get(PlayerModelPartsAccessor.playerModelParts()));
     }
 
     @Override
@@ -108,13 +123,8 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
 
     @Override
     public void onBeforeSpawnPacket(ServerPlayerEntity player, Consumer<Packet<?>> packetConsumer) {
-        var packet = PolymerEntityUtils.createMutablePlayerListPacket(EnumSet.of(PlayerListS2CPacket.Action.ADD_PLAYER, PlayerListS2CPacket.Action.UPDATE_LISTED));
-        var profile = new GameProfile(this.getUuid(), "AppleDr");
-        profile.getProperties().put("textures", new Property("textures",
-                "e3RleHR1cmVzOntTS0lOOnt1cmw6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmU2OTg4YWMzYzIzMGNhZDUzMDA4NjBlOTY1NjgxNWYyMzkwMDZkZmE3YzVmYzdhMmRkMjliODI2MzQzNWJiOSJ9fX0=",
-                "H6Y/64HDwOTZ1edMGpTOQ0CGKKGaHUiS/Wqmsxb/LEh53ZHS1qoc/qHicpq39s0p/YNlc06tEdGmncBq8zx9bFJ/ZT9WwdG05JiHCjBEC0IWZ3n+J5W5wTUEbpNMEL+gpFIERKdNdxsNWC4e1nbRMrdMqgDbt0wPR+8LzBXlEJ841g7Opb9vK5wctgNeMKSLxJjK5CdYbm3YAyLu+Jbz+O8by3eShkj83BUBvoraJ/qMGmX8mC4m8QOYnWIshd9b4X5mQLqMWkYHN7iiTTslJuljYrBMk8sxRU7yCfVTQYobprHn1b4d74YsxhedpRvADHyCYS9GhiU1OiSk5KOhpW2UeM1vaxuqpdvkj0Xogs4xbNcDd+vMkgGW1G6eSqYQD8qvxLgUY3oQkf3AQBDGCCtBQ9dNioTPH/d5VMLjbYAgz9wf1kzxqH+Z1GneWv0KO/0bb5ZEL+XKAq/NCzx7GNiTKKKArqNpaK0uC0HNKqk6c4Pt/newMorQrvdVqxzTp1sDO1AhbM74L+dsgh5zEqwUmrl+Gp/BgQx6fT1CIvVfHHVWbY9EVPaNHF1n/QCriGVsiuKEhPTzusPpDSsAP/Hgv9PQdCx1jdpmoNGRHJ0zmdfq4TpCJD4LddV1pCSUKdT34JibDrlJIIpxM72b2NULCTTeIa4Jx4GMUMducEg="
-        ));
-        packet.getEntries().add(new PlayerListS2CPacket.Entry(this.getUuid(), profile, true, 0, GameMode.CREATIVE, Text.literal("AppleDr"), null));
+        PlayerListS2CPacket packet = PolymerEntityUtils.createMutablePlayerListPacket(EnumSet.of(PlayerListS2CPacket.Action.ADD_PLAYER, PlayerListS2CPacket.Action.UPDATE_LISTED));
+        packet.getEntries().add(new PlayerListS2CPacket.Entry(this.getUuid(), this.profile, true, 0, GameMode.CREATIVE, Text.literal("AppleDr"), null));
         packetConsumer.accept(packet);
     }
 
@@ -165,5 +175,19 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     @Override
     public boolean canGather(ItemStack stack) {
         return false;
+    }
+
+
+    @Override
+    protected void initDataTracker(DataTracker.Builder builder) {
+        super.initDataTracker(builder);
+        builder.add(PLAYER_MODEL_PARTS, (byte)0);
+    }
+
+    @Override
+    public void modifyRawTrackedData(List<DataTracker.SerializedEntry<?>> data, ServerPlayerEntity player, boolean initial) {
+        if (initial) {
+            data.add(DataTracker.SerializedEntry.of(PlayerModelPartsAccessor.playerModelParts(), this.getDataTracker().get(PLAYER_MODEL_PARTS)));
+        }
     }
 }
