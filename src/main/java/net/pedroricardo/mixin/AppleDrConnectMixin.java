@@ -3,7 +3,6 @@ package net.pedroricardo.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -34,7 +33,7 @@ public class AppleDrConnectMixin {
                 });
             });
         }
-        if (!player.getUuid().equals(AppleDrMod.APPLEDR_UUID) || !this.foundAppleDr) {
+        if (!this.foundAppleDr) {
             original.call(instance, message, overlay);
         }
     }
