@@ -50,8 +50,6 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 	public static final UUID APPLEDR_UUID = UUID.fromString("3bd4c790-aea5-47da-8963-7f907539889c");
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	private static HashMap<PlayerEntity, Appledrness> playersDrness;
-
 	@Override
 	public void onInitializeServer() {
 		AppleDrLootConditions.init();
