@@ -10,6 +10,7 @@ import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
+import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.EntityType;
@@ -28,11 +29,13 @@ import net.minecraft.predicate.NbtPredicate;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.content.AppleDrItems;
+import net.pedroricardo.content.entity.SendAIChatMessageGoal;
 import net.pedroricardo.loot.AppleDrLootConditions;
 import net.pedroricardo.loot.AppledrnessLootConditionType;
 import net.pedroricardo.util.AppleDrAI;
@@ -45,6 +48,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AppleDrMod implements DedicatedServerModInitializer {
 	public static final String MOD_ID = "appledrmod";
@@ -112,6 +117,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 					.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("message", StringArgumentType.greedyString())
 							.executes(c -> {
 								String key = AppleDrConfig.getValue("openai_api_key", "");
+								ServerPlayerEntity player = c.getSource().getPlayer();
 
 								if (key.isEmpty()) {
 									return 0;
@@ -119,16 +125,25 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 
 								new Thread(() -> {
 									try {
-										JsonObject object = AppleDrAI.sendMessageRequest(key, StringArgumentType.getString(c, "message"));
+										JsonObject object = AppleDrAI.sendSingleMessage(key, new AppleDrAI.Message(AppleDrAI.MessageRole.USER, (player == null ? c.getSource().getDisplayName().getString() + ": " : player.getName().getString() + " (" + Appledrness.getAppledrness(c.getSource().getWorld(), player) + " Appledrness): ") + StringArgumentType.getString(c, "message")));
 										String message = object.getAsJsonArray("choices").get(0).getAsJsonObject().getAsJsonObject("message").get("content").getAsString();
-										FakePlayer player = FakePlayer.get(c.getSource().getWorld(), new GameProfile(APPLEDR_UUID, "AppleDr"));
-										c.getSource().getServer().getPlayerManager().broadcast(SignedMessage.ofUnsigned(message), player, MessageType.params(MessageType.CHAT, player));
+										FakePlayer fakePlayer = FakePlayer.get(c.getSource().getWorld(), new GameProfile(APPLEDR_UUID, "AppleDr"));
+										c.getSource().getServer().getPlayerManager().broadcast(SignedMessage.ofUnsigned(message), fakePlayer, MessageType.params(MessageType.CHAT, fakePlayer));
 									} catch (IOException ignored) {
 									}
 								}).start();
 
                                 return Command.SINGLE_SUCCESS;
 							})));
+		});
+
+		ServerMessageEvents.CHAT_MESSAGE.register((message, sender, params) -> {
+			if (message.getSender().equals(APPLEDR_UUID) || message.isSenderMissing()) return;
+			Pattern pattern = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
+			Matcher matcher = pattern.matcher(message.getContent().getString());
+			if (matcher.find()) {
+				SendAIChatMessageGoal.MESSAGES.add(message);
+			}
 		});
 	}
 }

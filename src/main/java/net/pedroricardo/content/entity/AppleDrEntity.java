@@ -1,4 +1,4 @@
-package net.pedroricardo.content;
+package net.pedroricardo.content.entity;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -28,6 +28,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
+import net.pedroricardo.content.AppleDrEntityTypes;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -63,10 +64,11 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
 
     @Override
     protected void initGoals() {
-        this.goalSelector.add(1, new SwimGoal(this));
-        this.goalSelector.add(2, new WanderAroundFarGoal(this, 2.8));
-        this.goalSelector.add(3, new LookAtEntityGoal(this, PlayerEntity.class, 8.0f));
-        this.goalSelector.add(4, new LookAroundGoal(this));
+        this.goalSelector.add(1, new SendAIChatMessageGoal(this));
+        this.goalSelector.add(2, new SwimGoal(this));
+        this.goalSelector.add(3, new WanderAroundFarGoal(this, 2.8));
+        this.goalSelector.add(4, new LookAtEntityGoal(this, PlayerEntity.class, 8.0f));
+        this.goalSelector.add(5, new LookAroundGoal(this));
     }
 
     public static DefaultAttributeContainer.Builder createAppleDrAttributes() {

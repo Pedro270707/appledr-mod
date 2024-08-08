@@ -10,6 +10,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.pedroricardo.AppleDrMod;
+import net.pedroricardo.content.entity.AppleDrEntity;
 
 public class AppleDrEntityTypes {
     public static final EntityType<AppleDrEntity> APPLEDR = register("appledr", EntityType.Builder.<AppleDrEntity>create(AppleDrEntity::new, SpawnGroup.MISC).dimensions(0.6f, 1.8f).eyeHeight(1.62f).vehicleAttachment(PlayerEntity.VEHICLE_ATTACHMENT_POS).maxTrackingRange(32).trackingTickInterval(2).build());

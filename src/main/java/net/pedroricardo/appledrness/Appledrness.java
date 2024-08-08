@@ -16,6 +16,7 @@ public class Appledrness {
     public static SimpleRegistry<AppledrnessProvider> REGISTRY = FabricRegistryBuilder.from(new SimpleRegistry<>(REGISTRY_KEY, Lifecycle.stable(), false)).buildAndRegister();
 
     public static int getAppledrness(World world, PlayerEntity player) {
+        if (player.getUuid().equals(AppleDrMod.APPLEDR_UUID)) return Integer.MAX_VALUE;
         int appledrness = 0;
         for (AppledrnessProvider provider : REGISTRY.stream().toList()) {
             appledrness += provider.getAppledrness(world, player);
