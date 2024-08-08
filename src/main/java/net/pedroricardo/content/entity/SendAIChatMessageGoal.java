@@ -64,9 +64,9 @@ public class SendAIChatMessageGoal extends Goal {
             }
 
             try {
-                JsonObject object = AppleDrAI.sendStoredMessage(key, new AppleDrAI.Message(AppleDrAI.MessageRole.USER, name + this.messageBeingAnswered.getContent().getString()));
+                JsonObject object = AppleDrAI.sendStoredMessage(key, this.mob.getInitialMessageContext(), new AppleDrAI.Message(AppleDrAI.MessageRole.USER, name + this.messageBeingAnswered.getContent().getString()));
                 String message = object.getAsJsonArray("choices").get(0).getAsJsonObject().getAsJsonObject("message").get("content").getAsString();
-                FakePlayer fakePlayer = FakePlayer.get(this.mob.getServer().getOverworld(), new GameProfile(AppleDrMod.APPLEDR_UUID, "AppleDr"));
+                FakePlayer fakePlayer = FakePlayer.get(this.mob.getServer().getOverworld(), new GameProfile(this.mob.getGameProfile().getId(), this.mob.getGameProfile().getName()));
                 this.mob.getServer().getPlayerManager().broadcast(SignedMessage.ofUnsigned(message), fakePlayer, MessageType.params(MessageType.CHAT, fakePlayer));
                 this.messageBeingAnswered = null;
             } catch (IOException ignored) {

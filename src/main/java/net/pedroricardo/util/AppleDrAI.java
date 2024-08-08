@@ -18,11 +18,7 @@ import java.util.List;
 public class AppleDrAI {
     public static final String API_URL = "https://api.openai.com/v1/chat/completions";
     public static final Message INITIAL_CONTEXT = new Message(MessageRole.SYSTEM, "You're Domenic Dvojmoc (aka AppleDr, your in-game name), a Slovenian player and Twitch streamer in a Minecraft server called AppleDr Server. The people in it do not speak Slovenian; they speak English, but if the message is in another language, you should respond in that language unless the player asks otherwise. You are in university at 20 years old learning computer science. Player messages will start with some information about the player, such as their name and their Appledrness, but do NOT include that in your response. If asked, you have the maximum Appledrness (2³¹ - 1). Your messages should contain at most 120 characters.");
-    public static final List<Message> STORED_MESSAGES = new ArrayList<>() {
-        {
-            this.add(INITIAL_CONTEXT);
-        }
-    };
+    public static final List<Message> STORED_MESSAGES = new ArrayList<>();
 
     /**
      * Sends a list of messages.
@@ -62,16 +58,19 @@ public class AppleDrAI {
 
     /**
      * Sends a single message.
-     * Unlike {@link AppleDrAI#sendSingleMessage(String, Message)}, this stores the message for future context.
+     * Unlike {@link AppleDrAI#sendSingleMessage(String, Message, Message)}, this stores the message for future context.
      * It also includes the context that the AI is AppleDr.
      * @param apiKey the OpenAI API key
      * @param message the message to send to the AI
      * @return the response as a JSON object
      * @throws IOException if an I/O issue happens
      */
-    public static JsonObject sendStoredMessage(String apiKey, Message message) throws IOException {
+    public static JsonObject sendStoredMessage(String apiKey, Message context, Message message) throws IOException {
         STORED_MESSAGES.add(message);
-        return sendMessages(apiKey, STORED_MESSAGES);
+        List<Message> list = new ArrayList<>();
+        list.add(context);
+        list.addAll(STORED_MESSAGES);
+        return sendMessages(apiKey, list);
     }
 
     /**
@@ -81,8 +80,8 @@ public class AppleDrAI {
      * @return the response as a JSON object
      * @throws IOException if an I/O issue happens
      */
-    public static JsonObject sendSingleMessage(String apiKey, Message message) throws IOException {
-        return sendMessages(apiKey, List.of(INITIAL_CONTEXT, message));
+    public static JsonObject sendSingleMessage(String apiKey, Message context, Message message) throws IOException {
+        return sendMessages(apiKey, List.of(context, message));
     }
 
     private static String getPayload(List<Message> messages) {

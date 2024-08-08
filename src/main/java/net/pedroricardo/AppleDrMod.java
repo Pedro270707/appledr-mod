@@ -1,6 +1,7 @@
 package net.pedroricardo;
 
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import net.fabricmc.api.DedicatedServerModInitializer;
@@ -131,7 +132,14 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 					.executes(c -> {
 						c.getSource().getWorld().spawnEntity(new AppleDrEntity(c.getSource().getPlayer().getServerWorld(), c.getSource().getPlayer()));
 						return Command.SINGLE_SUCCESS;
-					}));
+					})
+					.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("context", StringArgumentType.greedyString())
+							.executes(c -> {
+								AppleDrEntity appleDr = new AppleDrEntity(c.getSource().getPlayer().getServerWorld(), c.getSource().getPlayer());
+								appleDr.setInitialMessageContext(StringArgumentType.getString(c, "context"));
+								c.getSource().getWorld().spawnEntity(appleDr);
+								return Command.SINGLE_SUCCESS;
+							})));
 		});
 	}
 }

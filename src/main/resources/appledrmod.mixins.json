@@ -5,7 +5,6 @@
   "mixins": [
     "AppleDrConnectMixin",
     "AppleDrDisconnectMixin",
-    "AppleDrMessageMixin",
     "EntityManagerAccessor",
     "PlayerModelPartsAccessor"
   ],
