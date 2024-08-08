@@ -1,10 +1,14 @@
 package net.pedroricardo;
 
+import com.google.gson.JsonObject;
+import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -18,6 +22,8 @@ import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.entry.EmptyEntry;
 import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.message.MessageType;
+import net.minecraft.network.message.SignedMessage;
 import net.minecraft.predicate.NbtPredicate;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.predicate.entity.EntityPredicate;
@@ -29,16 +35,20 @@ import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.content.AppleDrItems;
 import net.pedroricardo.loot.AppleDrLootConditions;
 import net.pedroricardo.loot.AppledrnessLootConditionType;
+import net.pedroricardo.util.AppleDrAI;
+import net.pedroricardo.util.AppleDrConfig;
 import net.pedroricardo.util.AppleDrTags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
 
 public class AppleDrMod implements DedicatedServerModInitializer {
 	public static final String MOD_ID = "appledrmod";
+	public static final UUID APPLEDR_UUID = UUID.fromString("3bd4c790-aea5-47da-8963-7f907539889c");
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	private static HashMap<PlayerEntity, Appledrness> playersDrness;
@@ -63,7 +73,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 						.with(EmptyEntry.builder().weight(10));
 
 				NbtCompound nbt = new NbtCompound();
-				nbt.putUuid(PlayerEntity.UUID_KEY, UUID.fromString("3bd4c790-aea5-47da-8963-7f907539889c"));
+				nbt.putUuid(PlayerEntity.UUID_KEY, APPLEDR_UUID);
 				LootPool.Builder appleGreathelmPool = LootPool.builder()
 						.with(ItemEntry.builder(AppleDrItems.APPLE_GREATHELM).weight(1)
 								.conditionally(EntityPropertiesLootCondition.builder(LootContext.EntityTarget.THIS, EntityPredicate.Builder.create().nbt(new NbtPredicate(nbt)))))
@@ -94,6 +104,30 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 										.append(Text.literal("Appledrness: ").formatted(Formatting.WHITE)
 												.append(Text.literal(String.valueOf(Appledrness.getAppledrness(player.getWorld(), player))))));
 								return Command.SINGLE_SUCCESS;
+							})));
+		});
+
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appledr")
+					.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("message", StringArgumentType.greedyString())
+							.executes(c -> {
+								String key = AppleDrConfig.getValue("openai_api_key", null);
+
+								if (key == null) {
+									return 0;
+								}
+
+								new Thread(() -> {
+									try {
+										JsonObject object = AppleDrAI.sendMessageRequest(key, StringArgumentType.getString(c, "message"));
+										String message = object.getAsJsonArray("choices").get(0).getAsJsonObject().getAsJsonObject("message").get("content").getAsString();
+										FakePlayer player = FakePlayer.get(c.getSource().getWorld(), new GameProfile(APPLEDR_UUID, "AppleDr"));
+										c.getSource().getServer().getPlayerManager().broadcast(SignedMessage.ofUnsigned(message), player, MessageType.params(MessageType.CHAT, player));
+									} catch (IOException ignored) {
+									}
+								}).start();
+
+                                return Command.SINGLE_SUCCESS;
 							})));
 		});
 	}

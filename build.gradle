@@ -35,6 +35,9 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+	implementation "org.apache.httpcomponents.client5:httpclient5:5.1"
+	implementation "com.fasterxml.jackson.core:jackson-databind:2.15.2"
+
 	// Polymer
 	modImplementation include("eu.pb4:polymer-core:${project.polymer_version}")
 }
