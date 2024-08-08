@@ -17,6 +17,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.message.SignedMessage;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntityS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySetHeadYawS2CPacket;
@@ -30,11 +31,14 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import net.pedroricardo.content.AppleDrEntityTypes;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, InventoryOwner {
+    public final List<SignedMessage> messagesReceived = new ArrayList<>();
+
     private final SimpleInventory inventory = new SimpleInventory(36);
 
     public AppleDrEntity(EntityType<AppleDrEntity> entityType, World world) {

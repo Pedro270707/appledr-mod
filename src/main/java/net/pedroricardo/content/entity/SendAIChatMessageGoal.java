@@ -18,19 +18,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SendAIChatMessageGoal extends Goal {
-    public static final List<SignedMessage> MESSAGES = new ArrayList<>();
     private final List<SignedMessage> answeredMessages;
     private SignedMessage messageBeingAnswered;
-    private final MobEntity mob;
+    private final AppleDrEntity mob;
 
-    SendAIChatMessageGoal(MobEntity mob) {
+    SendAIChatMessageGoal(AppleDrEntity mob) {
         this.mob = mob;
         this.answeredMessages = new ArrayList<>();
     }
 
     @Override
     public boolean canStart() {
-        return this.answeredMessages.size() < MESSAGES.size() && this.messageBeingAnswered == null;
+        return this.answeredMessages.size() < this.mob.messagesReceived.size() && this.messageBeingAnswered == null;
     }
 
     @Override
@@ -47,7 +46,7 @@ public class SendAIChatMessageGoal extends Goal {
     public void tick() {
         if (this.messageBeingAnswered != null) return;
 
-        this.answeredMessages.add(MESSAGES.getLast());
+        this.answeredMessages.add(this.mob.messagesReceived.getLast());
 
         String key = AppleDrConfig.getValue("openai_api_key", "");
         if (key.isEmpty() || this.mob.getServer() == null) {

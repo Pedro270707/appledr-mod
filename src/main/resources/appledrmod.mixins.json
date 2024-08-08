@@ -1,10 +1,11 @@
 {
-	"required": true,
-	"package": "net.pedroricardo.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "package": "net.pedroricardo.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "EntityManagerAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }

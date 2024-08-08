@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
@@ -32,12 +33,15 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.TypeFilter;
 import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.content.AppleDrItems;
+import net.pedroricardo.content.entity.AppleDrEntity;
 import net.pedroricardo.content.entity.SendAIChatMessageGoal;
 import net.pedroricardo.loot.AppleDrLootConditions;
 import net.pedroricardo.loot.AppledrnessLootConditionType;
+import net.pedroricardo.mixin.EntityManagerAccessor;
 import net.pedroricardo.util.AppleDrAI;
 import net.pedroricardo.util.AppleDrConfig;
 import net.pedroricardo.util.AppleDrTags;
@@ -138,11 +142,19 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 		});
 
 		ServerMessageEvents.CHAT_MESSAGE.register((message, sender, params) -> {
-			if (message.getSender().equals(APPLEDR_UUID) || message.isSenderMissing()) return;
+			if (message.getSender().equals(APPLEDR_UUID) || message.isSenderMissing() || sender instanceof FakePlayer) return;
 			Pattern pattern = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
 			Matcher matcher = pattern.matcher(message.getContent().getString());
 			if (matcher.find()) {
-				SendAIChatMessageGoal.MESSAGES.add(message);
+				for (Entity entity : ((EntityManagerAccessor) sender.getServerWorld()).entityManager().getLookup().iterate()) {
+					if (entity instanceof AppleDrEntity appleDr) {
+						appleDr.messagesReceived.add(message);
+					}
+				}
+			} else {
+				for (AppleDrEntity entity : sender.getWorld().getEntitiesByType(TypeFilter.equals(AppleDrEntity.class), sender.getBoundingBox().expand(32.0f), (appleDr) -> true)) {
+					entity.messagesReceived.add(message);
+				}
 			}
 		});
 	}
