@@ -116,31 +116,6 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 							})));
 		});
 
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appledr")
-					.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("message", StringArgumentType.greedyString())
-							.executes(c -> {
-								String key = AppleDrConfig.getValue("openai_api_key", "");
-								ServerPlayerEntity player = c.getSource().getPlayer();
-
-								if (key.isEmpty()) {
-									return 0;
-								}
-
-								new Thread(() -> {
-									try {
-										JsonObject object = AppleDrAI.sendSingleMessage(key, new AppleDrAI.Message(AppleDrAI.MessageRole.USER, (player == null ? c.getSource().getDisplayName().getString() + ": " : player.getName().getString() + " (" + Appledrness.getAppledrness(c.getSource().getWorld(), player) + " Appledrness): ") + StringArgumentType.getString(c, "message")));
-										String message = object.getAsJsonArray("choices").get(0).getAsJsonObject().getAsJsonObject("message").get("content").getAsString();
-										FakePlayer fakePlayer = FakePlayer.get(c.getSource().getWorld(), new GameProfile(APPLEDR_UUID, "AppleDr"));
-										c.getSource().getServer().getPlayerManager().broadcast(SignedMessage.ofUnsigned(message), fakePlayer, MessageType.params(MessageType.CHAT, fakePlayer));
-									} catch (IOException ignored) {
-									}
-								}).start();
-
-                                return Command.SINGLE_SUCCESS;
-							})));
-		});
-
 		ServerMessageEvents.CHAT_MESSAGE.register((message, sender, params) -> {
 			if (message.getSender().equals(APPLEDR_UUID) || message.isSenderMissing() || sender instanceof FakePlayer) return;
 			Pattern pattern = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
