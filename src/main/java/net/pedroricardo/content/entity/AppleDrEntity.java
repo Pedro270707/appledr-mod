@@ -32,6 +32,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
+import net.pedroricardo.AppleDrMod;
 import net.pedroricardo.content.AppleDrEntityTypes;
 
 import java.util.ArrayList;
@@ -139,6 +140,9 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     @Override
     public void tick() {
         super.tick();
+        if (this.getWorld().getServer() != null && this.getWorld().getServer().getPlayerManager().getPlayer(AppleDrMod.APPLEDR_UUID) != null) {
+            this.discard();
+        }
     }
 
     @Override
