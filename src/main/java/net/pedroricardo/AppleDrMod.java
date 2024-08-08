@@ -111,9 +111,9 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appledr")
 					.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("message", StringArgumentType.greedyString())
 							.executes(c -> {
-								String key = AppleDrConfig.getValue("openai_api_key", null);
+								String key = AppleDrConfig.getValue("openai_api_key", "");
 
-								if (key == null) {
+								if (key.isEmpty()) {
 									return 0;
 								}
 
