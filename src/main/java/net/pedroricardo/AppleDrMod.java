@@ -39,6 +39,7 @@ import net.pedroricardo.loot.AppleDrLootConditions;
 import net.pedroricardo.loot.AppledrnessLootConditionType;
 import net.pedroricardo.mixin.EntityManagerAccessor;
 import net.pedroricardo.util.AppleDrTags;
+import net.pedroricardo.util.Appledrlevels;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,9 +103,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 					.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("player", EntityArgumentType.player())
 							.executes(c -> {
 								ServerPlayerEntity player = EntityArgumentType.getPlayer(c, "player");
-								c.getSource().sendMessage(Text.literal("<AppleDr, the Appledrful> ").formatted(Formatting.RED)
-										.append(Text.literal("Appledrness: ").formatted(Formatting.WHITE)
-												.append(Text.literal(String.valueOf(Appledrness.getAppledrness(player.getWorld(), player))))));
+								c.getSource().sendMessage(Text.translatable(Appledrlevels.getAppledrlevel(Appledrness.getAppledrness(player.getWorld(), player)).getAppledrnessTranslationKey(), Text.translatable("appledrmod.appledr_the_appledrful").formatted(Formatting.RED), Appledrness.getAppledrness(player.getWorld(), player)));
 								return Command.SINGLE_SUCCESS;
 							})));
 		});
