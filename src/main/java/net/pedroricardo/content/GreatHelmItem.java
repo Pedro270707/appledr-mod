@@ -4,9 +4,12 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
+import net.minecraft.block.DispenserBlock;
+import net.minecraft.block.dispenser.FallibleItemDispenserBehavior;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -17,6 +20,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPointer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -28,6 +32,13 @@ public class GreatHelmItem extends Item implements PolymerItem {
     public GreatHelmItem(Settings settings, String texture) {
         super(settings.equipmentSlot((entity, stack) -> EquipmentSlot.HEAD).maxCount(1));
         this.texture = texture;
+        DispenserBlock.registerBehavior(this, new FallibleItemDispenserBehavior(){
+            @Override
+            protected ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack) {
+                this.setSuccess(ArmorItem.dispenseArmor(pointer, stack));
+                return stack;
+            }
+        });
     }
 
     @Override
