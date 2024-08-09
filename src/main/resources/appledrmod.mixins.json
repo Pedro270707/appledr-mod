@@ -5,6 +5,8 @@
   "mixins": [
     "AppleDrConnectMixin",
     "AppleDrDisconnectMixin",
+    "CongratulateAdvancementMixin",
+    "CongratulateAdvancementMixin$OwnerAccessor",
     "EntityManagerAccessor",
     "PlayerModelPartsAccessor"
   ],

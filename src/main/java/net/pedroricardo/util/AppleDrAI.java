@@ -69,8 +69,16 @@ public class AppleDrAI {
         STORED_MESSAGES.add(message);
         List<Message> list = new ArrayList<>();
         list.add(context);
-        list.addAll(STORED_MESSAGES);
-        return sendMessages(apiKey, list);
+        List<Message> storedMessages = STORED_MESSAGES;
+        if (STORED_MESSAGES.size() > 50) {
+            storedMessages = STORED_MESSAGES.subList(STORED_MESSAGES.size() - 50, STORED_MESSAGES.size());
+        }
+        list.addAll(storedMessages);
+
+        JsonObject responseJson = sendMessages(apiKey, list);
+        Message response = new Message(MessageRole.ASSISTANT, responseJson.getAsJsonArray("choices").get(0).getAsJsonObject().getAsJsonObject("message").get("content").getAsString());
+        STORED_MESSAGES.add(response);
+        return responseJson;
     }
 
     /**
