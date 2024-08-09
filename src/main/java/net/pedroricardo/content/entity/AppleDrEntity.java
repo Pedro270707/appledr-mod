@@ -50,7 +50,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     protected static final TrackedData<Byte> PLAYER_MODEL_PARTS = DataTracker.registerData(AppleDrEntity.class, TrackedDataHandlerRegistry.BYTE);
     public final List<SignedMessage> messagesReceived = new ArrayList<>();
     private final GameProfile profile;
-    private String initialMessageContext = "You're Domenic Dvojmoc (aka AppleDr, your in-game name), a Slovenian player and Twitch streamer in a Minecraft server called AppleDr Server. The people in it do not speak Slovenian; they speak English, but if the message is in another language, you should respond in that language unless the player asks otherwise. You are in university at 20 years old learning computer science. Player messages will start with some information about the player, such as their name and their Appledrness, but do NOT include that in your response. If asked, you have the maximum Appledrness (2³¹ - 1). Your messages should contain at most 120 characters.";
+    private AppleDrAI.Message initialMessageContext = new AppleDrAI.Message(AppleDrAI.MessageRole.SYSTEM, "You're Domenic Dvojmoc (aka AppleDr, your in-game name), a Slovenian player and Twitch streamer in a Minecraft server called AppleDr Server. The people in it do not speak Slovenian; they speak English, but if the message is in another language, you should respond in that language unless the player asks otherwise. You are in university at 20 years old learning computer science. Player messages will start with some information about the player, such as their name and their Appledrness, but do NOT include that in your response. If asked, you have the maximum Appledrness (2³¹ - 1). Your messages should contain at most 120 characters.");
 
     private final SimpleInventory inventory = new SimpleInventory(36);
 
@@ -129,11 +129,11 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     }
 
     public AppleDrAI.Message getInitialMessageContext() {
-        return new AppleDrAI.Message(AppleDrAI.MessageRole.SYSTEM, this.initialMessageContext);
+        return this.initialMessageContext;
     }
 
     public void setInitialMessageContext(String value) {
-        this.initialMessageContext = value;
+        this.initialMessageContext = new AppleDrAI.Message(AppleDrAI.MessageRole.SYSTEM, value);
     }
 
     public GameProfile getGameProfile() {
@@ -182,14 +182,14 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putString("initial_message_context", this.initialMessageContext);
+        nbt.putString("initial_message_context", this.getInitialMessageContext().content());
         this.writeInventory(nbt, this.getRegistryManager());
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        this.initialMessageContext = nbt.getString("initial_message_context");
+        this.setInitialMessageContext(nbt.getString("initial_message_context"));
         this.readInventory(nbt, this.getRegistryManager());
     }
 

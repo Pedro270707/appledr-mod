@@ -38,7 +38,7 @@ public class CongratulateAdvancementMixin {
                 ((EntityManagerAccessor)world).entityManager().getLookup().iterate().forEach(entity -> {
                     if (entity instanceof AppleDrEntity appleDr) {
                         try {
-                            JsonObject object = AppleDrAI.sendStoredMessage(key, appleDr.getInitialMessageContext(), new AppleDrAI.Message(AppleDrAI.MessageRole.USER, String.format("The player %s received the advancement with ID %s. You should congratulate them using the name of the advancement (not the ID).", owner.getDisplayName().getString(), advancementEntry.id().toString())));
+                            JsonObject object = AppleDrAI.sendStoredMessage(key, appleDr.getInitialMessageContext(), new AppleDrAI.Message(AppleDrAI.MessageRole.SYSTEM, String.format("The player %s received the advancement with ID %s. You should congratulate them using the name of the advancement (not the ID).", owner.getDisplayName().getString(), advancementEntry.id().toString())));
                             String message = object.getAsJsonArray("choices").get(0).getAsJsonObject().getAsJsonObject("message").get("content").getAsString();
                             FakePlayer fakePlayer = FakePlayer.get(owner.getServer().getOverworld(), new GameProfile(appleDr.getGameProfile().getId(), appleDr.getGameProfile().getName()));
                             owner.getServer().getPlayerManager().broadcast(SignedMessage.ofUnsigned(message), fakePlayer, MessageType.params(MessageType.CHAT, fakePlayer));
