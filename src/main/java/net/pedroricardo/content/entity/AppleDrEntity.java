@@ -198,7 +198,6 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
         return false;
     }
 
-
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
