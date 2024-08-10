@@ -1,6 +1,7 @@
-package net.pedroricardo.content;
+package net.pedroricardo.content.item;
 
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
+import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -9,16 +10,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import net.pedroricardo.appledrness.Appledrness;
+import net.pedroricardo.util.ResourcePackUtil;
 import org.jetbrains.annotations.Nullable;
 
 public class RottenAppleItem extends SimplePolymerItem {
+    private PolymerModelData MODEL;
+
     public RottenAppleItem(Settings settings, Item polymerItem) {
         super(settings, polymerItem);
     }
 
     @Override
     public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        return 1;
+        return ResourcePackUtil.MODELS.get(this).value();
     }
 
     @Override

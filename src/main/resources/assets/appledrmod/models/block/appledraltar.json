@@ -1,0 +1,38 @@
+{
+	"parent": "minecraft:block/block",
+	"textures": {
+		"particle": "appledrmod:block/appledraltar_bottom",
+		"bottom": "appledrmod:block/appledraltar_bottom",
+		"top": "appledrmod:block/appledraltar_top",
+		"small_top": "appledrmod:block/appledraltar_small_top",
+		"small_side": "appledrmod:block/appledraltar_small_side",
+		"side": "appledrmod:block/appledraltar_side"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 12, 16],
+			"faces": {
+				"north": {"uv": [0, 4, 16, 16], "texture": "#side", "cullface": "north"},
+				"east": {"uv": [0, 4, 16, 16], "texture": "#side", "cullface": "east"},
+				"south": {"uv": [0, 4, 16, 16], "texture": "#side", "cullface": "south"},
+				"west": {"uv": [0, 4, 16, 16], "texture": "#side", "cullface": "west"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#top"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#bottom", "cullface": "down"}
+			}
+		},
+		{
+			"from": [4, 4, 4],
+			"to": [12, 16, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [4, 4, 4]},
+			"faces": {
+				"north": {"uv": [4, 2, 12, 14], "texture": "#small_side"},
+				"east": {"uv": [4, 2, 12, 14], "texture": "#small_side"},
+				"south": {"uv": [4, 2, 12, 14], "texture": "#small_side"},
+				"west": {"uv": [4, 2, 12, 14], "texture": "#small_side"},
+				"up": {"uv": [4, 4, 12, 12], "texture": "#small_top", "cullface": "up"},
+				"down": {"uv": [4, 4, 12, 12], "texture": "#small_top"}
+			}
+		}
+	]
+}

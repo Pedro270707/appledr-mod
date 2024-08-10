@@ -1,4 +1,4 @@
-package net.pedroricardo.content;
+package net.pedroricardo.content.item;
 
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
@@ -14,22 +14,20 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPointer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 
-public class GreatHelmItem extends Item implements PolymerItem {
+public class GreathelmItem extends Item implements PolymerItem {
     private final String texture;
 
-    public GreatHelmItem(Settings settings, String texture) {
+    public GreathelmItem(Settings settings, String texture) {
         super(settings.equipmentSlot((entity, stack) -> EquipmentSlot.HEAD).maxCount(1));
         this.texture = texture;
         DispenserBlock.registerBehavior(this, new FallibleItemDispenserBehavior(){
@@ -53,12 +51,6 @@ public class GreatHelmItem extends Item implements PolymerItem {
         properties.put("textures", new Property("textures", this.texture));
         stack.set(DataComponentTypes.PROFILE, new ProfileComponent(Optional.empty(), Optional.empty(), properties));
         return stack;
-    }
-
-    @Override
-    public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        Identifier id = Registries.ITEM.getId(this);
-        return id.hashCode();
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
@@ -40,6 +41,7 @@ import net.pedroricardo.loot.AppledrnessLootConditionType;
 import net.pedroricardo.mixin.EntityManagerAccessor;
 import net.pedroricardo.util.AppleDrTags;
 import net.pedroricardo.util.Appledrlevels;
+import net.pedroricardo.util.ResourcePackUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,5 +142,9 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 								return Command.SINGLE_SUCCESS;
 							})));
 		});
+
+		ResourcePackUtil.bootstrap();
+		PolymerResourcePackUtils.addModAssets(MOD_ID);
+		PolymerResourcePackUtils.markAsRequired();
 	}
 }
