@@ -31,6 +31,7 @@ import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
@@ -40,10 +41,7 @@ import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.mixin.PlayerModelPartsAccessor;
 import net.pedroricardo.util.AppleDrAI;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, InventoryOwner {
@@ -169,6 +167,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     @Override
     public void tick() {
         super.tick();
+        ((ServerWorld)this.getWorld()).getChunkManager().addTicket(ChunkTicketType.PLAYER, this.getChunkPos(), 3, this.getChunkPos());
         if (this.getWorld().getServer() != null && this.getWorld().getServer().getPlayerManager().getPlayer(AppleDrMod.APPLEDR_UUID) != null) {
             this.discard();
         }
@@ -177,6 +176,11 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     @Override
     public boolean shouldSave() {
         return false;
+    }
+
+    @Override
+    public boolean cannotDespawn() {
+        return true;
     }
 
     @Override
