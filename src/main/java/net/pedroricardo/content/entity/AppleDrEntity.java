@@ -47,8 +47,8 @@ import java.util.function.Consumer;
 public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, InventoryOwner {
     protected static final TrackedData<Byte> PLAYER_MODEL_PARTS = DataTracker.registerData(AppleDrEntity.class, TrackedDataHandlerRegistry.BYTE);
     public final List<SignedMessage> messagesReceived = new ArrayList<>();
-    private final GameProfile profile;
     private AppleDrAI.Message initialMessageContext = new AppleDrAI.Message(AppleDrAI.MessageRole.SYSTEM, "You're Domenic Dvojmoc (aka AppleDr, your in-game name), a Slovenian player and Twitch streamer in a Minecraft server called AppleDr Server. The people in it do not speak Slovenian; they speak English, but if the message is in another language, you should respond in that language unless the player asks otherwise. You are in university at 20 years old learning computer science. Player messages will start with some information about the player, such as their name and their Appledrness, but do NOT include that in your response. If asked, you have the maximum Appledrness (2³¹ - 1). Your messages should contain at most 120 characters.");
+    private final GameProfile profile;
 
     private final SimpleInventory inventory = new SimpleInventory(36);
 
