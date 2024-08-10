@@ -1,16 +1,15 @@
 package net.pedroricardo.content.entity;
 
-import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.pedroricardo.AppleDrMod;
 import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.util.AppleDrAI;
 import net.pedroricardo.util.AppleDrConfig;
+import net.pedroricardo.util.OpenAIResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,8 +63,8 @@ public class SendAIChatMessageGoal extends Goal {
             }
 
             try {
-                JsonObject object = AppleDrAI.sendStoredMessage(key, this.mob.getInitialMessageContext(), new AppleDrAI.Message(AppleDrAI.MessageRole.USER, name + this.messageBeingAnswered.getContent().getString()));
-                String message = object.getAsJsonArray("choices").get(0).getAsJsonObject().getAsJsonObject("message").get("content").getAsString();
+                OpenAIResponse response = AppleDrAI.sendStoredMessage(key, this.mob.getInitialMessageContext(), new AppleDrAI.Message(AppleDrAI.MessageRole.USER, name + this.messageBeingAnswered.getContent().getString()));
+                String message = response.choices().getFirst().message().content();
                 FakePlayer fakePlayer = FakePlayer.get(this.mob.getServer().getOverworld(), new GameProfile(this.mob.getGameProfile().getId(), this.mob.getGameProfile().getName()));
                 this.mob.getServer().getPlayerManager().broadcast(SignedMessage.ofUnsigned(message), fakePlayer, MessageType.params(MessageType.CHAT, fakePlayer));
                 this.messageBeingAnswered = null;

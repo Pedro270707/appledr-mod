@@ -45,7 +45,6 @@ import net.pedroricardo.util.ResourcePackUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -62,7 +61,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 		AppleDrItems.init();
 		AppleDrEntityTypes.init();
 
-		LootTableEvents.MODIFY.register((key, builder, source) -> {
+        LootTableEvents.MODIFY.register((key, builder, source) -> {
 			if (source.isBuiltin() && key == EntityType.PLAYER.getLootTableId()) {
 				LootPool.Builder applePool = LootPool.builder()
 						.with(ItemEntry.builder(Items.APPLE).weight(1)

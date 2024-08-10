@@ -3,7 +3,11 @@ package net.pedroricardo.util;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.StringIdentifiable;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,6 +18,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class AppleDrAI {
     public static final String API_URL = "https://api.openai.com/v1/chat/completions";
@@ -27,7 +32,7 @@ public class AppleDrAI {
      * @return the response as a JSON object
      * @throws IOException if an I/O issue happens
      */
-    public static JsonObject sendMessages(String apiKey, List<Message> messages) throws IOException {
+    public static OpenAIResponse sendMessages(String apiKey, List<Message> messages) throws IOException {
         JsonObject object;
 
         URL url = URI.create(API_URL).toURL();
@@ -52,7 +57,7 @@ public class AppleDrAI {
         }
 
         connection.disconnect();
-        return object;
+        return OpenAIResponse.CODEC.parse(JsonOps.INSTANCE, object).getOrThrow();
     }
 
     /**
@@ -64,20 +69,20 @@ public class AppleDrAI {
      * @return the response as a JSON object
      * @throws IOException if an I/O issue happens
      */
-    public static JsonObject sendStoredMessage(String apiKey, Message context, Message message) throws IOException {
+    public static OpenAIResponse sendStoredMessage(String apiKey, @Nullable Message context, Message message) throws IOException {
         STORED_MESSAGES.add(message);
         List<Message> list = new ArrayList<>();
-        list.add(context);
+        if (context != null) list.add(context);
         List<Message> storedMessages = STORED_MESSAGES;
         if (STORED_MESSAGES.size() > 50) {
             storedMessages = STORED_MESSAGES.subList(STORED_MESSAGES.size() - 50, STORED_MESSAGES.size());
         }
         list.addAll(storedMessages);
 
-        JsonObject responseJson = sendMessages(apiKey, list);
-        Message response = new Message(MessageRole.ASSISTANT, responseJson.getAsJsonArray("choices").get(0).getAsJsonObject().getAsJsonObject("message").get("content").getAsString());
-        STORED_MESSAGES.add(response);
-        return responseJson;
+        OpenAIResponse response = sendMessages(apiKey, list);
+
+        STORED_MESSAGES.add(new Message(MessageRole.ASSISTANT, response.choices().getFirst().message().content()));
+        return response;
     }
 
     /**
@@ -87,8 +92,8 @@ public class AppleDrAI {
      * @return the response as a JSON object
      * @throws IOException if an I/O issue happens
      */
-    public static JsonObject sendSingleMessage(String apiKey, Message context, Message message) throws IOException {
-        return sendMessages(apiKey, List.of(context, message));
+    public static OpenAIResponse sendSingleMessage(String apiKey, @Nullable Message context, Message message) throws IOException {
+        return sendMessages(apiKey, context == null ? List.of(message) : List.of(context, message));
     }
 
     private static String getPayload(List<Message> messages) {
@@ -102,7 +107,13 @@ public class AppleDrAI {
         return payloadJson.toString();
     }
 
-    public record Message(MessageRole role, String content) {
+    public record Message(MessageRole role, String content, Optional<String> refusal) {
+        public static final Codec<Message> CODEC = RecordCodecBuilder.create(instance -> instance.group(MessageRole.CODEC.fieldOf("role").forGetter(Message::role), Codec.STRING.fieldOf("content").forGetter(Message::content), Codec.STRING.optionalFieldOf("refusal").forGetter(Message::refusal)).apply(instance, Message::new));
+
+        public Message(MessageRole role, String content) {
+            this(role, content, Optional.empty());
+        }
+
         public JsonObject toJson() {
             JsonObject json = new JsonObject();
             json.addProperty("role", this.role().asString());
@@ -115,6 +126,8 @@ public class AppleDrAI {
         SYSTEM("system"),
         USER("user"),
         ASSISTANT("assistant");
+
+        public static final Codec<MessageRole> CODEC = StringIdentifiable.createCodec(MessageRole::values);
 
         private final String id;
 
