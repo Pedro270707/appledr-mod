@@ -38,7 +38,7 @@ public class AppleDrItems {
             entries.add(ROTTEN_APPLE);
             entries.add(APPLEDRALTAR);
         }).build());
-        registerItemGroup("appledrmod_operators", PolymerItemGroupUtils.builder().special().icon(() -> new ItemStack(APPLE_GREATHELM)).displayName(Text.translatable("itemGroup.appledrmod")).entries((ctx, entries) -> {
+        registerItemGroup("appledrmod.operator", PolymerItemGroupUtils.builder().special().icon(() -> new ItemStack(APPLE_GREATHELM)).displayName(Text.translatable("itemGroup.appledrmod.operator")).entries((ctx, entries) -> {
             entries.add(APPLE_GREATHELM);
             entries.add(TECHNO_GREATHELM);
             entries.add(LEGACY_APPLE_GREATHELM);
