@@ -4,6 +4,7 @@ import net.minecraft.util.Identifier;
 import net.pedroricardo.AppleDrMod;
 
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.TreeMap;
 
 public class Appledrlevels {
@@ -11,7 +12,8 @@ public class Appledrlevels {
     public static final Appledrlevel DEFAULT_LEVEL = new Appledrlevel(Identifier.of(AppleDrMod.MOD_ID, "sprout"));
 
     static {
-        LEVELS.put(-1000, new Appledrlevel(Identifier.of(AppleDrMod.MOD_ID, "antiappledr")));
+        LEVELS.put(-6000, new Appledrlevel(Identifier.of(AppleDrMod.MOD_ID, "antiappledr")));
+        LEVELS.put(-1000, new Appledrlevel(Identifier.of(AppleDrMod.MOD_ID, "antiappledrmaster")));
         LEVELS.put(-600, new Appledrlevel(Identifier.of(AppleDrMod.MOD_ID, "appledrenemy")));
         LEVELS.put(-300, new Appledrlevel(Identifier.of(AppleDrMod.MOD_ID, "appledrhater")));
         LEVELS.put(-100, new Appledrlevel(Identifier.of(AppleDrMod.MOD_ID, "appledrdisliker")));
@@ -28,5 +30,17 @@ public class Appledrlevels {
             return DEFAULT_LEVEL;
         }
         return level.getValue();
+    }
+
+    /**
+     * Use {@link Appledrlevel#getLevel()} instead.
+     */
+    protected static OptionalInt getAppledrness(Appledrlevel appledrlevel) {
+        for (Map.Entry<Integer, Appledrlevel> entry : LEVELS.entrySet()) {
+            if (entry.getValue() == appledrlevel) {
+                return OptionalInt.of(entry.getKey());
+            }
+        }
+        return OptionalInt.empty();
     }
 }

@@ -8,14 +8,18 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.condition.EntityPropertiesLootCondition;
@@ -34,6 +38,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypeFilter;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.RaycastContext;
 import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.content.AppleDrItems;
@@ -43,6 +49,7 @@ import net.pedroricardo.loot.AppleDrLootConditions;
 import net.pedroricardo.loot.AppledrnessLootConditionType;
 import net.pedroricardo.mixin.EntityManagerAccessor;
 import net.pedroricardo.util.AppleDrTags;
+import net.pedroricardo.util.Appledrlevel;
 import net.pedroricardo.util.Appledrlevels;
 import net.pedroricardo.util.ResourcePackUtil;
 import org.slf4j.Logger;
@@ -110,7 +117,8 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 					.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("player", EntityArgumentType.player())
 							.executes(c -> {
 								ServerPlayerEntity player = EntityArgumentType.getPlayer(c, "player");
-								c.getSource().sendMessage(Text.translatable(Appledrlevels.getAppledrlevel(Appledrness.getAppledrness(player.getWorld(), player)).getAppledrnessTranslationKey(), Text.translatable("appledrmod.appledr_the_appledrful").formatted(Formatting.RED), Appledrness.getAppledrness(player.getWorld(), player)));
+								int appledrness = Appledrness.getAppledrness(player.getWorld(), player);
+								c.getSource().sendMessage(Text.translatable(Appledrlevels.getAppledrlevel(Appledrness.getAppledrness(player.getWorld(), player)).getAppledrnessTranslationKey(), Text.translatable("appledrmod.appledr_the_appledrful").formatted(Formatting.RED), appledrness, Text.translatable(Appledrlevels.getAppledrlevel(appledrness).getTranslationKey()).formatted(Formatting.GOLD)));
 								return Command.SINGLE_SUCCESS;
 							})));
 		});
@@ -151,5 +159,19 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 		ResourcePackUtil.bootstrap();
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
+
+		ServerTickEvents.START_SERVER_TICK.register(server -> {
+			server.getWorlds().forEach(world -> {
+				ServerPlayerEntity player = world.getRandomAlivePlayer();
+				if (player == null) {
+					return;
+				}
+				int appledrness = Appledrness.getAppledrness(world, player);
+				Appledrlevel appledrlevel = Appledrlevels.getAppledrlevel(appledrness);
+				if (appledrlevel != Appledrlevels.DEFAULT_LEVEL && world.getRandom().nextDouble() < (1.0/16384.0) * MathHelper.sqrt((MathHelper.abs(appledrlevel.getLevel())) / 2000.0f)) {
+					world.spawnEntity(new ItemEntity(world, player.getX(), Math.min(world.raycast(new RaycastContext(player.getPos(), player.getPos().add(0.0, 30.0, 0.0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, ShapeContext.absent())).getBlockPos().down().getY(), player.getY() + 30.0), player.getZ(), new ItemStack(appledrlevel.getLevel() < 0 ? AppleDrItems.ROTTEN_APPLE : Items.APPLE)));
+				}
+			});
+		});
 	}
 }
