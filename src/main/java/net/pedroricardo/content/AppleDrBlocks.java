@@ -8,12 +8,14 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.pedroricardo.AppleDrMod;
+import net.pedroricardo.content.block.AppleDrTexturedBlock;
 import net.pedroricardo.content.block.ApplePieBlock;
 import net.pedroricardo.content.block.AppledraltarBlock;
 
 public class AppleDrBlocks {
-    public static final Block APPLEDRALTAR = register("appledraltar", new AppledraltarBlock(AbstractBlock.Settings.create().mapColor(MapColor.RED).sounds(BlockSoundGroup.GLASS).nonOpaque().allowsSpawning(Blocks::never).solidBlock(Blocks::never).suffocates(Blocks::never).blockVision(Blocks::never).instrument(NoteBlockInstrument.BASEDRUM).strength(2.0f)));
-    public static final Block APPLE_PIE = register("apple_pie", new ApplePieBlock(AbstractBlock.Settings.create().mapColor(MapColor.RED).sounds(BlockSoundGroup.GLASS).nonOpaque().allowsSpawning(Blocks::never).solidBlock(Blocks::never).suffocates(Blocks::never).blockVision(Blocks::never).instrument(NoteBlockInstrument.BASEDRUM).strength(2.0f), Blocks.SNOW.getDefaultState().with(Properties.LAYERS, 2)));
+    public static final Block APPLEDRALTAR = register("appledraltar", new AppledraltarBlock(AbstractBlock.Settings.create().mapColor(MapColor.RED).sounds(BlockSoundGroup.GLASS).nonOpaque().allowsSpawning(Blocks::never).solidBlock(Blocks::never).suffocates(Blocks::never).blockVision(Blocks::never).instrument(NoteBlockInstrument.BASEDRUM).strength(2.0f).dropsNothing()));
+    public static final Block APPLE_PIE = register("apple_pie", new ApplePieBlock(AbstractBlock.Settings.create().mapColor(MapColor.YELLOW).sounds(BlockSoundGroup.GLASS).nonOpaque().allowsSpawning(Blocks::never).solidBlock(Blocks::never).suffocates(Blocks::never).blockVision(Blocks::never).strength(2.0f).dropsNothing(), Blocks.SNOW.getDefaultState().with(Properties.LAYERS, 2)));
+    public static final Block APPLE_BRICKS = register("apple_bricks", new AppleDrTexturedBlock(AbstractBlock.Settings.create().mapColor(MapColor.RED).sounds(BlockSoundGroup.GLASS).instrument(NoteBlockInstrument.XYLOPHONE).strength(-1.0f, 3600000.0f).dropsNothing()));
 
     public static Block register(String id, Block block) {
         return Registry.register(Registries.BLOCK, Identifier.of(AppleDrMod.MOD_ID, id), block);

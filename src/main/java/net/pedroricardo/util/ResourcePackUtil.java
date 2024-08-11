@@ -1,7 +1,12 @@
 package net.pedroricardo.util;
 
+import eu.pb4.polymer.blocks.api.BlockModelType;
+import eu.pb4.polymer.blocks.api.PolymerBlockModel;
+import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
@@ -13,6 +18,7 @@ import java.util.Map;
 
 public class ResourcePackUtil {
     public static final Map<ItemConvertible, PolymerModelData> MODELS = new HashMap<>();
+    public static final Map<Block, BlockState> BLOCK_MODELS = new HashMap<>();
 
     public static void bootstrap() {
         MODELS.clear();
@@ -20,5 +26,8 @@ public class ResourcePackUtil {
         MODELS.put(AppleDrItems.APPLE_PIE, PolymerResourcePackUtils.requestModel(Items.PUMPKIN_PIE, Registries.ITEM.getId(AppleDrItems.APPLE_PIE).withPrefixedPath("item/")));
         MODELS.put(AppleDrItems.APPLEDRALTAR, PolymerResourcePackUtils.requestModel(Items.ENCHANTING_TABLE, Registries.ITEM.getId(AppleDrItems.APPLEDRALTAR).withPrefixedPath("block/")));
         MODELS.put(AppleDrBlocks.APPLE_PIE, PolymerResourcePackUtils.requestModel(Items.CAKE, Registries.BLOCK.getId(AppleDrBlocks.APPLE_PIE).withPrefixedPath("block/")));
+
+        BLOCK_MODELS.put(AppleDrBlocks.APPLE_BRICKS, PolymerBlockResourceUtils.requestBlock(BlockModelType.FULL_BLOCK, PolymerBlockModel.of(Registries.BLOCK.getId(AppleDrBlocks.APPLE_BRICKS).withPrefixedPath("block/"))));
+        MODELS.put(AppleDrItems.APPLE_BRICKS, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.BLOCK.getId(AppleDrBlocks.APPLE_BRICKS).withPrefixedPath("block/")));
     }
 }
