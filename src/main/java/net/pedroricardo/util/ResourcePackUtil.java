@@ -16,6 +16,7 @@ public class ResourcePackUtil {
     public static void bootstrap() {
         MODELS.clear();
         MODELS.put(AppleDrItems.ROTTEN_APPLE, PolymerResourcePackUtils.requestModel(Items.ROTTEN_FLESH, Registries.ITEM.getId(AppleDrItems.ROTTEN_APPLE).withPrefixedPath("item/")));
+        MODELS.put(AppleDrItems.APPLE_PIE, PolymerResourcePackUtils.requestModel(Items.PUMPKIN_PIE, Registries.ITEM.getId(AppleDrItems.APPLE_PIE).withPrefixedPath("item/")));
         MODELS.put(AppleDrItems.APPLEDRALTAR, PolymerResourcePackUtils.requestModel(Items.ENCHANTING_TABLE, Registries.ITEM.getId(AppleDrItems.APPLEDRALTAR).withPrefixedPath("block/")));
     }
 }

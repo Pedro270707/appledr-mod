@@ -9,9 +9,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import net.pedroricardo.appledrness.Appledrness;
 
-public class RottenAppleItem extends AppleDrItem {
-    public RottenAppleItem(Settings settings, Item polymerItem) {
-        super(settings, polymerItem);
+public class ApplePieItem extends AppleDrItem {
+    public ApplePieItem(Settings settings, Item virtualItem) {
+        super(settings, virtualItem);
     }
 
     @Override
@@ -21,16 +21,16 @@ public class RottenAppleItem extends AppleDrItem {
         if (user instanceof ServerPlayerEntity player) {
             appledrness = Appledrness.getAppledrness(world, player);
         }
-        if (appledrness > -100) {
+        if (appledrness < 0) {
             user.addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 800));
-            if (appledrness >= 100) {
+            if (appledrness <= -100) {
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 800));
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 800));
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 800));
             }
         } else {
             user.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 800));
-            if (appledrness <= -2000) {
+            if (appledrness >= 2000) {
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 800, 1));
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 800));
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 800, 1));
