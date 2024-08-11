@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "appledrmod:big_apple",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 622227480,
+    "spacing": 24,
+    "separation": 10
+  }
+}
