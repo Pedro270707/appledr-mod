@@ -13,7 +13,7 @@ import net.pedroricardo.AppleDrMod;
 import net.pedroricardo.content.block.AppledraltarBlock;
 
 public class AppleDrBlocks {
-    public static final Block APPLEDRALTAR = register("appledraltar", new AppledraltarBlock(AbstractBlock.Settings.create().mapColor(MapColor.RED).sounds(BlockSoundGroup.GLASS).blockVision(Blocks::never).solidBlock(Blocks::always).instrument(NoteBlockInstrument.BASEDRUM).strength(2.0f)));
+    public static final Block APPLEDRALTAR = register("appledraltar", new AppledraltarBlock(AbstractBlock.Settings.create().mapColor(MapColor.RED).sounds(BlockSoundGroup.GLASS).nonOpaque().allowsSpawning(Blocks::never).solidBlock(Blocks::never).suffocates(Blocks::never).blockVision(Blocks::never).instrument(NoteBlockInstrument.BASEDRUM).strength(2.0f)));
 
     public static Block register(String id, Block block) {
         return Registry.register(Registries.BLOCK, Identifier.of(AppleDrMod.MOD_ID, id), block);
