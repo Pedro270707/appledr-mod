@@ -14,7 +14,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -24,7 +23,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldEvents;
 import net.minecraft.world.event.GameEvent;
 import net.pedroricardo.content.AppleDrStatistics;
 import org.jetbrains.annotations.Nullable;
@@ -43,20 +41,9 @@ public class AppledraltarBlock extends Block implements FactoryBlock {
         builder.add(HAS_APPLE);
     }
 
-    @Nullable
-    @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return super.getPlacementState(ctx);
-    }
-
     @Override
     public BlockState getPolymerBlockState(BlockState state) {
         return Blocks.BARRIER.getDefaultState();
-    }
-
-    @Override
-    public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, ServerPlayerEntity player) {
-        FactoryBlock.super.onPolymerBlockSend(blockState, pos, player);
     }
 
     @Override
@@ -64,7 +51,7 @@ public class AppledraltarBlock extends Block implements FactoryBlock {
         return new Model(initialBlockState);
     }
 
-    public ItemStack getModel(BlockState state) {
+    public ItemStack getModel() {
         return ItemDisplayElementUtil.getModel(this.asItem());
     }
 
@@ -97,7 +84,7 @@ public class AppledraltarBlock extends Block implements FactoryBlock {
         private final DroppedItemElement item;
 
         public Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(getModel(state));
+            this.main = ItemDisplayElementUtil.createSimple(AppledraltarBlock.this.getModel());
             this.main.setDisplaySize(1, 1);
             this.main.setScale(new Vector3f(2));
             this.addElement(this.main);
@@ -110,8 +97,8 @@ public class AppledraltarBlock extends Block implements FactoryBlock {
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockAwareAttachment.BLOCK_STATE_UPDATE) {
                 var state = this.blockState();
-                this.main.setItem(getModel(state));
-                this.item.setStack(this.blockState().get(HAS_APPLE) ? new ItemStack(Items.APPLE) : ItemStack.EMPTY);
+                this.main.setItem(AppledraltarBlock.this.getModel());
+                this.item.setStack(state.get(HAS_APPLE) ? new ItemStack(Items.APPLE) : ItemStack.EMPTY);
 
                 this.tick();
             }

@@ -1,5 +1,6 @@
 package net.pedroricardo.content.item;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -9,9 +10,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import net.pedroricardo.appledrness.Appledrness;
 
-public class ApplePieItem extends AppleDrItem {
-    public ApplePieItem(Settings settings, Item virtualItem) {
-        super(settings, virtualItem);
+public class ApplePieItem extends AppleDrBlockItem {
+    public ApplePieItem(Block block, Settings settings, Item virtualItem) {
+        super(block, settings, virtualItem);
     }
 
     @Override

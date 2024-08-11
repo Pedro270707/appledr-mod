@@ -20,7 +20,7 @@ public class AppleDrItems {
     public static final Item TECHNO_GREATHELM = register("techno_greathelm", new GreathelmItem(new Item.Settings().rarity(Rarity.EPIC), "e3RleHR1cmVzOntTS0lOOnt1cmw6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNhNTM4Zjc4NzA0OGRiYTI3ZGNkYmJjYjcyZDJmNTc4Zjg1NzczMTY4ZDcyNDY2MjY2ZTc1NWY0NzFjODkifX19"));
     public static final Item LEGACY_APPLE_GREATHELM = register("legacy_apple_greathelm", new GreathelmItem(new Item.Settings().rarity(Rarity.EPIC), "e3RleHR1cmVzOntTS0lOOnt1cmw6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTdjMWFlYzJhYTBkZTlhZGQ4NjM2MTM1NDRjZTYzNDBlYWQ2M2RkZmFiNGUzYmY0ZjEwYzgwMDZhY2Q2NzY3NSJ9fX0="));
     public static final Item APPLEDRALTAR = register("appledraltar", new AppleDrBlockItem(AppleDrBlocks.APPLEDRALTAR, new Item.Settings().rarity(Rarity.EPIC), Items.ENCHANTING_TABLE));
-    public static final Item APPLE_PIE = register("apple_pie", new ApplePieItem(new Item.Settings().food(FoodComponents.PUMPKIN_PIE), Items.PUMPKIN_PIE));
+    public static final Item APPLE_PIE = register("apple_pie", new ApplePieItem(AppleDrBlocks.APPLE_PIE, new Item.Settings().food(FoodComponents.PUMPKIN_PIE), Items.PUMPKIN_PIE));
 
     public static void registerItemGroup(String id, ItemGroup group) {
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(AppleDrMod.MOD_ID, id), group);
