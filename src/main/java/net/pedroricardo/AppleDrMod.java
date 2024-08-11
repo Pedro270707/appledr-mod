@@ -26,15 +26,18 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.predicate.NbtPredicate;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.predicate.entity.EntityPredicate;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.TypeFilter;
 import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.content.AppleDrItems;
+import net.pedroricardo.content.AppleDrStatistics;
 import net.pedroricardo.content.entity.AppleDrEntity;
 import net.pedroricardo.loot.AppleDrLootConditions;
 import net.pedroricardo.loot.AppledrnessLootConditionType;
@@ -60,6 +63,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 		AppleDrLootConditions.init();
 		AppleDrItems.init();
 		AppleDrEntityTypes.init();
+		AppleDrStatistics.init();
 
         LootTableEvents.MODIFY.register((key, builder, source) -> {
 			if (source.isBuiltin() && key == EntityType.PLAYER.getLootTableId()) {
@@ -95,6 +99,8 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 			return 0;
 		});
 		Appledrness.register("eating_apples", (world, player) -> player.getStatHandler().getStat(Stats.USED, Items.APPLE));
+		Appledrness.register("accepting_appledraltar_offers", (world, player) -> player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRALTAR_OFFERS_ACCEPTED)) * 10);
+		Appledrness.register("rejecting_appledraltar_offers", (world, player) -> -player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRALTAR_OFFERS_REJECTED)) * 10);
 		Appledrness.register("having_rotten_apples_in_inventory", (world, player) -> -player.getInventory().count(AppleDrItems.ROTTEN_APPLE) * 5);
 		Appledrness.register("eating_rotten_apples", (world, player) -> -player.getStatHandler().getStat(Stats.USED, AppleDrItems.ROTTEN_APPLE));
 
