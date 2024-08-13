@@ -92,8 +92,8 @@ public class AppleDrAI {
      * @return the response as a JSON object
      * @throws IOException if an I/O issue happens
      */
-    public static OpenAIResponse sendSingleMessage(String apiKey, Message context, @Nullable Message message) throws IOException {
-        return sendMessages(apiKey, message == null ? List.of(context) : List.of(context, message));
+    public static OpenAIResponse sendSingleMessage(String apiKey, @Nullable Message context, Message message) throws IOException {
+        return sendMessages(apiKey, context == null ? List.of(message) : List.of(context, message));
     }
 
     private static String getPayload(List<Message> messages) {
