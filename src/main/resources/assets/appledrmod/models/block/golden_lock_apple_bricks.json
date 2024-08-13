@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "appledrmod:block/golden_lock_apple_bricks"
+  }
+}

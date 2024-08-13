@@ -31,7 +31,15 @@
   "item.appledrmod.techno_greathelm.desc": "Technoblade never dies!",
   "item.appledrmod.legacy_apple_greathelm": "Legacy Apple Greathelm",
   "item.appledrmod.legacy_apple_greathelm.desc": "I miss the old Apple Doctor!",
+  "item.appledrmod.iron_key": "Iron Key",
+  "item.appledrmod.golden_key": "Golden Key",
+  "item.appledrmod.diamond_key": "Diamond Key",
+  "item.appledrmod.netherite_key": "Netherite Key",
   "block.appledrmod.appledraltar": "Appledraltar",
   "block.appledrmod.apple_pie": "Apple Pie",
-  "block.appledrmod.apple_bricks": "Apple Bricks"
+  "block.appledrmod.apple_bricks": "Apple Bricks",
+  "block.appledrmod.iron_lock_apple_bricks": "Iron Lock Apple Bricks",
+  "block.appledrmod.golden_lock_apple_bricks": "Golden Lock Apple Bricks",
+  "block.appledrmod.diamond_lock_apple_bricks": "Diamond Lock Apple Bricks",
+  "block.appledrmod.netherite_lock_apple_bricks": "Netherite Lock Apple Bricks"
 }

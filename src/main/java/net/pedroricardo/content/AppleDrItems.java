@@ -22,6 +22,14 @@ public class AppleDrItems {
     public static final Item APPLEDRALTAR = register("appledraltar", new AppleDrBlockItem(AppleDrBlocks.APPLEDRALTAR, new Item.Settings().rarity(Rarity.EPIC), Items.ENCHANTING_TABLE));
     public static final Item APPLE_PIE = register("apple_pie", new ApplePieItem(AppleDrBlocks.APPLE_PIE, new Item.Settings().food(FoodComponents.PUMPKIN_PIE), Items.PUMPKIN_PIE));
     public static final Item APPLE_BRICKS = register("apple_bricks", new AppleDrBlockItem(AppleDrBlocks.APPLE_BRICKS, new Item.Settings(), Items.PAPER));
+    public static final Item IRON_LOCK_APPLE_BRICKS = register("iron_lock_apple_bricks", new AppleDrBlockItem(AppleDrBlocks.IRON_LOCK_APPLE_BRICKS, new Item.Settings(), Items.PAPER));
+    public static final Item GOLDEN_LOCK_APPLE_BRICKS = register("golden_lock_apple_bricks", new AppleDrBlockItem(AppleDrBlocks.GOLDEN_LOCK_APPLE_BRICKS, new Item.Settings(), Items.PAPER));
+    public static final Item DIAMOND_LOCK_APPLE_BRICKS = register("diamond_lock_apple_bricks", new AppleDrBlockItem(AppleDrBlocks.DIAMOND_LOCK_APPLE_BRICKS, new Item.Settings(), Items.PAPER));
+    public static final Item NETHERITE_LOCK_APPLE_BRICKS = register("netherite_lock_apple_bricks", new AppleDrBlockItem(AppleDrBlocks.NETHERITE_LOCK_APPLE_BRICKS, new Item.Settings(), Items.PAPER));
+    public static final Item IRON_KEY = register("iron_key", new AppleDrItem(new Item.Settings(), Items.PAPER));
+    public static final Item GOLDEN_KEY = register("golden_key", new AppleDrItem(new Item.Settings(), Items.PAPER));
+    public static final Item DIAMOND_KEY = register("diamond_key", new AppleDrItem(new Item.Settings(), Items.PAPER));
+    public static final Item NETHERITE_KEY = register("netherite_key", new AppleDrItem(new Item.Settings(), Items.PAPER));
 
     public static void registerItemGroup(String id, ItemGroup group) {
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(AppleDrMod.MOD_ID, id), group);
@@ -38,6 +46,15 @@ public class AppleDrItems {
             entries.add(ROTTEN_APPLE);
             entries.add(APPLE_PIE);
             entries.add(APPLEDRALTAR);
+            entries.add(APPLE_BRICKS);
+            entries.add(IRON_LOCK_APPLE_BRICKS);
+            entries.add(GOLDEN_LOCK_APPLE_BRICKS);
+            entries.add(DIAMOND_LOCK_APPLE_BRICKS);
+            entries.add(NETHERITE_LOCK_APPLE_BRICKS);
+            entries.add(IRON_KEY);
+            entries.add(GOLDEN_KEY);
+            entries.add(DIAMOND_KEY);
+            entries.add(NETHERITE_KEY);
         }).build());
         registerItemGroup("appledrmod.operator", PolymerItemGroupUtils.builder().special().icon(() -> new ItemStack(APPLE_GREATHELM)).displayName(Text.translatable("itemGroup.appledrmod.operator")).entries((ctx, entries) -> {
             entries.add(APPLE_GREATHELM);
