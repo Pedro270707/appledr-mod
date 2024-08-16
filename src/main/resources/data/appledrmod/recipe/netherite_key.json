@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "appledr_key",
+  "key": {
+    "n": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "a": {
+      "item": "minecraft:ancient_debris"
+    }
+  },
+  "pattern": [
+    "nan",
+    " n ",
+    " nn"
+  ],
+  "result": {
+    "count": 1,
+    "id": "appledrmod:netherite_key"
+  }
+}

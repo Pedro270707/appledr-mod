@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "appledr_key",
+  "key": {
+    "g": {
+      "item": "minecraft:gold_ingot"
+    },
+    "b": {
+      "item": "minecraft:gold_block"
+    }
+  },
+  "pattern": [
+    "gbg",
+    " g ",
+    " gg"
+  ],
+  "result": {
+    "count": 1,
+    "id": "appledrmod:golden_key"
+  }
+}
