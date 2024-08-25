@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 13,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "appledrmod:apple_greathelm",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "appledrmod:netherite_key",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:diamond_block",
+          "weight": 20
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:netherite_block",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}
