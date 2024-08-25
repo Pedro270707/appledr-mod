@@ -1,17 +1,12 @@
 package net.pedroricardo.content.entity;
 
-import com.mojang.authlib.GameProfile;
-import net.fabricmc.fabric.api.entity.FakePlayer;
+import dev.langchain4j.data.message.UserMessage;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.util.AppleDrAI;
-import net.pedroricardo.util.AppleDrConfig;
-import net.pedroricardo.util.OpenAIResponse;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,8 +41,7 @@ public class SendAIChatMessageGoal extends Goal {
 
         this.answeredMessages.add(this.mob.messagesReceived.getLast());
 
-        String key = AppleDrConfig.getValue("openai_api_key", "");
-        if (key.isEmpty() || this.mob.getServer() == null) {
+        if (this.mob.getServer() == null) {
             this.messageBeingAnswered = null;
             return;
         }
@@ -62,14 +56,8 @@ public class SendAIChatMessageGoal extends Goal {
                 name = String.format("%s (%s Appledrness): ", player.getName().getString(), Appledrness.getAppledrness(this.mob.getWorld(), player));
             }
 
-            try {
-                OpenAIResponse response = AppleDrAI.sendStoredMessage(key, this.mob.getInitialMessageContext(), new AppleDrAI.Message(AppleDrAI.MessageRole.USER, name + this.messageBeingAnswered.getContent().getString()));
-                String message = response.choices().getFirst().message().content();
-                FakePlayer fakePlayer = FakePlayer.get(this.mob.getServer().getOverworld(), new GameProfile(this.mob.getGameProfile().getId(), this.mob.getGameProfile().getName()));
-                this.mob.getServer().getPlayerManager().broadcast(SignedMessage.ofUnsigned(message), fakePlayer, MessageType.params(MessageType.CHAT, fakePlayer));
-                this.messageBeingAnswered = null;
-            } catch (IOException ignored) {
-            }
+            AppleDrAI.respond(this.mob.getServer(), UserMessage.userMessage(name + this.messageBeingAnswered.getContent().getString()), this.mob);
+            this.messageBeingAnswered = null;
         }).start();
     }
 }

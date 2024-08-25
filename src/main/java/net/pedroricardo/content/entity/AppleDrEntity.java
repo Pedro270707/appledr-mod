@@ -39,7 +39,6 @@ import net.minecraft.world.World;
 import net.pedroricardo.AppleDrMod;
 import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.mixin.PlayerModelPartsAccessor;
-import net.pedroricardo.util.AppleDrAI;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -47,7 +46,7 @@ import java.util.function.Consumer;
 public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, InventoryOwner {
     protected static final TrackedData<Byte> PLAYER_MODEL_PARTS = DataTracker.registerData(AppleDrEntity.class, TrackedDataHandlerRegistry.BYTE);
     public final List<SignedMessage> messagesReceived = new ArrayList<>();
-    private AppleDrAI.Message initialMessageContext = new AppleDrAI.Message(AppleDrAI.MessageRole.SYSTEM, "You're Domenic Dvojmoc (aka AppleDr, your in-game name), a Slovenian player and Twitch streamer in a Minecraft server called AppleDr Server. The people in it do not speak Slovenian; they speak English, but if the message is in another language, you should respond in that language unless the player asks otherwise. You are in university at 20 years old learning computer science. Player messages will start with some information about the player, such as their name and their Appledrness, but do NOT include that in your response. If asked, you have the maximum Appledrness (2³¹ - 1). Your messages should contain at most 120 characters.");
+    private String initialMessageContext = "You're Domenic Dvojmoc (aka AppleDr, your in-game name), a Slovenian player and Twitch streamer in a Minecraft server called AppleDr Server. The people in it do not speak Slovenian; they speak English, but if the message is in another language, you should respond in that language unless the player asks otherwise. You are in university at 20 years old learning computer science. Player messages will start with some information about the player, such as their name and their Appledrness, but do NOT include that in your response. If asked, you have the maximum Appledrness (2³¹ - 1). Your messages should contain at most 120 characters.";
     private final GameProfile profile;
 
     private final SimpleInventory inventory = new SimpleInventory(36);
@@ -126,12 +125,12 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
         );
     }
 
-    public AppleDrAI.Message getInitialMessageContext() {
+    public String getInitialMessageContext() {
         return this.initialMessageContext;
     }
 
     public void setInitialMessageContext(String value) {
-        this.initialMessageContext = new AppleDrAI.Message(AppleDrAI.MessageRole.SYSTEM, value);
+        this.initialMessageContext = value;
     }
 
     public GameProfile getGameProfile() {
@@ -186,7 +185,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putString("initial_message_context", this.getInitialMessageContext().content());
+        nbt.putString("initial_message_context", this.getInitialMessageContext());
         this.writeInventory(nbt, this.getRegistryManager());
     }
 

@@ -1,9 +1,11 @@
 package net.pedroricardo;
 
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import dev.langchain4j.model.openai.OpenAiChatModel;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -14,6 +16,7 @@ import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -33,6 +36,8 @@ import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.stat.Stat;
+import net.minecraft.stat.StatFormatter;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -64,6 +69,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 	public static final String MOD_ID = "appledrmod";
 	public static final UUID APPLEDR_UUID = UUID.fromString("3bd4c790-aea5-47da-8963-7f907539889c");
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	public static final String OPENAI_API_KEY = System.getenv("OPENAI_API_KEY");
 
 	@Override
 	public void onInitializeServer() {
@@ -106,6 +112,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 			return 0;
 		});
 		Appledrness.register("eating_apples", (world, player) -> player.getStatHandler().getStat(Stats.USED, Items.APPLE));
+		Appledrness.register("having_appledrs_grace", (world, player) -> player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRS_GRACE)) * 50);
 		Appledrness.register("accepting_appledraltar_offers", (world, player) -> player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRALTAR_OFFERS_ACCEPTED)) * 10);
 		Appledrness.register("rejecting_appledraltar_offers", (world, player) -> -player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRALTAR_OFFERS_REJECTED)) * 10);
 		Appledrness.register("having_rotten_apples_in_inventory", (world, player) -> -player.getInventory().count(AppleDrItems.ROTTEN_APPLE) * 5);
@@ -154,6 +161,28 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 								c.getSource().getWorld().spawnEntity(appleDr);
 								return Command.SINGLE_SUCCESS;
 							})));
+		});
+
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("stat")
+					.requires(source -> source.isExecutedByPlayer() && source.hasPermissionLevel(2))
+					.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("player", EntityArgumentType.player())
+							.then(RequiredArgumentBuilder.<ServerCommandSource, Identifier>argument("stat", IdentifierArgumentType.identifier())
+									.then(LiteralArgumentBuilder.<ServerCommandSource>literal("set")
+											.then(RequiredArgumentBuilder.<ServerCommandSource, Integer>argument("value", IntegerArgumentType.integer())
+													.executes(c -> {
+														ServerPlayerEntity player = EntityArgumentType.getPlayer(c, "player");
+														Identifier id = IdentifierArgumentType.getIdentifier(c, "stat");
+														int value = IntegerArgumentType.getInteger(c, "value");
+														try {
+															System.out.println(AppleDrStatistics.APPLEDRS_GRACE);
+															player.getStatHandler().setStat(player, Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRS_GRACE), value);
+														} catch (Exception e) {
+															e.printStackTrace();
+														}
+														c.getSource().sendMessage(Text.translatable("commands.stat.set", id.toString(), value));
+														return Command.SINGLE_SUCCESS;
+													}))))));
 		});
 
 		ResourcePackUtil.bootstrap();

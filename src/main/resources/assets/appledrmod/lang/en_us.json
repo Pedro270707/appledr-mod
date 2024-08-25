@@ -1,4 +1,6 @@
 {
+  "commands.stat.set": "Set stat %s to %s",
+  "commands.stat.error": "Could not set stat",
   "appledrmod.appledr_the_appledrful": "AppleDr, the Appledrful",
   "level.appledrmod.antiappledr": "AntiappleDr",
   "level.appledrmod.antiappledrmaster": "Antiappledrmaster",
