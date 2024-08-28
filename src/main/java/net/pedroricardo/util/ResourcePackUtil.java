@@ -36,10 +36,12 @@ public class ResourcePackUtil {
         BLOCK_MODELS.put(AppleDrBlocks.GOLDEN_LOCK_APPLE_BRICKS, PolymerBlockResourceUtils.requestBlock(BlockModelType.FULL_BLOCK, PolymerBlockModel.of(Registries.BLOCK.getId(AppleDrBlocks.GOLDEN_LOCK_APPLE_BRICKS).withPrefixedPath("block/"))));
         BLOCK_MODELS.put(AppleDrBlocks.DIAMOND_LOCK_APPLE_BRICKS, PolymerBlockResourceUtils.requestBlock(BlockModelType.FULL_BLOCK, PolymerBlockModel.of(Registries.BLOCK.getId(AppleDrBlocks.DIAMOND_LOCK_APPLE_BRICKS).withPrefixedPath("block/"))));
         BLOCK_MODELS.put(AppleDrBlocks.NETHERITE_LOCK_APPLE_BRICKS, PolymerBlockResourceUtils.requestBlock(BlockModelType.FULL_BLOCK, PolymerBlockModel.of(Registries.BLOCK.getId(AppleDrBlocks.NETHERITE_LOCK_APPLE_BRICKS).withPrefixedPath("block/"))));
+        BLOCK_MODELS.put(AppleDrBlocks.APPLE_STONE, PolymerBlockResourceUtils.requestBlock(BlockModelType.FULL_BLOCK, PolymerBlockModel.of(Registries.BLOCK.getId(AppleDrBlocks.APPLE_STONE).withPrefixedPath("block/"))));
         MODELS.put(AppleDrItems.APPLE_BRICKS, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.BLOCK.getId(AppleDrBlocks.APPLE_BRICKS).withPrefixedPath("block/")));
         MODELS.put(AppleDrItems.IRON_LOCK_APPLE_BRICKS, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.BLOCK.getId(AppleDrBlocks.IRON_LOCK_APPLE_BRICKS).withPrefixedPath("block/")));
         MODELS.put(AppleDrItems.GOLDEN_LOCK_APPLE_BRICKS, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.BLOCK.getId(AppleDrBlocks.GOLDEN_LOCK_APPLE_BRICKS).withPrefixedPath("block/")));
         MODELS.put(AppleDrItems.DIAMOND_LOCK_APPLE_BRICKS, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.BLOCK.getId(AppleDrBlocks.DIAMOND_LOCK_APPLE_BRICKS).withPrefixedPath("block/")));
         MODELS.put(AppleDrItems.NETHERITE_LOCK_APPLE_BRICKS, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.BLOCK.getId(AppleDrBlocks.NETHERITE_LOCK_APPLE_BRICKS).withPrefixedPath("block/")));
+        MODELS.put(AppleDrItems.APPLE_STONE, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.BLOCK.getId(AppleDrBlocks.APPLE_STONE).withPrefixedPath("block/")));
     }
 }

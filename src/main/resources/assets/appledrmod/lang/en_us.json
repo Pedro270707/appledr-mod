@@ -45,5 +45,6 @@
   "block.appledrmod.iron_lock_apple_bricks": "Iron Lock Apple Bricks",
   "block.appledrmod.golden_lock_apple_bricks": "Golden Lock Apple Bricks",
   "block.appledrmod.diamond_lock_apple_bricks": "Diamond Lock Apple Bricks",
-  "block.appledrmod.netherite_lock_apple_bricks": "Netherite Lock Apple Bricks"
+  "block.appledrmod.netherite_lock_apple_bricks": "Netherite Lock Apple Bricks",
+  "block.appledrmod.apple_stone": "Apple Stone"
 }

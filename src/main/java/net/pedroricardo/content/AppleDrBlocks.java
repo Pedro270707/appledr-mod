@@ -21,6 +21,7 @@ public class AppleDrBlocks {
     public static final Block GOLDEN_LOCK_APPLE_BRICKS = register("golden_lock_apple_bricks", new LockedBrickBlock(AbstractBlock.Settings.create().mapColor(MapColor.RED).sounds(BlockSoundGroup.STONE).instrument(NoteBlockInstrument.XYLOPHONE).strength(-1.0f, 3600000.0f).dropsNothing(), () -> AppleDrItems.GOLDEN_KEY));
     public static final Block DIAMOND_LOCK_APPLE_BRICKS = register("diamond_lock_apple_bricks", new LockedBrickBlock(AbstractBlock.Settings.create().mapColor(MapColor.RED).sounds(BlockSoundGroup.STONE).instrument(NoteBlockInstrument.XYLOPHONE).strength(-1.0f, 3600000.0f).dropsNothing(), () -> AppleDrItems.DIAMOND_KEY));
     public static final Block NETHERITE_LOCK_APPLE_BRICKS = register("netherite_lock_apple_bricks", new LockedBrickBlock(AbstractBlock.Settings.create().mapColor(MapColor.RED).sounds(BlockSoundGroup.STONE).instrument(NoteBlockInstrument.XYLOPHONE).strength(-1.0f, 3600000.0f).dropsNothing(), () -> AppleDrItems.NETHERITE_KEY));
+    public static final Block APPLE_STONE = register("apple_stone", new AppleDrTexturedBlock(AbstractBlock.Settings.copy(Blocks.END_STONE).mapColor(MapColor.RED)));
 
     public static Block register(String id, Block block) {
         return Registry.register(Registries.BLOCK, Identifier.of(AppleDrMod.MOD_ID, id), block);

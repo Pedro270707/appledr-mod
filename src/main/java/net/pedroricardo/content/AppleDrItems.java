@@ -30,6 +30,7 @@ public class AppleDrItems {
     public static final Item GOLDEN_KEY = register("golden_key", new AppleDrItem(new Item.Settings(), Items.PAPER));
     public static final Item DIAMOND_KEY = register("diamond_key", new AppleDrItem(new Item.Settings(), Items.PAPER));
     public static final Item NETHERITE_KEY = register("netherite_key", new AppleDrItem(new Item.Settings(), Items.PAPER));
+    public static final Item APPLE_STONE = register("apple_stone", new AppleDrBlockItem(AppleDrBlocks.APPLE_STONE, new Item.Settings(), Items.PAPER));
 
     public static void registerItemGroup(String id, ItemGroup group) {
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(AppleDrMod.MOD_ID, id), group);
