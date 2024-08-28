@@ -26,6 +26,7 @@ import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
 import net.pedroricardo.AppleDrMod;
@@ -68,6 +69,16 @@ public class AppleDrAI {
     }
 
     static class Tools {
+        private static final String[] catchphrases = new String[] {
+                "An apple a day keeps the doctor away! But you're an Apple Doctor!",
+                "I'm an embarrassment to society and societal norms!",
+                "Feeling good. I am feeling good.",
+                "I'm gonna do the iconic AppleDr dance that I learned in Bavaria!",
+                "Don't say book in Slovenian!",
+                "Java is pronounced \"Yava!\"",
+                "If you haven't played Pogostuck yet, you should play it!"
+        };
+
         private final MinecraftServer server;
         private final AppleDrEntity appleDr;
 
@@ -124,6 +135,11 @@ public class AppleDrAI {
         @Tool("Gets every item in your inventory.")
         String getInventoryItems() {
             return this.appleDr.getInventory().toString();
+        }
+
+        @Tool("Gets one of your iconic catchphrases")
+        String getCatchphrase() {
+            return Util.getRandom(catchphrases, this.appleDr.getRandom());
         }
     }
 }

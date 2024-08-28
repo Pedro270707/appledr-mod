@@ -175,14 +175,30 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 														Identifier id = IdentifierArgumentType.getIdentifier(c, "stat");
 														int value = IntegerArgumentType.getInteger(c, "value");
 														try {
-															System.out.println(AppleDrStatistics.APPLEDRS_GRACE);
-															player.getStatHandler().setStat(player, Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRS_GRACE), value);
+															player.getStatHandler().setStat(player, Stats.CUSTOM.getOrCreateStat(id), value);
 														} catch (Exception e) {
 															e.printStackTrace();
 														}
 														c.getSource().sendMessage(Text.translatable("commands.stat.set", id.toString(), value));
 														return Command.SINGLE_SUCCESS;
 													}))))));
+		});
+
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("grace")
+					.requires(source -> source.hasPermissionLevel(2))
+					.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("player", EntityArgumentType.player())
+							.executes(c -> {
+								ServerPlayerEntity player = EntityArgumentType.getPlayer(c, "player");
+								if (player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRS_GRACE)) > 0) {
+									c.getSource().sendError(Text.translatable("commands.grace.error"));
+									return 0;
+								} else {
+									player.incrementStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRS_GRACE));
+									c.getSource().sendMessage(Text.translatable("commands.grace.success"));
+									return Command.SINGLE_SUCCESS;
+								}
+							})));
 		});
 
 		ResourcePackUtil.bootstrap();
