@@ -5,7 +5,6 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import dev.langchain4j.model.openai.OpenAiChatModel;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -33,11 +32,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.predicate.NbtPredicate;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.predicate.entity.EntityPredicate;
-import net.minecraft.registry.Registries;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.stat.Stat;
-import net.minecraft.stat.StatFormatter;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -135,14 +131,16 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 			Pattern pattern = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
 			Matcher matcher = pattern.matcher(message.getContent().getString());
 			if (matcher.find()) {
-				for (Entity entity : ((EntityManagerAccessor) sender.getServerWorld()).entityManager().getLookup().iterate()) {
-					if (entity instanceof AppleDrEntity appleDr) {
-						appleDr.messagesReceived.add(message);
+				sender.getServer().getWorlds().forEach(world -> {
+					for (Entity entity : ((EntityManagerAccessor) world).entityManager().getLookup().iterate()) {
+						if (entity instanceof AppleDrEntity appleDr) {
+							appleDr.replyTo(message);
+						}
 					}
-				}
+				});
 			} else {
-				for (AppleDrEntity entity : sender.getWorld().getEntitiesByType(TypeFilter.equals(AppleDrEntity.class), sender.getBoundingBox().expand(32.0f), (appleDr) -> true)) {
-					entity.messagesReceived.add(message);
+				for (AppleDrEntity appleDr : sender.getWorld().getEntitiesByType(TypeFilter.equals(AppleDrEntity.class), sender.getBoundingBox().expand(32.0f), (appleDr) -> true)) {
+					appleDr.replyTo(message);
 				}
 			}
 		});

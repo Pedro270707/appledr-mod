@@ -3,6 +3,7 @@ package net.pedroricardo.content.entity;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
+import dev.langchain4j.data.message.UserMessage;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import net.minecraft.entity.EntityType;
@@ -37,8 +38,10 @@ import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import net.pedroricardo.AppleDrMod;
+import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.mixin.PlayerModelPartsAccessor;
+import net.pedroricardo.util.AppleDrAI;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -93,11 +96,10 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
 
     @Override
     protected void initGoals() {
-        this.goalSelector.add(1, new SendAIChatMessageGoal(this));
-        this.goalSelector.add(2, new SwimGoal(this));
-        this.goalSelector.add(3, new WanderAroundFarGoal(this, 2.8));
-        this.goalSelector.add(4, new LookAtEntityGoal(this, PlayerEntity.class, 8.0f));
-        this.goalSelector.add(5, new LookAroundGoal(this));
+        this.goalSelector.add(1, new SwimGoal(this));
+        this.goalSelector.add(2, new WanderAroundFarGoal(this, 2.8));
+        this.goalSelector.add(3, new LookAtEntityGoal(this, PlayerEntity.class, 8.0f));
+        this.goalSelector.add(4, new LookAroundGoal(this));
     }
 
     public static DefaultAttributeContainer.Builder createAppleDrAttributes() {
@@ -123,6 +125,20 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
                 Pair.of(EquipmentSlot.OFFHAND, this.getOffHandStack()),
                 Pair.of(EquipmentSlot.MAINHAND, this.getMainHandStack())
         );
+    }
+
+    public void replyTo(SignedMessage message) {
+        new Thread(() -> {
+            ServerPlayerEntity player = this.getServer().getPlayerManager().getPlayer(message.getSender());
+            String name;
+            if (player == null) {
+                name = "Unknown player: ";
+            } else {
+                name = String.format("%s: ", player.getName().getString());
+            }
+
+            AppleDrAI.respond(this.getServer(), UserMessage.userMessage(name + message.getContent().getString()), this);
+        }).start();
     }
 
     public String getInitialMessageContext() {

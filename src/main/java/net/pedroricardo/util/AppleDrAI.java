@@ -2,10 +2,7 @@ package net.pedroricardo.util;
 
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
-import dev.langchain4j.agent.tool.Tool;
-import dev.langchain4j.agent.tool.ToolExecutionRequest;
-import dev.langchain4j.agent.tool.ToolSpecification;
-import dev.langchain4j.agent.tool.ToolSpecifications;
+import dev.langchain4j.agent.tool.*;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -14,6 +11,7 @@ import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.memory.chat.TokenWindowChatMemory;
 import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.model.openai.OpenAiChatModelName;
 import dev.langchain4j.model.openai.OpenAiTokenizer;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.tool.DefaultToolExecutor;
@@ -27,9 +25,14 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.EndPlatformFeature;
 import net.pedroricardo.AppleDrMod;
+import net.pedroricardo.appledrness.Appledrness;
+import net.pedroricardo.content.AppleDrDimension;
 import net.pedroricardo.content.AppleDrStatistics;
 import net.pedroricardo.content.entity.AppleDrEntity;
 
@@ -38,7 +41,7 @@ import java.util.UUID;
 
 public class AppleDrAI {
     public static final ChatMemory MEMORY = new TokenWindowChatMemory.Builder().maxTokens(10000, new OpenAiTokenizer()).build();
-    public static final OpenAiChatModel MODEL = OpenAiChatModel.withApiKey(AppleDrMod.OPENAI_API_KEY);
+    public static final OpenAiChatModel MODEL = OpenAiChatModel.builder().apiKey(AppleDrMod.OPENAI_API_KEY).modelName(OpenAiChatModelName.GPT_4_O_MINI).build();
 
     public static AiMessage respond(MinecraftServer server, ChatMessage message, AppleDrEntity appleDr) {
         MEMORY.add(message);
@@ -88,7 +91,7 @@ public class AppleDrAI {
         }
 
         @Tool("Gives the player 50 Appledrness if they haven't received it yet. Respond according to the received Appledrness.")
-        String giveAppledrness(String playerName) {
+        String giveAppledrnessTo(String playerName) {
             ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(playerName);
             if (player == null) {
                 return playerName + " is not online";
@@ -114,13 +117,8 @@ public class AppleDrAI {
         }
 
         @Tool("Gets the item in your hand.")
-        String getMainHandStack() {
-            return this.appleDr.getMainHandStack().toString();
-        }
-
-        @Tool("Gets the item in your offhand.")
-        String getOffHandStack() {
-            return this.appleDr.getOffHandStack().toString();
+        String getHandStacks() {
+            return "Main: " + this.appleDr.getMainHandStack().toString() + "; Off: " + this.appleDr.getOffHandStack().toString();
         }
 
         @Tool("Gets your equipped items.")
@@ -140,6 +138,30 @@ public class AppleDrAI {
         @Tool("Gets one of your iconic catchphrases")
         String getCatchphrase() {
             return Util.getRandom(catchphrases, this.appleDr.getRandom());
+        }
+
+        @Tool("Takes the player to the Apple End or out of it. The Apple End is a new apple dimension. Only execute if the player themselves ask for it, not another player. You can use this multiple times on a single player.")
+        String sendOrRemoveFromAppleEnd(@P(value = "The name of the player who asked to be teleported") String playerName) {
+            ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(playerName);
+            if (player == null) {
+                return playerName + " is not online";
+            } else if (player.getWorld().getRegistryKey() == AppleDrDimension.WORLD) {
+                player.teleportTo(new TeleportTarget(this.server.getWorld(World.OVERWORLD), player, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
+                return "Teleported " + playerName + " back to the Overworld";
+            } else {
+                EndPlatformFeature.generate(this.server.getWorld(AppleDrDimension.WORLD), BlockPos.ORIGIN.add(0, 60, 0).down(), true);
+                player.teleportTo(new TeleportTarget(this.server.getWorld(AppleDrDimension.WORLD), BlockPos.ORIGIN.add(0, 60, 0).toCenterPos(), Vec3d.ZERO, 0.0f, 0.0f, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
+                return "Teleported " + playerName + " to the Apple End";
+            }
+        }
+
+        @Tool("Gets the Appledrness of a player.")
+        String getAppledrness(String playerName) {
+            ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(playerName);
+            if (player == null) {
+                return playerName + " is not online";
+            }
+            return playerName + "'s Appledrness is " + Appledrness.getAppledrness(player.getWorld(), player);
         }
     }
 }
