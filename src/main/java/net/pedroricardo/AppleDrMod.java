@@ -130,21 +130,13 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 
 		ServerMessageEvents.CHAT_MESSAGE.register((message, sender, params) -> {
 			if (message.getSender().equals(APPLEDR_UUID) || message.isSenderMissing() || sender instanceof FakePlayer) return;
-			Pattern pattern = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
-			Matcher matcher = pattern.matcher(message.getContent().getString());
-			if (matcher.find()) {
-				sender.getServer().getWorlds().forEach(world -> {
-					for (Entity entity : ((EntityManagerAccessor) world).entityManager().getLookup().iterate()) {
-						if (entity instanceof AppleDrEntity appleDr) {
-							appleDr.replyTo(message);
-						}
+			sender.getServer().getWorlds().forEach(world -> {
+				for (Entity entity : ((EntityManagerAccessor) world).entityManager().getLookup().iterate()) {
+					if (entity instanceof AppleDrEntity appleDr && (appleDr.getPattern().matcher(message.getContent().getString()).find() || (world == sender.getServerWorld() && sender.distanceTo(appleDr) <= 32.0f))) {
+						appleDr.replyTo(message);
 					}
-				});
-			} else {
-				for (AppleDrEntity appleDr : sender.getWorld().getEntitiesByType(TypeFilter.equals(AppleDrEntity.class), sender.getBoundingBox().expand(32.0f), (appleDr) -> true)) {
-					appleDr.replyTo(message);
 				}
-			}
+			});
 		});
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -154,13 +146,15 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 						c.getSource().getWorld().spawnEntity(new AppleDrEntity(c.getSource().getPlayer().getServerWorld(), c.getSource().getPlayer()));
 						return Command.SINGLE_SUCCESS;
 					})
-					.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("context", StringArgumentType.greedyString())
-							.executes(c -> {
-								AppleDrEntity appleDr = new AppleDrEntity(c.getSource().getPlayer().getServerWorld(), c.getSource().getPlayer());
-								appleDr.setInitialMessageContext(StringArgumentType.getString(c, "context"));
-								c.getSource().getWorld().spawnEntity(appleDr);
-								return Command.SINGLE_SUCCESS;
-							})));
+					.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("pattern", StringArgumentType.string())
+							.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("context", StringArgumentType.greedyString())
+									.executes(c -> {
+										AppleDrEntity appleDr = new AppleDrEntity(c.getSource().getPlayer().getServerWorld(), c.getSource().getPlayer());
+										appleDr.setPattern(StringArgumentType.getString(c, "pattern"));
+										appleDr.setInitialMessageContext(StringArgumentType.getString(c, "context"));
+										c.getSource().getWorld().spawnEntity(appleDr);
+										return Command.SINGLE_SUCCESS;
+									}))));
 		});
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

@@ -38,18 +38,19 @@ import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import net.pedroricardo.AppleDrMod;
-import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.mixin.PlayerModelPartsAccessor;
 import net.pedroricardo.util.AppleDrAI;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, InventoryOwner {
     protected static final TrackedData<Byte> PLAYER_MODEL_PARTS = DataTracker.registerData(AppleDrEntity.class, TrackedDataHandlerRegistry.BYTE);
-    public final List<SignedMessage> messagesReceived = new ArrayList<>();
     private String initialMessageContext = "You're Domenic Dvojmoc (aka AppleDr, your in-game name), a Slovenian player and Twitch streamer in a Minecraft server called AppleDr Server. The people in it do not speak Slovenian; they speak English, but if the message is in another language, you should respond in that language unless the player asks otherwise. You are in university at 20 years old learning computer science. Player messages will start with some information about the player, such as their name and their Appledrness, but do NOT include that in your response. If asked, you have the maximum Appledrness (2³¹ - 1). Your messages should contain at most 120 characters.";
+    private Pattern pattern = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
     private final GameProfile profile;
 
     private final SimpleInventory inventory = new SimpleInventory(36);
@@ -149,6 +150,18 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
         this.initialMessageContext = value;
     }
 
+    public Pattern getPattern() {
+        return this.pattern;
+    }
+
+    public void setPattern(String string) {
+        try {
+            this.pattern = Pattern.compile(string, Pattern.CASE_INSENSITIVE);
+        } catch (PatternSyntaxException e) {
+            this.pattern = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
+        }
+    }
+
     public GameProfile getGameProfile() {
         return this.profile;
     }
@@ -202,6 +215,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putString("initial_message_context", this.getInitialMessageContext());
+        nbt.putString("message_pattern", this.getPattern().pattern());
         this.writeInventory(nbt, this.getRegistryManager());
     }
 
@@ -209,6 +223,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.setInitialMessageContext(nbt.getString("initial_message_context"));
+        this.setPattern(nbt.getString("message_pattern"));
         this.readInventory(nbt, this.getRegistryManager());
     }
 
