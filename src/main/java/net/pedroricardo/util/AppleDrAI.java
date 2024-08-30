@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class AppleDrAI {
-    public static final ChatMemory MEMORY = new TokenWindowChatMemory.Builder().maxTokens(10000, new OpenAiTokenizer()).build();
+    public static final ChatMemory MEMORY = new TokenWindowChatMemory.Builder().maxTokens(1000000, new OpenAiTokenizer()).build();
     public static final OpenAiChatModel MODEL = OpenAiChatModel.builder().apiKey(AppleDrMod.OPENAI_API_KEY).modelName(OpenAiChatModelName.GPT_4_O_MINI).build();
 
     public static AiMessage respond(MinecraftServer server, ChatMessage message, AppleDrEntity appleDr) {
