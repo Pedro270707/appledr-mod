@@ -11,6 +11,7 @@
     "EntityManagerAccessor",
     "GetAppleDrMixin",
     "ItemStackTrackerAccessor",
+    "MessageCommandMixin",
     "PlayerModelPartsAccessor"
   ],
   "injectors": {

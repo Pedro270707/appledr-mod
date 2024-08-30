@@ -40,7 +40,7 @@ public class AppleDrAI {
     public static final ChatMemory MEMORY = new TokenWindowChatMemory.Builder().maxTokens(1000000, new OpenAiTokenizer()).build();
     public static final OpenAiChatModel MODEL = OpenAiChatModel.builder().apiKey(AppleDrMod.OPENAI_API_KEY).modelName(OpenAiChatModelName.GPT_4_O_MINI).build();
 
-    public static AiMessage respond(MinecraftServer server, ChatMessage message, AppleDrEntity appleDr) {
+    public static AiMessage respondSilently(MinecraftServer server, ChatMessage message, AppleDrEntity appleDr) {
         MEMORY.add(message);
         List<ChatMessage> list = Lists.newArrayList(SystemMessage.systemMessage(appleDr.getInitialMessageContext()));
         list.addAll(MEMORY.messages());
@@ -62,10 +62,15 @@ public class AppleDrAI {
         }
         AiMessage finalResponse = MODEL.generate(list).content();
         MEMORY.add(finalResponse);
-        String str = finalResponse.text();
+        return finalResponse;
+    }
+
+    public static AiMessage respond(MinecraftServer server, ChatMessage message, AppleDrEntity appleDr) {
+        AiMessage response = respondSilently(server, message, appleDr);
+        String str = response.text();
         FakePlayer player = appleDr.getAsPlayer();
         server.getPlayerManager().broadcast(SignedMessage.ofUnsigned(str), player, MessageType.params(MessageType.CHAT, player));
-        return finalResponse;
+        return response;
     }
 
     static class Tools {
