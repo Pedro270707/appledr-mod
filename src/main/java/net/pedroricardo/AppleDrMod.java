@@ -38,7 +38,6 @@ import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.RaycastContext;
 import net.pedroricardo.appledrness.Appledrness;
@@ -49,7 +48,6 @@ import net.pedroricardo.content.AppleDrStatistics;
 import net.pedroricardo.content.entity.AppleDrEntity;
 import net.pedroricardo.loot.AppleDrLootConditions;
 import net.pedroricardo.loot.AppledrnessLootConditionType;
-import net.pedroricardo.mixin.EntityManagerAccessor;
 import net.pedroricardo.util.AppleDrTags;
 import net.pedroricardo.util.Appledrlevel;
 import net.pedroricardo.util.Appledrlevels;
@@ -59,8 +57,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class AppleDrMod implements DedicatedServerModInitializer {
 	public static final String MOD_ID = "appledrmod";
@@ -119,6 +115,12 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 		// Lambda of CommandRegistrationCallback: void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment).
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appledrness")
+					.executes(c -> {
+						ServerPlayerEntity player = c.getSource().getPlayerOrThrow();
+						int appledrness = Appledrness.getAppledrness(player.getWorld(), player);
+						c.getSource().sendMessage(Text.translatable(Appledrlevels.getAppledrlevel(Appledrness.getAppledrness(player.getWorld(), player)).getAppledrnessTranslationKey(), Text.translatable("appledrmod.appledr_the_appledrful").formatted(Formatting.RED), appledrness, Text.translatable(Appledrlevels.getAppledrlevel(appledrness).getTranslationKey()).formatted(Formatting.GOLD)));
+						return Command.SINGLE_SUCCESS;
+					})
 					.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("player", EntityArgumentType.player())
 							.executes(c -> {
 								ServerPlayerEntity player = EntityArgumentType.getPlayer(c, "player");
@@ -130,26 +132,23 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 
 		ServerMessageEvents.CHAT_MESSAGE.register((message, sender, params) -> {
 			if (message.getSender().equals(APPLEDR_UUID) || message.isSenderMissing() || sender instanceof FakePlayer) return;
-			sender.getServer().getWorlds().forEach(world -> {
-				for (Entity entity : ((EntityManagerAccessor) world).entityManager().getLookup().iterate()) {
-					if (entity instanceof AppleDrEntity appleDr && (appleDr.getPattern().matcher(message.getContent().getString()).find() || (world == sender.getServerWorld() && sender.distanceTo(appleDr) <= 32.0f))) {
-						appleDr.replyTo(message);
-					}
-				}
-			});
+			AppleDrEntity.find(sender.getServer(), appleDr -> appleDr.getPattern().matcher(message.getContent().getString()).find() || (appleDr.getWorld() == sender.getServerWorld() && sender.distanceTo(appleDr) <= 32.0f))
+					.forEach(appleDr -> appleDr.replyTo(message));
 		});
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appledr")
-					.requires(source -> source.isExecutedByPlayer() && source.hasPermissionLevel(2))
+					.requires(source -> source.hasPermissionLevel(2))
 					.executes(c -> {
-						c.getSource().getWorld().spawnEntity(new AppleDrEntity(c.getSource().getPlayer().getServerWorld(), c.getSource().getPlayer()));
+						ServerPlayerEntity player = c.getSource().getPlayerOrThrow();
+						c.getSource().getWorld().spawnEntity(new AppleDrEntity(player.getServerWorld(), player));
 						return Command.SINGLE_SUCCESS;
 					})
 					.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("pattern", StringArgumentType.string())
 							.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("context", StringArgumentType.greedyString())
 									.executes(c -> {
-										AppleDrEntity appleDr = new AppleDrEntity(c.getSource().getPlayer().getServerWorld(), c.getSource().getPlayer());
+										ServerPlayerEntity player = c.getSource().getPlayerOrThrow();
+										AppleDrEntity appleDr = new AppleDrEntity(player.getServerWorld(), player);
 										appleDr.setPattern(StringArgumentType.getString(c, "pattern"));
 										appleDr.setInitialMessageContext(StringArgumentType.getString(c, "context"));
 										c.getSource().getWorld().spawnEntity(appleDr);
@@ -159,7 +158,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("stat")
-					.requires(source -> source.isExecutedByPlayer() && source.hasPermissionLevel(2))
+					.requires(source -> source.hasPermissionLevel(2))
 					.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("player", EntityArgumentType.player())
 							.then(RequiredArgumentBuilder.<ServerCommandSource, Identifier>argument("stat", IdentifierArgumentType.identifier())
 									.then(LiteralArgumentBuilder.<ServerCommandSource>literal("set")
@@ -207,7 +206,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 				}
 				int appledrness = Appledrness.getAppledrness(world, player);
 				Appledrlevel appledrlevel = Appledrlevels.getAppledrlevel(appledrness);
-				if (appledrlevel != Appledrlevels.DEFAULT_LEVEL && world.getRandom().nextDouble() < (1.0/16384.0) * MathHelper.sqrt((MathHelper.abs(appledrlevel.getLevel())) / 2000.0f)) {
+				if (appledrlevel != Appledrlevels.SPROUT && world.getRandom().nextDouble() < (1.0/16384.0) * MathHelper.sqrt((MathHelper.abs(appledrlevel.getLevel())) / 2000.0f)) {
 					world.spawnEntity(new ItemEntity(world, player.getX(), Math.min(world.raycast(new RaycastContext(player.getPos(), player.getPos().add(0.0, 30.0, 0.0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, ShapeContext.absent())).getBlockPos().down().getY(), player.getY() + 30.0), player.getZ(), new ItemStack(appledrlevel.getLevel() < 0 ? AppleDrItems.ROTTEN_APPLE : Items.APPLE)));
 				}
 			});

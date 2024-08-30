@@ -25,12 +25,8 @@ public class CongratulateAdvancementMixin {
     private void appledrmod$tellAppleAboutAdvancement(AdvancementEntry advancementEntry, AdvancementDisplay display, CallbackInfo ci) {
         final ServerPlayerEntity owner = ((OwnerAccessor) this).owner();
         new Thread(() -> {
-            owner.getServer().getWorlds().forEach(world -> {
-                ((EntityManagerAccessor)world).entityManager().getLookup().iterate().forEach(entity -> {
-                    if (entity instanceof AppleDrEntity appleDr) {
-                        AppleDrAI.respond(owner.getServer(), SystemMessage.systemMessage(String.format("The player %s received the advancement with ID %s. You should congratulate them using the name of the advancement (not the ID).", owner.getDisplayName().getString(), advancementEntry.id().toString())), appleDr);
-                    }
-                });
+            AppleDrEntity.find(owner.getServer()).forEach(appleDr -> {
+                AppleDrAI.respond(owner.getServer(), SystemMessage.systemMessage(String.format("The player %s received the advancement with ID %s. You should congratulate them using the name of the advancement (not the ID).", owner.getDisplayName().getString(), advancementEntry.id().toString())), appleDr);
             });
         }).start();
     }

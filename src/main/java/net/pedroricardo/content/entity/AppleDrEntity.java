@@ -6,6 +6,8 @@ import com.mojang.datafixers.util.Pair;
 import dev.langchain4j.data.message.UserMessage;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
+import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.InventoryOwner;
@@ -31,6 +33,7 @@ import net.minecraft.network.packet.s2c.play.EntitySetHeadYawS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 import net.minecraft.registry.tag.DamageTypeTags;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
@@ -39,11 +42,14 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import net.pedroricardo.AppleDrMod;
 import net.pedroricardo.content.AppleDrEntityTypes;
+import net.pedroricardo.mixin.EntityManagerAccessor;
 import net.pedroricardo.mixin.PlayerModelPartsAccessor;
 import net.pedroricardo.util.AppleDrAI;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -52,6 +58,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     private String initialMessageContext = "You're Domenic Dvojmoc (aka AppleDr, your in-game name), a Slovenian player and Twitch streamer in a Minecraft server called AppleDr Server. The people in it do not speak Slovenian; they speak English, but if the message is in another language, you should respond in that language unless the player asks otherwise. You are in university at 20 years old learning computer science. Player messages will start with some information about the player, such as their name and their Appledrness, but do NOT include that in your response. If asked, you have the maximum Appledrness (2³¹ - 1). Your messages should contain at most 120 characters.";
     private Pattern pattern = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
     private final GameProfile profile;
+    private FakePlayer player = null;
 
     private final SimpleInventory inventory = new SimpleInventory(36);
 
@@ -66,6 +73,9 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
 
     public AppleDrEntity(ServerWorld world, PlayerEntity originalDr) {
         super(AppleDrEntityTypes.APPLEDR, world);
+        this.profile = new GameProfile(UUID.randomUUID(), originalDr.getGameProfile().getName());
+        this.profile.getProperties().putAll("textures", originalDr.getGameProfile().getProperties().get("textures"));
+        this.getDataTracker().set(PLAYER_MODEL_PARTS, originalDr.getDataTracker().get(PlayerModelPartsAccessor.playerModelParts()));
         this.copyPositionAndRotation(originalDr);
         this.setHeadYaw(originalDr.getHeadYaw());
         this.setPitch(originalDr.getPitch());
@@ -75,9 +85,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             this.equipStack(slot, originalDr.getEquippedStack(slot));
         }
-        this.profile = new GameProfile(UUID.randomUUID(), originalDr.getGameProfile().getName());
-        this.profile.getProperties().putAll("textures", originalDr.getGameProfile().getProperties().get("textures"));
-        this.getDataTracker().set(PLAYER_MODEL_PARTS, originalDr.getDataTracker().get(PlayerModelPartsAccessor.playerModelParts()));
+        this.player = FakePlayer.get(world, this.profile);
     }
 
     @Override
@@ -166,6 +174,31 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
         return this.profile;
     }
 
+    public FakePlayer getAsPlayer() {
+        if (this.player != null) {
+            this.player.copyPositionAndRotation(this);
+            this.player.setHeadYaw(this.getHeadYaw());
+            this.player.setPitch(this.getPitch());
+        }
+        return this.player;
+    }
+
+    public static List<AppleDrEntity> find(MinecraftServer server) {
+        return find(server, entity -> true);
+    }
+
+    public static List<AppleDrEntity> find(MinecraftServer server, Predicate<AppleDrEntity> predicate) {
+        List<AppleDrEntity> list = new ArrayList<>();
+        server.getWorlds().forEach(world -> {
+            for (Entity entity : ((EntityManagerAccessor) world).entityManager().getLookup().iterate()) {
+                if (entity instanceof AppleDrEntity appleDr && predicate.test(appleDr)) {
+                    list.add(appleDr);
+                }
+            }
+        });
+        return list;
+    }
+
     @Override
     public void onBeforeSpawnPacket(ServerPlayerEntity player, Consumer<Packet<?>> packetConsumer) {
         PlayerListS2CPacket packet = PolymerEntityUtils.createMutablePlayerListPacket(EnumSet.of(PlayerListS2CPacket.Action.ADD_PLAYER, PlayerListS2CPacket.Action.UPDATE_LISTED));
@@ -196,8 +229,9 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     public void tick() {
         super.tick();
         ((ServerWorld)this.getWorld()).getChunkManager().addTicket(ChunkTicketType.PLAYER, this.getChunkPos(), 3, this.getChunkPos());
-        if (this.getWorld().getServer() != null && this.getWorld().getServer().getPlayerManager().getPlayer(AppleDrMod.APPLEDR_UUID) != null) {
-            this.discard();
+        if (this.getWorld().getServer() != null) {
+            ServerPlayerEntity player = this.getWorld().getServer().getPlayerManager().getPlayer(AppleDrMod.APPLEDR_UUID);
+            if (player != null && !(player instanceof FakePlayer)) this.discard();
         }
     }
 

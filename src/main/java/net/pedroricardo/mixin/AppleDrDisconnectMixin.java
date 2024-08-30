@@ -2,6 +2,7 @@ package net.pedroricardo.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -18,7 +19,7 @@ public class AppleDrDisconnectMixin {
     @WrapOperation(method = "cleanUp", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Z)V"))
     private void appledrmod$cancelBroadcast(PlayerManager instance, Text message, boolean overlay, Operation<Void> original) {
         ServerPlayerEntity player = ((ServerPlayNetworkHandler)(Object) this).getPlayer();
-        if (!player.getUuid().equals(AppleDrMod.APPLEDR_UUID)) {
+        if (!(player instanceof FakePlayer) && !player.getUuid().equals(AppleDrMod.APPLEDR_UUID)) {
             original.call(instance, message, overlay);
         }
     }
@@ -26,7 +27,7 @@ public class AppleDrDisconnectMixin {
     @Inject(method = "cleanUp", at = @At("TAIL"))
     private void appledrmod$summonNewAppleDr(CallbackInfo ci) {
         ServerPlayerEntity player = ((ServerPlayNetworkHandler)(Object) this).getPlayer();
-        if (player.getUuid().equals(AppleDrMod.APPLEDR_UUID)) {
+        if (!(player instanceof FakePlayer) && player.getUuid().equals(AppleDrMod.APPLEDR_UUID)) {
             player.getWorld().spawnEntity(new AppleDrEntity(player.getServerWorld(), player));
         }
     }
