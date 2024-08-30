@@ -1,19 +1,16 @@
 package net.pedroricardo.util;
 
 import com.google.common.collect.Lists;
-import com.mojang.authlib.GameProfile;
 import dev.langchain4j.agent.tool.*;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.ToolExecutionResultMessage;
 import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.memory.chat.TokenWindowChatMemory;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModelName;
 import dev.langchain4j.model.openai.OpenAiTokenizer;
-import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.tool.DefaultToolExecutor;
 import dev.langchain4j.service.tool.ToolExecutor;
 import net.fabricmc.fabric.api.entity.FakePlayer;
@@ -66,8 +63,8 @@ public class AppleDrAI {
         AiMessage finalResponse = MODEL.generate(list).content();
         MEMORY.add(finalResponse);
         String str = finalResponse.text();
-        FakePlayer fakePlayer = FakePlayer.get(appleDr.getServer().getOverworld(), new GameProfile(appleDr.getGameProfile().getId(), appleDr.getGameProfile().getName()));
-        server.getPlayerManager().broadcast(SignedMessage.ofUnsigned(str), fakePlayer, MessageType.params(MessageType.CHAT, fakePlayer));
+        FakePlayer player = appleDr.getAsPlayer();
+        server.getPlayerManager().broadcast(SignedMessage.ofUnsigned(str), player, MessageType.params(MessageType.CHAT, player));
         return finalResponse;
     }
 
@@ -140,19 +137,21 @@ public class AppleDrAI {
             return Util.getRandom(catchphrases, this.appleDr.getRandom());
         }
 
-        @Tool("Takes the player to the Apple End or out of it. The Apple End is a new apple dimension. Only execute if the player themselves ask for it, not another player. You can use this multiple times on a single player.")
+        @Tool("Teleports a player to/from the Apple End, a new apple dimension. Only executes at the own player's request. Usable multiple times on a single player. Requires Appledrness ≥1000.")
         String sendOrRemoveFromAppleEnd(@P(value = "The name of the player who asked to be teleported") String playerName) {
             ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(playerName);
+            int appledrness;
             if (player == null) {
                 return playerName + " is not online";
             } else if (player.getWorld().getRegistryKey() == AppleDrDimension.WORLD) {
                 player.teleportTo(new TeleportTarget(this.server.getWorld(World.OVERWORLD), player, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
                 return "Teleported " + playerName + " back to the Overworld";
-            } else {
+            } else if (Math.abs(appledrness = Appledrness.getAppledrness(player.getWorld(), player)) >= 1000) {
                 EndPlatformFeature.generate(this.server.getWorld(AppleDrDimension.WORLD), BlockPos.ORIGIN.add(0, 60, 0).down(), true);
                 player.teleportTo(new TeleportTarget(this.server.getWorld(AppleDrDimension.WORLD), BlockPos.ORIGIN.add(0, 60, 0).toCenterPos(), Vec3d.ZERO, 0.0f, 0.0f, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
-                return "Teleported " + playerName + " to the Apple End";
+                return "Teleported " + playerName + " to the Apple End (reason: player " + (appledrness > 0 ? "has a high Appledrness" : "is too evil, scaring you into sending them to the Apple End") + ")";
             }
+            return "The absolute value of " + playerName + "'s Appledrness is too low; not teleporting";
         }
 
         @Tool("Gets the Appledrness of a player.")

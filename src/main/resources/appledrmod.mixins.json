@@ -9,6 +9,7 @@
     "CongratulateAdvancementMixin$OwnerAccessor",
     "DoNotNameTagAppleDrMixin",
     "EntityManagerAccessor",
+    "GetAppleDrMixin",
     "ItemStackTrackerAccessor",
     "PlayerModelPartsAccessor"
   ],
