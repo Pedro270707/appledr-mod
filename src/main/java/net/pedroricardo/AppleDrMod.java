@@ -38,8 +38,13 @@ import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
+import net.minecraft.world.TeleportTarget;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.EndPlatformFeature;
 import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.content.AppleDrDimension;
 import net.pedroricardo.content.AppleDrEntityTypes;
@@ -188,6 +193,27 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 									c.getSource().sendMessage(Text.translatable("commands.grace.success"));
 									return Command.SINGLE_SUCCESS;
 								}
+							})));
+		});
+
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appleend")
+					.requires(source -> source.hasPermissionLevel(2))
+					.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("player", EntityArgumentType.player())
+							.executes(c -> {
+								ServerPlayerEntity player = EntityArgumentType.getPlayer(c, "player");
+                                if (player.getWorld().getRegistryKey() == AppleDrDimension.WORLD) {
+									player.teleportTo(new TeleportTarget(c.getSource().getServer().getWorld(World.OVERWORLD), player, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
+									c.getSource().sendMessage(Text.translatable("commands.appleend.success.overworld"));
+									return Command.SINGLE_SUCCESS;
+								} else if (Math.abs(Appledrness.getAppledrness(player.getWorld(), player)) >= 1000) {
+									EndPlatformFeature.generate(c.getSource().getServer().getWorld(AppleDrDimension.WORLD), BlockPos.ORIGIN.add(0, 60, 0).down(), true);
+									player.teleportTo(new TeleportTarget(c.getSource().getServer().getWorld(AppleDrDimension.WORLD), BlockPos.ORIGIN.add(0, 60, 0).toCenterPos(), Vec3d.ZERO, 0.0f, 0.0f, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
+									c.getSource().sendMessage(Text.translatable("commands.appleend.success"));
+									return Command.SINGLE_SUCCESS;
+								}
+								c.getSource().sendError(Text.translatable("commands.appleend.error"));
+								return 0;
 							})));
 		});
 

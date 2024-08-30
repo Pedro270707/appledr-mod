@@ -23,6 +23,10 @@ public final class Appledrlevel {
         this(id, () -> Text.translatable(id.toTranslationKey("appledrlevel")));
     }
 
+    public Identifier getId() {
+        return this.id;
+    }
+
     public String getAppledrnessTranslationKey() {
         return this.getTranslationKey() + ".appledrness";
     }

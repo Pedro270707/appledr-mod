@@ -154,13 +154,16 @@ public class AppleDrAI {
             return "The absolute value of " + playerName + "'s Appledrness is too low; not teleporting";
         }
 
-        @Tool("Gets the Appledrness of a player.")
+        @Tool("Gets the Appledrness of a player and the corresponding level.")
         String getAppledrness(String playerName) {
             ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(playerName);
             if (player == null) {
                 return playerName + " is not online";
             }
-            return playerName + "'s Appledrness is " + Appledrness.getAppledrness(player.getWorld(), player);
+            int appledrness = Appledrness.getAppledrness(player.getWorld(), player);
+            String appledrlevel = Appledrlevels.getAppledrlevel(appledrness).getId().getPath();
+            appledrlevel = Character.toUpperCase(appledrlevel.charAt(0)) + appledrlevel.substring(1);
+            return playerName + "'s Appledrness is " + appledrness + " (" + appledrlevel + ")";
         }
     }
 }
