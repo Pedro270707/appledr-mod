@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "minecraft:apple"
+    },
+    "c": {
+      "item": "appledrmod:applecaxe_ii"
+    }
+  },
+  "pattern": [
+    "aaa",
+    "aca",
+    "aaa"
+  ],
+  "result": {
+    "count": 1,
+    "id": "appledrmod:applecaxe_iii"
+  }
+}

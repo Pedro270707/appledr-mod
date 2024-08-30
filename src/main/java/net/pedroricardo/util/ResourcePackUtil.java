@@ -22,14 +22,24 @@ public class ResourcePackUtil {
 
     public static void bootstrap() {
         MODELS.clear();
-        MODELS.put(AppleDrItems.ROTTEN_APPLE, PolymerResourcePackUtils.requestModel(Items.ROTTEN_FLESH, Registries.ITEM.getId(AppleDrItems.ROTTEN_APPLE).withPrefixedPath("item/")));
-        MODELS.put(AppleDrItems.APPLE_PIE, PolymerResourcePackUtils.requestModel(Items.PUMPKIN_PIE, Registries.ITEM.getId(AppleDrItems.APPLE_PIE).withPrefixedPath("item/")));
-        MODELS.put(AppleDrItems.APPLEDRALTAR, PolymerResourcePackUtils.requestModel(Items.ENCHANTING_TABLE, Registries.ITEM.getId(AppleDrItems.APPLEDRALTAR).withPrefixedPath("block/")));
-        MODELS.put(AppleDrBlocks.APPLE_PIE, PolymerResourcePackUtils.requestModel(Items.CAKE, Registries.BLOCK.getId(AppleDrBlocks.APPLE_PIE).withPrefixedPath("block/")));
-        MODELS.put(AppleDrItems.IRON_KEY, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.ITEM.getId(AppleDrItems.IRON_KEY).withPrefixedPath("item/")));
-        MODELS.put(AppleDrItems.GOLDEN_KEY, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.ITEM.getId(AppleDrItems.GOLDEN_KEY).withPrefixedPath("item/")));
-        MODELS.put(AppleDrItems.DIAMOND_KEY, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.ITEM.getId(AppleDrItems.DIAMOND_KEY).withPrefixedPath("item/")));
-        MODELS.put(AppleDrItems.NETHERITE_KEY, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.ITEM.getId(AppleDrItems.NETHERITE_KEY).withPrefixedPath("item/")));
+        item(AppleDrItems.ROTTEN_APPLE);
+        item(AppleDrItems.APPLE_PIE);
+        blockItem(AppleDrBlocks.APPLEDRALTAR);
+        item(AppleDrBlocks.APPLE_PIE);
+        item(AppleDrItems.IRON_KEY);
+        item(AppleDrItems.GOLDEN_KEY);
+        item(AppleDrItems.DIAMOND_KEY);
+        item(AppleDrItems.NETHERITE_KEY);
+        item(AppleDrItems.APPLECAXE);
+        item(AppleDrItems.APPLECAXE_II);
+        item(AppleDrItems.APPLECAXE_III);
+        item(AppleDrItems.APPLECAXE_IV);
+        item(AppleDrItems.APPLECAXE_V);
+        item(AppleDrItems.APPLECAXE_VI);
+        item(AppleDrItems.APPLECAXE_VII);
+        item(AppleDrItems.APPLECAXE_VIII);
+        item(AppleDrItems.APPLECAXE_IX);
+        item(AppleDrItems.APPLECAXE_X);
 
         BLOCK_MODELS.put(AppleDrBlocks.APPLE_BRICKS, PolymerBlockResourceUtils.requestBlock(BlockModelType.FULL_BLOCK, PolymerBlockModel.of(Registries.BLOCK.getId(AppleDrBlocks.APPLE_BRICKS).withPrefixedPath("block/"))));
         BLOCK_MODELS.put(AppleDrBlocks.IRON_LOCK_APPLE_BRICKS, PolymerBlockResourceUtils.requestBlock(BlockModelType.FULL_BLOCK, PolymerBlockModel.of(Registries.BLOCK.getId(AppleDrBlocks.IRON_LOCK_APPLE_BRICKS).withPrefixedPath("block/"))));
@@ -37,11 +47,19 @@ public class ResourcePackUtil {
         BLOCK_MODELS.put(AppleDrBlocks.DIAMOND_LOCK_APPLE_BRICKS, PolymerBlockResourceUtils.requestBlock(BlockModelType.FULL_BLOCK, PolymerBlockModel.of(Registries.BLOCK.getId(AppleDrBlocks.DIAMOND_LOCK_APPLE_BRICKS).withPrefixedPath("block/"))));
         BLOCK_MODELS.put(AppleDrBlocks.NETHERITE_LOCK_APPLE_BRICKS, PolymerBlockResourceUtils.requestBlock(BlockModelType.FULL_BLOCK, PolymerBlockModel.of(Registries.BLOCK.getId(AppleDrBlocks.NETHERITE_LOCK_APPLE_BRICKS).withPrefixedPath("block/"))));
         BLOCK_MODELS.put(AppleDrBlocks.APPLE_STONE, PolymerBlockResourceUtils.requestBlock(BlockModelType.FULL_BLOCK, PolymerBlockModel.of(Registries.BLOCK.getId(AppleDrBlocks.APPLE_STONE).withPrefixedPath("block/"))));
-        MODELS.put(AppleDrItems.APPLE_BRICKS, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.BLOCK.getId(AppleDrBlocks.APPLE_BRICKS).withPrefixedPath("block/")));
-        MODELS.put(AppleDrItems.IRON_LOCK_APPLE_BRICKS, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.BLOCK.getId(AppleDrBlocks.IRON_LOCK_APPLE_BRICKS).withPrefixedPath("block/")));
-        MODELS.put(AppleDrItems.GOLDEN_LOCK_APPLE_BRICKS, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.BLOCK.getId(AppleDrBlocks.GOLDEN_LOCK_APPLE_BRICKS).withPrefixedPath("block/")));
-        MODELS.put(AppleDrItems.DIAMOND_LOCK_APPLE_BRICKS, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.BLOCK.getId(AppleDrBlocks.DIAMOND_LOCK_APPLE_BRICKS).withPrefixedPath("block/")));
-        MODELS.put(AppleDrItems.NETHERITE_LOCK_APPLE_BRICKS, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.BLOCK.getId(AppleDrBlocks.NETHERITE_LOCK_APPLE_BRICKS).withPrefixedPath("block/")));
-        MODELS.put(AppleDrItems.APPLE_STONE, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.BLOCK.getId(AppleDrBlocks.APPLE_STONE).withPrefixedPath("block/")));
+        blockItem(AppleDrBlocks.APPLE_BRICKS);
+        blockItem(AppleDrBlocks.IRON_LOCK_APPLE_BRICKS);
+        blockItem(AppleDrBlocks.GOLDEN_LOCK_APPLE_BRICKS);
+        blockItem(AppleDrBlocks.DIAMOND_LOCK_APPLE_BRICKS);
+        blockItem(AppleDrBlocks.NETHERITE_LOCK_APPLE_BRICKS);
+        blockItem(AppleDrBlocks.APPLE_STONE);
+    }
+
+    private static void item(ItemConvertible item) {
+        MODELS.put(item, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.ITEM.getId(item.asItem()).withPrefixedPath("item/")));
+    }
+
+    private static void blockItem(Block block) {
+        MODELS.put(block.asItem(), PolymerResourcePackUtils.requestModel(Items.STONE, Registries.BLOCK.getId(block).withPrefixedPath("block/")));
     }
 }

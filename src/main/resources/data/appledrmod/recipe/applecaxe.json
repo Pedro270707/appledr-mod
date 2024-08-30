@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "appledrmod:apple_stone"
+    },
+    "s": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    "aaa",
+    " s ",
+    " s "
+  ],
+  "result": {
+    "count": 1,
+    "id": "appledrmod:applecaxe"
+  }
+}
