@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -32,6 +33,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.predicate.NbtPredicate;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.predicate.entity.EntityPredicate;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
@@ -44,6 +48,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.source.TheEndBiomeSource;
 import net.minecraft.world.gen.feature.EndPlatformFeature;
 import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.content.AppleDrDimension;
@@ -51,6 +57,7 @@ import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.content.AppleDrItems;
 import net.pedroricardo.content.AppleDrStatistics;
 import net.pedroricardo.content.entity.AppleDrEntity;
+import net.pedroricardo.content.worldgen.TheAppleEndBiomeSource;
 import net.pedroricardo.loot.AppleDrLootConditions;
 import net.pedroricardo.loot.AppledrnessLootConditionType;
 import net.pedroricardo.util.*;
@@ -73,11 +80,28 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 		AppleDrEntityTypes.init();
 		AppleDrStatistics.init();
 
-        LootTableEvents.MODIFY.register((key, builder, source) -> {
+		Appledrness.register("having_apple_in_name", (world, player) -> player.getName().getString().toLowerCase(Locale.ROOT).contains("apple") ? 50 : 0);
+		Appledrness.register("being_appledr", (world, player) -> player.getName().getString().equals("AppleDr") ? 100 : 0);
+		Appledrness.register("having_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE) * 5);
+		Appledrness.register("wearing_apple_greathelm", (world, player) -> {
+			if (player.getInventory().getArmorStack(EquipmentSlot.HEAD.getEntitySlotId()).isIn(AppleDrTags.Items.APPLE_GREATHELMS)) {
+				return 250;
+			}
+			return 0;
+		});
+		Appledrness.register("eating_apples", (world, player) -> player.getStatHandler().getStat(Stats.USED, Items.APPLE));
+		Appledrness.register("having_appledrs_grace", (world, player) -> player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRS_GRACE)) * 50);
+		Appledrness.register("being_in_apple_end", (world, player) -> player.getWorld().getRegistryKey() == AppleDrDimension.WORLD ? 50 : 0);
+		Appledrness.register("accepting_appledraltar_offers", (world, player) -> player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRALTAR_OFFERS_ACCEPTED)) * 10);
+		Appledrness.register("rejecting_appledraltar_offers", (world, player) -> -player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRALTAR_OFFERS_REJECTED)) * 10);
+		Appledrness.register("having_rotten_apples_in_inventory", (world, player) -> -player.getInventory().count(AppleDrItems.ROTTEN_APPLE) * 5);
+		Appledrness.register("eating_rotten_apples", (world, player) -> -player.getStatHandler().getStat(Stats.USED, AppleDrItems.ROTTEN_APPLE));
+
+		LootTableEvents.MODIFY.register((key, builder, source) -> {
 			if (source.isBuiltin() && key == EntityType.PLAYER.getLootTableId()) {
 				LootPool.Builder applePool = LootPool.builder()
 						.with(ItemEntry.builder(Items.APPLE).weight(1)
-						.conditionally(AppledrnessLootConditionType.builder(NumberRange.IntRange.atLeast(300), AppledrnessLootConditionType.Source.THIS))
+								.conditionally(AppledrnessLootConditionType.builder(NumberRange.IntRange.atLeast(300), AppledrnessLootConditionType.Source.THIS))
 								.conditionally(AppledrnessLootConditionType.builder(NumberRange.IntRange.atMost(-100), AppledrnessLootConditionType.Source.ATTACKING_ENTITY)))
 						.with(EmptyEntry.builder().weight(10));
 				LootPool.Builder rottenApplePool = LootPool.builder()
@@ -97,24 +121,6 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 			}
 		});
 
-		Appledrness.register("having_apple_in_name", (world, player) -> player.getName().getString().toLowerCase(Locale.ROOT).contains("apple") ? 50 : 0);
-		Appledrness.register("being_appledr", (world, player) -> player.getName().getString().equals("AppleDr") ? 100 : 0);
-		Appledrness.register("having_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE) * 5);
-		Appledrness.register("wearing_apple_greathelm", (world, player) -> {
-			if (player.getInventory().getArmorStack(EquipmentSlot.HEAD.getEntitySlotId()).isIn(AppleDrTags.Items.APPLE_GREATHELMS)) {
-				return 250;
-			}
-			return 0;
-		});
-		Appledrness.register("eating_apples", (world, player) -> player.getStatHandler().getStat(Stats.USED, Items.APPLE));
-		Appledrness.register("having_appledrs_grace", (world, player) -> player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRS_GRACE)) * 50);
-		Appledrness.register("being_in_apple_end", (world, player) -> player.getWorld().getRegistryKey() == AppleDrDimension.WORLD ? 50 : 0);
-		Appledrness.register("accepting_appledraltar_offers", (world, player) -> player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRALTAR_OFFERS_ACCEPTED)) * 10);
-		Appledrness.register("rejecting_appledraltar_offers", (world, player) -> -player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRALTAR_OFFERS_REJECTED)) * 10);
-		Appledrness.register("having_rotten_apples_in_inventory", (world, player) -> -player.getInventory().count(AppleDrItems.ROTTEN_APPLE) * 5);
-		Appledrness.register("eating_rotten_apples", (world, player) -> -player.getStatHandler().getStat(Stats.USED, AppleDrItems.ROTTEN_APPLE));
-
-		// Lambda of CommandRegistrationCallback: void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment).
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appledrness")
 					.executes(c -> {
@@ -204,22 +210,18 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 								ServerPlayerEntity player = EntityArgumentType.getPlayer(c, "player");
                                 if (player.getWorld().getRegistryKey() == AppleDrDimension.WORLD) {
 									player.teleportTo(new TeleportTarget(c.getSource().getServer().getWorld(World.OVERWORLD), player, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
-									c.getSource().sendMessage(Text.translatable("commands.appleend.success.overworld"));
+									c.getSource().sendMessage(Text.translatable("commands.appleend.success.overworld", player.getName()));
 									return Command.SINGLE_SUCCESS;
 								} else if (Math.abs(Appledrness.getAppledrness(player.getWorld(), player)) >= 1000) {
 									EndPlatformFeature.generate(c.getSource().getServer().getWorld(AppleDrDimension.WORLD), BlockPos.ORIGIN.add(0, 60, 0).down(), true);
 									player.teleportTo(new TeleportTarget(c.getSource().getServer().getWorld(AppleDrDimension.WORLD), BlockPos.ORIGIN.add(0, 60, 0).toCenterPos(), Vec3d.ZERO, 0.0f, 0.0f, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
-									c.getSource().sendMessage(Text.translatable("commands.appleend.success"));
+									c.getSource().sendMessage(Text.translatable("commands.appleend.success", player.getName()));
 									return Command.SINGLE_SUCCESS;
 								}
-								c.getSource().sendError(Text.translatable("commands.appleend.error"));
+								c.getSource().sendError(Text.translatable("commands.appleend.error", player.getName()));
 								return 0;
 							})));
 		});
-
-		ResourcePackUtil.bootstrap();
-		PolymerResourcePackUtils.addModAssets(MOD_ID);
-		PolymerResourcePackUtils.markAsRequired();
 
 		ServerTickEvents.START_SERVER_TICK.register(server -> {
 			server.getWorlds().forEach(world -> {
@@ -234,5 +236,11 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 				}
 			});
 		});
+
+		Registry.register(Registries.BIOME_SOURCE, Identifier.of(MOD_ID, "the_apple_end"), TheAppleEndBiomeSource.CODEC);
+
+		ResourcePackUtil.bootstrap();
+		PolymerResourcePackUtils.addModAssets(MOD_ID);
+		PolymerResourcePackUtils.markAsRequired();
 	}
 }

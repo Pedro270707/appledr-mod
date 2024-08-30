@@ -47,8 +47,12 @@
       }
     },
     "biome_source": {
-      "type": "minecraft:fixed",
-      "biome": "appledrmod:the_apple_end"
+      "type": "appledrmod:the_apple_end",
+      "center_biome": "appledrmod:the_apple_end",
+      "highlands_biome": "appledrmod:apple_end_highlands",
+      "midlands_biome": "appledrmod:apple_end_midlands",
+      "small_islands_biome": "appledrmod:small_apple_end_islands",
+      "barrens_biome": "appledrmod:apple_end_barrens"
     }
   }
 }

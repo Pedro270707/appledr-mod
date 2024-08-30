@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "appledrmod:great_tower_of_apple",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 103845602,
+    "spacing": 25,
+    "separation": 20
+  }
+}
