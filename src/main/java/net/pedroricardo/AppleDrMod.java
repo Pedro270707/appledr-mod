@@ -48,10 +48,7 @@ import net.pedroricardo.content.AppleDrStatistics;
 import net.pedroricardo.content.entity.AppleDrEntity;
 import net.pedroricardo.loot.AppleDrLootConditions;
 import net.pedroricardo.loot.AppledrnessLootConditionType;
-import net.pedroricardo.util.AppleDrTags;
-import net.pedroricardo.util.Appledrlevel;
-import net.pedroricardo.util.Appledrlevels;
-import net.pedroricardo.util.ResourcePackUtil;
+import net.pedroricardo.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +59,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 	public static final String MOD_ID = "appledrmod";
 	public static final UUID APPLEDR_UUID = UUID.fromString("3bd4c790-aea5-47da-8963-7f907539889c");
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static final String OPENAI_API_KEY = System.getenv("OPENAI_API_KEY");
+	public static final String OPENAI_API_KEY = AppleDrConfig.getValue("OPENAI_API_KEY", "");
 
 	@Override
 	public void onInitializeServer() {
