@@ -56,6 +56,7 @@ public class AppleDrItems {
             entries.add(GOLDEN_KEY);
             entries.add(DIAMOND_KEY);
             entries.add(NETHERITE_KEY);
+            entries.add(APPLE_STONE);
         }).build());
         registerItemGroup("appledrmod.operator", PolymerItemGroupUtils.builder().special().icon(() -> new ItemStack(APPLE_GREATHELM)).displayName(Text.translatable("itemGroup.appledrmod.operator")).entries((ctx, entries) -> {
             entries.add(APPLE_GREATHELM);
