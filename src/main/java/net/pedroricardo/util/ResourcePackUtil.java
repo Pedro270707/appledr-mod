@@ -25,7 +25,8 @@ public class ResourcePackUtil {
         item(AppleDrItems.ROTTEN_APPLE);
         item(AppleDrItems.APPLE_PIE);
         blockItem(AppleDrBlocks.APPLEDRALTAR);
-        item(AppleDrBlocks.APPLE_PIE);
+        item(AppleDrItems.APPLE_PIE);
+        block(AppleDrBlocks.APPLE_PIE);
         item(AppleDrItems.IRON_KEY);
         item(AppleDrItems.GOLDEN_KEY);
         item(AppleDrItems.DIAMOND_KEY);
@@ -55,8 +56,12 @@ public class ResourcePackUtil {
         blockItem(AppleDrBlocks.APPLE_STONE);
     }
 
+    private static void block(Block block) {
+        MODELS.put(block, PolymerResourcePackUtils.requestModel(Items.STONE, Registries.BLOCK.getId(block).withPrefixedPath("block/")));
+    }
+
     private static void item(ItemConvertible item) {
-        MODELS.put(item, PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.ITEM.getId(item.asItem()).withPrefixedPath("item/")));
+        MODELS.put(item.asItem(), PolymerResourcePackUtils.requestModel(Items.PAPER, Registries.ITEM.getId(item.asItem()).withPrefixedPath("item/")));
     }
 
     private static void blockItem(Block block) {
