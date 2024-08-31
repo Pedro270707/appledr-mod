@@ -1,0 +1,17 @@
+{
+  "type": "appledrmod:1e8bf29c9c6240b2a7aae7d226df8486",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "appledrmod:subterfuge",
+      "lakes": false,
+      "features": false,
+      "layers": [
+        {
+          "block": "appledrmod:pitch_black_block",
+          "height": 64
+        }
+      ]
+    }
+  }
+}

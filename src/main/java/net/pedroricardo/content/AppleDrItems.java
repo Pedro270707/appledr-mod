@@ -38,6 +38,7 @@ public class AppleDrItems {
     public static final Item APPLECAXE_VIII = register("applecaxe_viii", new AppleDrItem(new Item.Settings().rarity(Rarity.EPIC).food(FoodComponents.APPLE).maxCount(1), Items.PAPER));
     public static final Item APPLECAXE_IX = register("applecaxe_ix", new AppleDrItem(new Item.Settings().rarity(Rarity.EPIC).food(FoodComponents.APPLE).maxCount(1), Items.PAPER));
     public static final Item APPLECAXE_X = register("applecaxe_x", new AppleDrItem(new Item.Settings().rarity(Rarity.EPIC).food(FoodComponents.APPLE).maxCount(1), Items.PAPER));
+    public static final Item CORE = register("core", new AppleDrBlockItem(AppleDrBlocks.CORE, new Item.Settings(), Items.STONE));
 
     public static void registerItemGroup(String id, ItemGroup group) {
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(AppleDrMod.MOD_ID, id), group);
