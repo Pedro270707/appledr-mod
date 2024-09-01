@@ -19,7 +19,7 @@ public class AppleDrDisconnectMixin {
     @WrapOperation(method = "cleanUp", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Z)V"))
     private void appledrmod$cancelBroadcast(PlayerManager instance, Text message, boolean overlay, Operation<Void> original) {
         ServerPlayerEntity player = ((ServerPlayNetworkHandler)(Object) this).getPlayer();
-        if (!(player instanceof FakePlayer) && !player.getUuid().equals(AppleDrMod.APPLEDR_UUID)) {
+        if (!(player instanceof FakePlayer) && !AppleDrMod.REPLACED_PLAYERS.contains(player.getUuid())) {
             original.call(instance, message, overlay);
         }
     }
@@ -27,7 +27,7 @@ public class AppleDrDisconnectMixin {
     @Inject(method = "cleanUp", at = @At("TAIL"))
     private void appledrmod$summonNewAppleDr(CallbackInfo ci) {
         ServerPlayerEntity player = ((ServerPlayNetworkHandler)(Object) this).getPlayer();
-        if (!(player instanceof FakePlayer) && player.getUuid().equals(AppleDrMod.APPLEDR_UUID)) {
+        if (!(player instanceof FakePlayer) && AppleDrMod.REPLACED_PLAYERS.contains(player.getUuid())) {
             player.getWorld().spawnEntity(new AppleDrEntity(player.getServerWorld(), player));
         }
     }

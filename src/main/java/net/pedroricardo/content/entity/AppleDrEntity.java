@@ -59,6 +59,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     private Pattern pattern = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
     private final GameProfile profile;
     private FakeAppleDrPlayer player = null;
+    private UUID associatedPlayerUuid = null;
 
     private final SimpleInventory inventory = new SimpleInventory(36);
 
@@ -86,6 +87,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
             this.equipStack(slot, originalDr.getEquippedStack(slot));
         }
         this.player = FakeAppleDrPlayer.get(world, this.profile, this);
+        this.uuid = originalDr.getUuid();
     }
 
     @Override
@@ -172,6 +174,10 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
 
     public GameProfile getGameProfile() {
         return this.profile;
+    }
+
+    public UUID getAssociatedPlayerUuid() {
+        return this.associatedPlayerUuid;
     }
 
     public FakeAppleDrPlayer getAsPlayer() {

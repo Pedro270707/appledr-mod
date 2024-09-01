@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
@@ -42,6 +43,7 @@ import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -64,6 +66,7 @@ import net.pedroricardo.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -71,7 +74,8 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 	public static final String MOD_ID = "appledrmod";
 	public static final UUID APPLEDR_UUID = UUID.fromString("3bd4c790-aea5-47da-8963-7f907539889c");
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static final String OPENAI_API_KEY = AppleDrConfig.getValue("OPENAI_API_KEY", "");
+	public static final String OPENAI_API_KEY = AppleDrConfig.getValue("OPENAI_API_KEY", Codec.STRING, "");
+	public static final List<UUID> REPLACED_PLAYERS = AppleDrConfig.getValue("REPLACED_PLAYERS", Uuids.CODEC.listOf(), List.of());
 
 	@Override
 	public void onInitializeServer() {

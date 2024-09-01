@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '1.7-SNAPSHOT'
 	id 'maven-publish'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 version = project.mod_version
@@ -46,8 +47,23 @@ dependencies {
 	modImplementation include('eu.pb4:factorytools:0.3.1+1.21')
 
 	// langchain (AppleDr AI)
-	implementation include('dev.langchain4j:langchain4j-open-ai:0.33.0')
-	implementation include('dev.langchain4j:langchain4j:0.33.0')
+	implementation 'dev.langchain4j:langchain4j-open-ai:0.33.0'
+	shadow 'dev.langchain4j:langchain4j-open-ai:0.33.0'
+	implementation 'dev.langchain4j:langchain4j:0.33.0'
+	shadow 'dev.langchain4j:langchain4j:0.33.0'
+}
+
+shadowJar {
+	configurations = [project.configurations.shadow]
+	exclude("META-INF")
+}
+
+remapJar {
+	// wait until the shadowJar is done
+	dependsOn(shadowJar)
+	mustRunAfter(shadowJar)
+	// Set the input jar for the task. Here use the shadow Jar that include the .class of the transitive dependency
+	inputFile = file(shadowJar.archivePath)
 }
 
 processResources {

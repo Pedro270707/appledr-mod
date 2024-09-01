@@ -12,7 +12,8 @@
     "GetAppleDrMixin",
     "ItemStackTrackerAccessor",
     "MessageCommandMixin",
-    "PlayerModelPartsAccessor"
+    "PlayerModelPartsAccessor",
+    "ServerLoginMixin"
   ],
   "injectors": {
     "defaultRequire": 1

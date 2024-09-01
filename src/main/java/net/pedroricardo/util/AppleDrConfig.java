@@ -1,6 +1,10 @@
 package net.pedroricardo.util;
 
 import com.google.gson.*;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.JsonOps;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +16,7 @@ import java.io.IOException;
 public class AppleDrConfig {
     private static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    public static String getValue(String setting, @NotNull String fallback) {
+    public static <T> T getValue(String setting, Codec<T> codec, @NotNull T fallback) {
         File file = FabricLoader.getInstance().getConfigDir().resolve("appledr.json").toFile();
         try {
             if (!file.exists() && !file.createNewFile()) {
@@ -29,14 +33,13 @@ public class AppleDrConfig {
             }
 
             JsonElement element = config.getAsJsonObject().get(setting);
-            if (element == null || !element.isJsonPrimitive()) {
-                config.getAsJsonObject().addProperty(setting, fallback);
-                element = new JsonPrimitive(fallback);
+            if (element == null) {
+                config.getAsJsonObject().add(setting, codec.encodeStart(JsonOps.INSTANCE, fallback).getOrThrow());
             }
             try (FileWriter fileWriter = new FileWriter(file)) {
                 fileWriter.write(PRETTY_GSON.toJson(config));
             }
-            return element.getAsString();
+            return codec.decode(JsonOps.INSTANCE, config.getAsJsonObject().get(setting)).getOrThrow().getFirst();
         } catch (IOException ignored) {
         }
         return fallback;
