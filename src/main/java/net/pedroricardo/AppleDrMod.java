@@ -143,8 +143,8 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 		});
 
 		ServerMessageEvents.CHAT_MESSAGE.register((message, sender, params) -> {
-			if (message.getSender().equals(APPLEDR_UUID) || message.isSenderMissing() || sender instanceof FakePlayer) return;
-			AppleDrEntity.find(sender.getServer(), appleDr -> appleDr.getPattern().matcher(message.getContent().getString()).find() || (appleDr.getWorld() == sender.getServerWorld() && sender.distanceTo(appleDr) <= 32.0f))
+			if (message.isSenderMissing() || sender instanceof FakePlayer) return;
+			AppleDrEntity.find(sender.getServer(), appleDr -> !appleDr.getAssociatedPlayerUuid().equals(sender.getUuid()) && appleDr.getPattern().matcher(message.getContent().getString()).find() || (appleDr.getWorld() == sender.getServerWorld() && sender.distanceTo(appleDr) <= 32.0f))
 					.forEach(appleDr -> appleDr.replyTo(message));
 		});
 

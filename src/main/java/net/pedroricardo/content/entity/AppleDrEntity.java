@@ -236,7 +236,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
         super.tick();
         ((ServerWorld)this.getWorld()).getChunkManager().addTicket(ChunkTicketType.PLAYER, this.getChunkPos(), 3, this.getChunkPos());
         if (this.getWorld().getServer() != null) {
-            ServerPlayerEntity player = this.getWorld().getServer().getPlayerManager().getPlayer(AppleDrMod.APPLEDR_UUID);
+            ServerPlayerEntity player = this.getWorld().getServer().getPlayerManager().getPlayer(this.getAssociatedPlayerUuid());
             if (player != null && !(player instanceof FakePlayer)) this.discard();
         }
     }
