@@ -33,13 +33,17 @@ public class AppleDrConfig {
             }
 
             JsonElement element = config.getAsJsonObject().get(setting);
-            if (element == null) {
+            DataResult<Pair<T, JsonElement>> result = codec.decode(JsonOps.INSTANCE, config.getAsJsonObject().get(setting));
+            T value = fallback;
+            if (element == null || result.isError()) {
                 config.getAsJsonObject().add(setting, codec.encodeStart(JsonOps.INSTANCE, fallback).getOrThrow());
+            } else {
+                value = result.getOrThrow().getFirst();
             }
             try (FileWriter fileWriter = new FileWriter(file)) {
                 fileWriter.write(PRETTY_GSON.toJson(config));
             }
-            return codec.decode(JsonOps.INSTANCE, config.getAsJsonObject().get(setting)).getOrThrow().getFirst();
+            return value;
         } catch (IOException ignored) {
         }
         return fallback;

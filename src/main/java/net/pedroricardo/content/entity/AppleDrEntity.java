@@ -44,7 +44,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Uuids;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
-import net.pedroricardo.AppleDrMod;
 import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.mixin.EntityManagerAccessor;
 import net.pedroricardo.mixin.PlayerModelPartsAccessor;
@@ -58,9 +57,12 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, InventoryOwner {
+    public static final Pattern DEFAULT_PATTERN = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
+    public static final String DEFAULT_CONTEXT = "You're Domenic Dvojmoc (aka AppleDr, your in-game name), a Slovenian player and Twitch streamer in a Minecraft server called AppleDr Server. The people in it do not speak Slovenian; they speak English, but if the message is in another language, you should respond in that language unless the player asks otherwise. You are in university at 20 years old learning computer science. Player messages will start with some information about the player, such as their name and their Appledrness, but do NOT include that in your response. If asked, you have the maximum Appledrness (2³¹ - 1). Your messages should contain at most 120 characters.";
+
     protected static final TrackedData<Byte> PLAYER_MODEL_PARTS = DataTracker.registerData(AppleDrEntity.class, TrackedDataHandlerRegistry.BYTE);
-    private String initialMessageContext = "You're Domenic Dvojmoc (aka AppleDr, your in-game name), a Slovenian player and Twitch streamer in a Minecraft server called AppleDr Server. The people in it do not speak Slovenian; they speak English, but if the message is in another language, you should respond in that language unless the player asks otherwise. You are in university at 20 years old learning computer science. Player messages will start with some information about the player, such as their name and their Appledrness, but do NOT include that in your response. If asked, you have the maximum Appledrness (2³¹ - 1). Your messages should contain at most 120 characters.";
-    private Pattern pattern = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
+    private String initialMessageContext = DEFAULT_CONTEXT;
+    private Pattern pattern = DEFAULT_PATTERN;
     private final GameProfile profile;
     private FakeAppleDrPlayer player = null;
     private UUID associatedPlayerUuid = null;
