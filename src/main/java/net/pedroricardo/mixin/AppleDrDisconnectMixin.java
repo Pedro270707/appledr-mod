@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.text.Text;
 import net.pedroricardo.AppleDrMod;
 import net.pedroricardo.content.entity.AppleDrEntity;
@@ -28,6 +29,7 @@ public class AppleDrDisconnectMixin {
     private void appledrmod$summonNewAppleDr(CallbackInfo ci) {
         ServerPlayerEntity player = ((ServerPlayNetworkHandler)(Object) this).getPlayer();
         if (!(player instanceof FakePlayer) && AppleDrMod.REPLACED_PLAYERS.contains(player.getUuid())) {
+            player.getServerWorld().getChunkManager().addTicket(ChunkTicketType.PLAYER, player.getChunkPos(), 3, player.getChunkPos());
             player.getWorld().spawnEntity(new AppleDrEntity(player.getServerWorld(), player));
         }
     }
