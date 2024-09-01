@@ -16,8 +16,8 @@ import java.util.UUID;
 public class GetAppleDrMixin {
     @ModifyReturnValue(method = "getPlayer(Ljava/util/UUID;)Lnet/minecraft/server/network/ServerPlayerEntity;", at = @At(value = "RETURN", ordinal = 0))
     private ServerPlayerEntity appledrmod$getAppleDrByUUID(ServerPlayerEntity original, @Local(ordinal = 0, argsOnly = true) UUID uuid) {
-        if (original == null && AppleDrMod.REPLACED_PLAYERS.contains(uuid)) {
-            List<AppleDrEntity> list = AppleDrEntity.find(((PlayerManager)(Object) this).getServer());
+        if (original == null && uuid != null && AppleDrMod.REPLACED_PLAYERS.contains(uuid)) {
+            List<AppleDrEntity> list = AppleDrEntity.find(((PlayerManager)(Object) this).getServer(), appleDr -> appleDr.getAssociatedPlayerUuid() != null && appleDr.getAssociatedPlayerUuid().equals(uuid));
             if (!list.isEmpty()) {
                 return list.getFirst().getAsPlayer();
             }

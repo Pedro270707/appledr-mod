@@ -6,7 +6,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -18,7 +17,6 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
@@ -36,7 +34,6 @@ import net.minecraft.predicate.NumberRange;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
@@ -50,8 +47,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.TheEndBiomeSource;
 import net.minecraft.world.gen.feature.EndPlatformFeature;
 import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.content.AppleDrDimension;
@@ -75,7 +70,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 	public static final UUID APPLEDR_UUID = UUID.fromString("3bd4c790-aea5-47da-8963-7f907539889c");
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static final String OPENAI_API_KEY = AppleDrConfig.getValue("OPENAI_API_KEY", Codec.STRING, "");
-	public static final List<UUID> REPLACED_PLAYERS = AppleDrConfig.getValue("REPLACED_PLAYERS", Uuids.CODEC.listOf(), List.of());
+	public static final List<UUID> REPLACED_PLAYERS = AppleDrConfig.getValue("REPLACED_PLAYERS", Uuids.CODEC.listOf(), List.of(APPLEDR_UUID));
 
 	@Override
 	public void onInitializeServer() {
@@ -144,7 +139,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 
 		ServerMessageEvents.CHAT_MESSAGE.register((message, sender, params) -> {
 			if (message.isSenderMissing() || sender instanceof FakePlayer) return;
-			AppleDrEntity.find(sender.getServer(), appleDr -> !appleDr.getAssociatedPlayerUuid().equals(sender.getUuid()) && appleDr.getPattern().matcher(message.getContent().getString()).find() || (appleDr.getWorld() == sender.getServerWorld() && sender.distanceTo(appleDr) <= 32.0f))
+			AppleDrEntity.find(sender.getServer(), appleDr -> (appleDr.getAssociatedPlayerUuid() == null || !appleDr.getAssociatedPlayerUuid().equals(sender.getUuid())) && appleDr.getPattern().matcher(message.getContent().getString()).find() || (appleDr.getWorld() == sender.getServerWorld() && sender.distanceTo(appleDr) <= 32.0f))
 					.forEach(appleDr -> appleDr.replyTo(message));
 		});
 
@@ -153,7 +148,9 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 					.requires(source -> source.hasPermissionLevel(2))
 					.executes(c -> {
 						ServerPlayerEntity player = c.getSource().getPlayerOrThrow();
-						c.getSource().getWorld().spawnEntity(new AppleDrEntity(player.getServerWorld(), player));
+						AppleDrEntity appleDr = new AppleDrEntity(player.getServerWorld(), player);
+						appleDr.setAssociatedPlayerUuid(null);
+						c.getSource().getWorld().spawnEntity(appleDr);
 						return Command.SINGLE_SUCCESS;
 					})
 					.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("pattern", StringArgumentType.string())
@@ -161,6 +158,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 									.executes(c -> {
 										ServerPlayerEntity player = c.getSource().getPlayerOrThrow();
 										AppleDrEntity appleDr = new AppleDrEntity(player.getServerWorld(), player);
+										appleDr.setAssociatedPlayerUuid(null);
 										appleDr.setPattern(StringArgumentType.getString(c, "pattern"));
 										appleDr.setInitialMessageContext(StringArgumentType.getString(c, "context"));
 										c.getSource().getWorld().spawnEntity(appleDr);

@@ -3,6 +3,7 @@ package net.pedroricardo.content.entity;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.DataResult;
 import dev.langchain4j.data.message.UserMessage;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
@@ -26,6 +27,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntityS2CPacket;
@@ -38,6 +41,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.Uuids;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import net.pedroricardo.AppleDrMod;
@@ -87,7 +91,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
             this.equipStack(slot, originalDr.getEquippedStack(slot));
         }
         this.player = FakeAppleDrPlayer.get(world, this.profile, this);
-        this.uuid = originalDr.getUuid();
+        this.setAssociatedPlayerUuid(originalDr.getUuid());
     }
 
     @Override
@@ -176,8 +180,13 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
         return this.profile;
     }
 
+    @Nullable
     public UUID getAssociatedPlayerUuid() {
         return this.associatedPlayerUuid;
+    }
+
+    public void setAssociatedPlayerUuid(UUID associatedPlayerUuid) {
+        this.associatedPlayerUuid = associatedPlayerUuid;
     }
 
     public FakeAppleDrPlayer getAsPlayer() {
@@ -254,6 +263,9 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
+        if (this.getAssociatedPlayerUuid() != null) {
+            nbt.putString("associated_player_uuid", this.getAssociatedPlayerUuid().toString());
+        }
         nbt.putString("initial_message_context", this.getInitialMessageContext());
         nbt.putString("message_pattern", this.getPattern().pattern());
         this.writeInventory(nbt, this.getRegistryManager());
@@ -262,6 +274,10 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
+        DataResult<Pair<UUID, NbtElement>> dataResult;
+        if (nbt.contains("associated_player_uuid", NbtElement.STRING_TYPE) && (dataResult = Uuids.CODEC.fieldOf("associated_player_uuid").codec().decode(NbtOps.INSTANCE, nbt)).isSuccess()) {
+            this.setAssociatedPlayerUuid(dataResult.getOrThrow().getFirst());
+        }
         this.setInitialMessageContext(nbt.getString("initial_message_context"));
         this.setPattern(nbt.getString("message_pattern"));
         this.readInventory(nbt, this.getRegistryManager());
