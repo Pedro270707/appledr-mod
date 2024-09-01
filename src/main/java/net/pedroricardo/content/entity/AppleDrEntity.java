@@ -76,7 +76,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
         ));
     }
 
-    public AppleDrEntity(ServerWorld world, PlayerEntity originalDr) {
+    public AppleDrEntity(ServerWorld world, ServerPlayerEntity originalDr) {
         super(AppleDrEntityTypes.APPLEDR, world);
         this.profile = new GameProfile(UUID.randomUUID(), originalDr.getGameProfile().getName());
         this.profile.getProperties().putAll("textures", originalDr.getGameProfile().getProperties().get("textures"));
@@ -90,7 +90,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             this.equipStack(slot, originalDr.getEquippedStack(slot));
         }
-        this.player = FakeAppleDrPlayer.get(world, this.profile, this);
+        this.player = FakeAppleDrPlayer.get(world, originalDr.getGameProfile(), originalDr.getClientOptions(), this);
         this.setAssociatedPlayerUuid(originalDr.getUuid());
     }
 
