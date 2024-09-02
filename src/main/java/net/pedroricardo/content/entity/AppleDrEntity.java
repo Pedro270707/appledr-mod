@@ -415,7 +415,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
             ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(playerName);
             if (player == null) {
                 return playerName + " is not online";
-            } else if (player.getWorld().getRegistryKey() == AppleDrDimension.WORLD) {
+            } else if (player.getWorld().getRegistryKey() == AppleDrDimension.WORLD_1E8BF29C9C6240B2A7AAE7D226DF8486) {
                 player.teleportTo(new TeleportTarget(this.server.getWorld(World.OVERWORLD), player, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
                 return "Teleported " + playerName + " back to the Overworld";
             } else {

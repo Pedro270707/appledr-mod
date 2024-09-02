@@ -38,7 +38,7 @@ public class AppleDrAI {
     public static final OpenAiChatModel MODEL = OpenAiChatModel.builder().apiKey(AppleDrMod.OPENAI_API_KEY).modelName(OpenAiChatModelName.GPT_4_O_MINI).build();
 
     public static AiMessage respondSilently(MinecraftServer server, ChatMessage message, Entity entity) {
-        final ChatMemory memory = CHAT_MEMORY_MAP.containsKey(entity) ? CHAT_MEMORY_MAP.get(entity) : new TokenWindowChatMemory.Builder().maxTokens(1000000, new OpenAiTokenizer()).build();
+        final ChatMemory memory = CHAT_MEMORY_MAP.containsKey(entity) ? CHAT_MEMORY_MAP.get(entity) : CHAT_MEMORY_MAP.put(entity, new TokenWindowChatMemory.Builder().maxTokens(1000000, new OpenAiTokenizer()).build());
         memory.add(message);
         List<ChatMessage> list = Lists.newArrayList(SystemMessage.systemMessage(entity.getComponent(COMPONENT).getContext()));
         list.addAll(memory.messages());
