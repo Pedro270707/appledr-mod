@@ -35,9 +35,7 @@ public class AppleDrDisconnectMixin {
         Optional<ReplacedPlayer> replacedPlayer = AppleDrMod.REPLACED_PLAYERS.stream().filter(p -> p.uuid().equals(player.getUuid())).findFirst();
         if (!(player instanceof FakePlayer) && replacedPlayer.isPresent()) {
             player.getServerWorld().getChunkManager().addTicket(ChunkTicketType.PLAYER, player.getChunkPos(), 3, player.getChunkPos());
-            AppleDrEntity appleDr = new AppleDrEntity(player.getServerWorld(), player);
-            appleDr.setPattern(replacedPlayer.get().pattern());
-            appleDr.setInitialMessageContext(replacedPlayer.get().context());
+            AppleDrEntity appleDr = AppleDrEntity.create(player, replacedPlayer.get().pattern(), replacedPlayer.get().context());
             player.getWorld().spawnEntity(appleDr);
         }
     }

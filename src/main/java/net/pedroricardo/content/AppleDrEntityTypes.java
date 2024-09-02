@@ -10,11 +10,9 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.pedroricardo.AppleDrMod;
-import net.pedroricardo.content.entity.AIEntity;
 import net.pedroricardo.content.entity.AppleDrEntity;
 
 public class AppleDrEntityTypes {
-    public static final EntityType<AIEntity> AI_ENTITY = register("ai_entity", EntityType.Builder.<AIEntity>create(AIEntity::new, SpawnGroup.MISC).dimensions(0.6f, 1.8f).eyeHeight(1.62f).vehicleAttachment(PlayerEntity.VEHICLE_ATTACHMENT_POS).maxTrackingRange(32).trackingTickInterval(2).build());
     public static final EntityType<AppleDrEntity> APPLEDR = register("appledr", EntityType.Builder.<AppleDrEntity>create(AppleDrEntity::new, SpawnGroup.MISC).dimensions(0.6f, 1.8f).eyeHeight(1.62f).vehicleAttachment(PlayerEntity.VEHICLE_ATTACHMENT_POS).maxTrackingRange(32).trackingTickInterval(2).build());
 
     public static <T extends Entity> EntityType<T> register(String id, EntityType<T> entityType) {
@@ -25,7 +23,6 @@ public class AppleDrEntityTypes {
 
     public static void init() {
         AppleDrMod.LOGGER.debug("Registering entity types");
-        FabricDefaultAttributeRegistry.register(AI_ENTITY, AIEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(APPLEDR, AppleDrEntity.createAppleDrAttributes());
     }
 }

@@ -13,6 +13,10 @@ base {
 
 repositories {
 	maven { url 'https://maven.nucleoid.xyz' }
+	maven {
+		name = "Ladysnake Mods"
+		url = 'https://maven.ladysnake.org/releases'
+	}
 }
 
 loom {
@@ -51,6 +55,10 @@ dependencies {
 	shadow 'dev.langchain4j:langchain4j-open-ai:0.33.0'
 	implementation 'dev.langchain4j:langchain4j:0.33.0'
 	shadow 'dev.langchain4j:langchain4j:0.33.0'
+
+	// Cardinal Components API
+	modImplementation include("org.ladysnake.cardinal-components-api:cardinal-components-base:${project.cca_version}")
+	modImplementation include("org.ladysnake.cardinal-components-api:cardinal-components-entity:${project.cca_version}")
 }
 
 shadowJar {

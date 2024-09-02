@@ -6,10 +6,12 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
+import dev.langchain4j.data.message.UserMessage;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.InventoryOwner;
@@ -23,12 +25,14 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.message.SignedMessage;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntityS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySetHeadYawS2CPacket;
@@ -54,14 +58,21 @@ import net.pedroricardo.content.AppleDrDimension;
 import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.content.AppleDrItems;
 import net.pedroricardo.content.AppleDrStatistics;
+import net.pedroricardo.mixin.EntityManagerAccessor;
 import net.pedroricardo.mixin.PlayerModelPartsAccessor;
+import net.pedroricardo.util.AppleDrAI;
 import net.pedroricardo.util.Appledrlevels;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
-public class AppleDrEntity extends AIEntity implements PolymerEntity, InventoryOwner {
+public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, InventoryOwner, AIEntity {
+    public static final Pattern DEFAULT_PATTERN = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
+    public static final String DEFAULT_CONTEXT = "You're Domenic Dvojmoc (aka AppleDr, your in-game name), a Slovenian player and Twitch streamer in a Minecraft server called AppleDr Server. The people in it do not speak Slovenian; they speak English, but if the message is in another language, you should respond in that language unless the player asks otherwise. You are in university at 20 years old learning computer science. Player messages will start with the player's name, but do NOT include your name in your response. If asked, you have the maximum Appledrness (2³¹ - 1). Your messages should contain at most 120 characters.";
+
     protected static final TrackedData<Byte> PLAYER_MODEL_PARTS = DataTracker.registerData(AppleDrEntity.class, TrackedDataHandlerRegistry.BYTE);
     private final GameProfile profile;
     private FakeAIEntityPlayer player = null;
@@ -79,7 +90,7 @@ public class AppleDrEntity extends AIEntity implements PolymerEntity, InventoryO
     }
 
     public AppleDrEntity(ServerWorld world, ServerPlayerEntity originalDr) {
-        super(AppleDrEntityTypes.APPLEDR, world, EntityType.PLAYER);
+        super(AppleDrEntityTypes.APPLEDR, world);
         this.profile = new GameProfile(UUID.randomUUID(), originalDr.getGameProfile().getName());
         this.profile.getProperties().putAll("textures", originalDr.getGameProfile().getProperties().get("textures"));
         this.getDataTracker().set(PLAYER_MODEL_PARTS, originalDr.getDataTracker().get(PlayerModelPartsAccessor.playerModelParts()));
@@ -96,9 +107,33 @@ public class AppleDrEntity extends AIEntity implements PolymerEntity, InventoryO
         this.setAssociatedPlayerUuid(originalDr.getUuid());
     }
 
+    public static AppleDrEntity create(ServerPlayerEntity player) {
+        AppleDrEntity appleDr = new AppleDrEntity(player.getServerWorld(), player);
+        AppleDrAI.create(appleDr, AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT);
+        return appleDr;
+    }
+
+    public static AppleDrEntity create(ServerPlayerEntity player, Pattern pattern, String context) {
+        AppleDrEntity appleDr = create(player);
+        AIEntityComponent component = appleDr.getComponent(AppleDrAI.COMPONENT);
+        component.setPattern(pattern);
+        component.setContext(context);
+        return appleDr;
+    }
+
     @Override
     protected Text getDefaultName() {
         return Text.literal(this.getGameProfile().getName());
+    }
+
+    @Override
+    public int getMaxLookPitchChange() {
+        return 90;
+    }
+
+    @Override
+    public int getMaxHeadRotation() {
+        return 30;
     }
 
     @Override
@@ -113,8 +148,39 @@ public class AppleDrEntity extends AIEntity implements PolymerEntity, InventoryO
         return PlayerEntity.createPlayerAttributes().add(EntityAttributes.GENERIC_FOLLOW_RANGE, 12);
     }
 
+    @Override
+    public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
+        return EntityType.PLAYER;
+    }
+
     public SimpleInventory getInventory() {
         return this.inventory;
+    }
+
+    @Override
+    public List<Pair<EquipmentSlot, ItemStack>> getPolymerVisibleEquipment(List<Pair<EquipmentSlot, ItemStack>> items, ServerPlayerEntity player) {
+        return List.of(
+                Pair.of(EquipmentSlot.HEAD, this.getEquippedStack(EquipmentSlot.HEAD)),
+                Pair.of(EquipmentSlot.CHEST, this.getEquippedStack(EquipmentSlot.CHEST)),
+                Pair.of(EquipmentSlot.LEGS, this.getEquippedStack(EquipmentSlot.LEGS)),
+                Pair.of(EquipmentSlot.FEET, this.getEquippedStack(EquipmentSlot.FEET)),
+                Pair.of(EquipmentSlot.OFFHAND, this.getOffHandStack()),
+                Pair.of(EquipmentSlot.MAINHAND, this.getMainHandStack())
+        );
+    }
+
+    public void replyTo(SignedMessage message) {
+        new Thread(() -> {
+            ServerPlayerEntity player = this.getServer().getPlayerManager().getPlayer(message.getSender());
+            String name;
+            if (player == null) {
+                name = "Unknown player: ";
+            } else {
+                name = String.format("%s: ", player.getName().getString());
+            }
+
+            AppleDrAI.respond(this.getServer(), UserMessage.userMessage(name + message.getContent().getString()), this);
+        }).start();
     }
 
     public GameProfile getGameProfile() {
@@ -130,6 +196,7 @@ public class AppleDrEntity extends AIEntity implements PolymerEntity, InventoryO
         this.associatedPlayerUuid = associatedPlayerUuid;
     }
 
+    @Override
     public FakeAIEntityPlayer getAsPlayer() {
         if (this.player != null) {
             this.player.copyPositionAndRotation(this);
@@ -139,10 +206,26 @@ public class AppleDrEntity extends AIEntity implements PolymerEntity, InventoryO
         return this.player;
     }
 
+    public static List<AppleDrEntity> find(MinecraftServer server) {
+        return find(server, entity -> true);
+    }
+
+    public static List<AppleDrEntity> find(MinecraftServer server, Predicate<AppleDrEntity> predicate) {
+        List<AppleDrEntity> list = new ArrayList<>();
+        server.getWorlds().forEach(world -> {
+            for (Entity entity : ((EntityManagerAccessor) world).entityManager().getLookup().iterate()) {
+                if (entity instanceof AppleDrEntity appleDr && predicate.test(appleDr)) {
+                    list.add(appleDr);
+                }
+            }
+        });
+        return list;
+    }
+
     @Override
     public void onBeforeSpawnPacket(ServerPlayerEntity player, Consumer<Packet<?>> packetConsumer) {
         PlayerListS2CPacket packet = PolymerEntityUtils.createMutablePlayerListPacket(EnumSet.of(PlayerListS2CPacket.Action.ADD_PLAYER, PlayerListS2CPacket.Action.UPDATE_LISTED));
-        packet.getEntries().add(new PlayerListS2CPacket.Entry(this.getUuid(), this.profile, true, 0, GameMode.CREATIVE, player.getName(), null));
+        packet.getEntries().add(new PlayerListS2CPacket.Entry(this.getUuid(), this.profile, true, 0, GameMode.CREATIVE, this.getName(), null));
         packetConsumer.accept(packet);
     }
 
@@ -154,7 +237,7 @@ public class AppleDrEntity extends AIEntity implements PolymerEntity, InventoryO
 
     @Override
     public void onEntityPacketSent(Consumer<Packet<?>> consumer, Packet<?> packet) {
-        super.onEntityPacketSent(consumer, packet);
+        PolymerEntity.super.onEntityPacketSent(consumer, packet);
         if (packet instanceof EntitySetHeadYawS2CPacket headYawS2CPacket) {
             consumer.accept(new EntityS2CPacket.Rotate(this.getId(), headYawS2CPacket.getHeadYaw(), (byte) (this.getPitch() * 256.0F / 360.0F), this.isOnGround()));
         }
