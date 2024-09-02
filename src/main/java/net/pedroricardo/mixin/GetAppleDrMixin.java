@@ -7,6 +7,7 @@ import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.pedroricardo.AppleDrMod;
 import net.pedroricardo.content.entity.AppleDrEntity;
+import net.pedroricardo.util.ReplacedPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 public class GetAppleDrMixin {
     @ModifyReturnValue(method = "getPlayer(Ljava/util/UUID;)Lnet/minecraft/server/network/ServerPlayerEntity;", at = @At(value = "RETURN", ordinal = 0))
     private ServerPlayerEntity appledrmod$getAppleDrByUUID(ServerPlayerEntity original, @Local(ordinal = 0, argsOnly = true) UUID uuid) {
-        if (original == null && uuid != null && AppleDrMod.REPLACED_PLAYERS.contains(uuid)) {
+        if (original == null && uuid != null && AppleDrMod.REPLACED_PLAYERS.stream().map(ReplacedPlayer::uuid).collect(Collectors.toSet()).contains(uuid)) {
             List<AppleDrEntity> list = AppleDrEntity.find(((PlayerManager)(Object) this).getServer(), appleDr -> appleDr.getAssociatedPlayerUuid() != null && appleDr.getAssociatedPlayerUuid().equals(uuid));
             if (!list.isEmpty()) {
                 return list.getFirst().getAsPlayer();

@@ -172,10 +172,14 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
 
     public void setPattern(String string) {
         try {
-            this.pattern = Pattern.compile(string, Pattern.CASE_INSENSITIVE);
+            this.setPattern(Pattern.compile(string, Pattern.CASE_INSENSITIVE));
         } catch (PatternSyntaxException e) {
-            this.pattern = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
+            this.setPattern(DEFAULT_PATTERN);
         }
+    }
+
+    public void setPattern(Pattern pattern) {
+        this.pattern = pattern;
     }
 
     public GameProfile getGameProfile() {
