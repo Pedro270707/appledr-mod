@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class AIEntityComponent implements Component {
     public static final Pattern DEFAULT_PATTERN = Pattern.compile(".*", Pattern.CASE_INSENSITIVE);
-    public static final String DEFAULT_CONTEXT = "You're a typical %type in Minecraft. Your messages should contain at most 120 characters.";
+    public static final String DEFAULT_CONTEXT = "You're a typical %type in Minecraft named %name. Your messages should contain at most 120 characters.";
 
     private final Entity entity;
     private boolean shouldRespond = false;
