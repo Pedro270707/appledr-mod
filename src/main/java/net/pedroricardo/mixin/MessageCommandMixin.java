@@ -11,8 +11,7 @@ import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.command.MessageCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.pedroricardo.content.entity.FakeAppleDrPlayer;
+import net.pedroricardo.content.entity.FakeAIEntityPlayer;
 import net.pedroricardo.util.AppleDrAI;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,9 +29,9 @@ public class MessageCommandMixin {
 
     @WrapOperation(method = "execute", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;sendChatMessage(Lnet/minecraft/network/message/SentMessage;ZLnet/minecraft/network/message/MessageType$Parameters;)V"))
     private static void appledrmod$sendChatMessageToAppleDrEntity(ServerPlayerEntity instance, SentMessage message, boolean filterMaskEnabled, MessageType.Parameters params, Operation<Void> original, @Local(argsOnly = true) ServerCommandSource source) {
-        if (instance instanceof FakeAppleDrPlayer fakePlayer) {
+        if (instance instanceof FakeAIEntityPlayer fakePlayer) {
             new Thread(() -> {
-                AiMessage aiMessage = AppleDrAI.respondSilently(source.getServer(), UserMessage.userMessage(params.name() + " whispers to you: " + message.content().getString()), fakePlayer.getAppleDr());
+                AiMessage aiMessage = AppleDrAI.respondSilently(source.getServer(), UserMessage.userMessage(params.name() + " whispers to you: " + message.content().getString()), fakePlayer.getAIEntity());
                 MessageType.Parameters parameters = MessageType.params(MessageType.MSG_COMMAND_INCOMING, fakePlayer);
                 source.sendChatMessage(SentMessage.of(SignedMessage.ofUnsigned(aiMessage.text())), source.getPlayer() != null && source.shouldFilterText(source.getPlayer()), parameters);
             }).start();

@@ -1,5 +1,6 @@
 package net.pedroricardo.util;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import dev.langchain4j.agent.tool.*;
 import dev.langchain4j.data.message.AiMessage;
@@ -16,6 +17,7 @@ import dev.langchain4j.service.tool.ToolExecutor;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.InventoryOwner;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SignedMessage;
@@ -33,7 +35,7 @@ import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.content.AppleDrDimension;
 import net.pedroricardo.content.AppleDrItems;
 import net.pedroricardo.content.AppleDrStatistics;
-import net.pedroricardo.content.entity.AppleDrEntity;
+import net.pedroricardo.content.entity.AIEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -42,13 +44,19 @@ public class AppleDrAI {
     public static final ChatMemory MEMORY = new TokenWindowChatMemory.Builder().maxTokens(1000000, new OpenAiTokenizer()).build();
     public static final OpenAiChatModel MODEL = OpenAiChatModel.builder().apiKey(AppleDrMod.OPENAI_API_KEY).modelName(OpenAiChatModelName.GPT_4_O_MINI).build();
 
-    public static AiMessage respondSilently(MinecraftServer server, ChatMessage message, AppleDrEntity appleDr) {
+    public static AiMessage respondSilently(MinecraftServer server, ChatMessage message, AIEntity aiEntity) {
         MEMORY.add(message);
-        List<ChatMessage> list = Lists.newArrayList(SystemMessage.systemMessage(appleDr.getInitialMessageContext()));
+        List<ChatMessage> list = Lists.newArrayList(SystemMessage.systemMessage(aiEntity.getInitialMessageContext()));
         list.addAll(MEMORY.messages());
-        Tools tools = new Tools(server, appleDr);
+        Object tools = aiEntity.getTools(server);
+        AiMessage aiMessage;
+        if (tools == null) {
+            aiMessage = MODEL.generate(list).content();
+            MEMORY.add(aiMessage);
+            return aiMessage;
+        }
         List<ToolSpecification> toolSpecifications = ToolSpecifications.toolSpecificationsFrom(tools);
-        AiMessage aiMessage = MODEL.generate(list, toolSpecifications).content();
+        aiMessage = MODEL.generate(list, toolSpecifications).content();
         if (aiMessage.hasToolExecutionRequests()) {
             List<ToolExecutionRequest> toolExecutionRequests = aiMessage.toolExecutionRequests();
             MEMORY.add(aiMessage);
@@ -67,10 +75,10 @@ public class AppleDrAI {
         return finalResponse;
     }
 
-    public static AiMessage respond(MinecraftServer server, ChatMessage message, AppleDrEntity appleDr) {
-        AiMessage response = respondSilently(server, message, appleDr);
+    public static AiMessage respond(MinecraftServer server, ChatMessage message, AIEntity aiEntity) {
+        AiMessage response = respondSilently(server, message, aiEntity);
         String str = response.text();
-        FakePlayer player = appleDr.getAsPlayer();
+        FakePlayer player = aiEntity.getAsPlayer();
         server.getPlayerManager().broadcast(SignedMessage.ofUnsigned(str), player, MessageType.params(MessageType.CHAT, player));
         return response;
     }
@@ -87,9 +95,9 @@ public class AppleDrAI {
         };
 
         private final MinecraftServer server;
-        private final AppleDrEntity appleDr;
+        private final AIEntity appleDr;
 
-        Tools(MinecraftServer server, AppleDrEntity appleDr) {
+        Tools(MinecraftServer server, AIEntity appleDr) {
             this.server = server;
             this.appleDr = appleDr;
         }
@@ -136,7 +144,7 @@ public class AppleDrAI {
 
         @Tool("Gets every item in your inventory.")
         String getInventoryItems() {
-            return this.appleDr.getInventory().toString();
+            return this.appleDr instanceof InventoryOwner ? ((InventoryOwner) this.appleDr).getInventory().toString() : Iterables.concat(this.appleDr.getAllArmorItems(), this.appleDr.getHandItems()).toString();
         }
 
         @Tool("Gets one of your iconic catchphrases")

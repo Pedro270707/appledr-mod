@@ -9,30 +9,30 @@ import net.minecraft.server.world.ServerWorld;
 import java.util.Map;
 import java.util.Objects;
 
-public class FakeAppleDrPlayer extends FakePlayer {
-    private final AppleDrEntity appleDr;
+public class FakeAIEntityPlayer extends FakePlayer {
+    private final AIEntity aiEntity;
     private SyncedClientOptions clientOptions = SyncedClientOptions.createDefault();
 
-    protected FakeAppleDrPlayer(ServerWorld world, GameProfile profile, SyncedClientOptions clientOptions, AppleDrEntity appleDr) {
+    protected FakeAIEntityPlayer(ServerWorld world, GameProfile profile, SyncedClientOptions clientOptions, AIEntity aiEntity) {
         super(world, profile);
-        this.appleDr = appleDr;
+        this.aiEntity = aiEntity;
         this.setClientOptions(clientOptions);
     }
 
-    public static FakeAppleDrPlayer get(ServerWorld world, GameProfile profile, SyncedClientOptions clientOptions, AppleDrEntity appleDr) {
+    public static FakeAIEntityPlayer get(ServerWorld world, GameProfile profile, SyncedClientOptions clientOptions, AIEntity aiEntity) {
         Objects.requireNonNull(world, "World may not be null.");
         Objects.requireNonNull(profile, "Game profile may not be null.");
-        Objects.requireNonNull(appleDr, "AppleDr may not be null.");
+        Objects.requireNonNull(aiEntity, "AI entity may not be null.");
         if (clientOptions == null) clientOptions = SyncedClientOptions.createDefault();
 
-        return FAKE_APPLEDR_PLAYER_MAP.computeIfAbsent(new FakePlayerKey(world, profile, clientOptions, appleDr), key -> new FakeAppleDrPlayer(key.world, key.profile, key.clientOptions, key.appleDr));
+        return FAKE_APPLEDR_PLAYER_MAP.computeIfAbsent(new FakePlayerKey(world, profile, clientOptions, aiEntity), key -> new FakeAIEntityPlayer(key.world, key.profile, key.clientOptions, key.aiEntity));
     }
 
-    private record FakePlayerKey(ServerWorld world, GameProfile profile, SyncedClientOptions clientOptions, AppleDrEntity appleDr) {}
-    private static final Map<FakePlayerKey, FakeAppleDrPlayer> FAKE_APPLEDR_PLAYER_MAP = new MapMaker().weakValues().makeMap();
+    private record FakePlayerKey(ServerWorld world, GameProfile profile, SyncedClientOptions clientOptions, AIEntity aiEntity) {}
+    private static final Map<FakePlayerKey, FakeAIEntityPlayer> FAKE_APPLEDR_PLAYER_MAP = new MapMaker().weakValues().makeMap();
 
-    public AppleDrEntity getAppleDr() {
-        return this.appleDr;
+    public AIEntity getAIEntity() {
+        return this.aiEntity;
     }
 
     @Override

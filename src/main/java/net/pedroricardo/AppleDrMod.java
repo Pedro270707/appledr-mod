@@ -17,9 +17,7 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -52,6 +50,7 @@ import net.pedroricardo.content.AppleDrDimension;
 import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.content.AppleDrItems;
 import net.pedroricardo.content.AppleDrStatistics;
+import net.pedroricardo.content.entity.AIEntity;
 import net.pedroricardo.content.entity.AppleDrEntity;
 import net.pedroricardo.content.worldgen.TheAppleEndBiomeSource;
 import net.pedroricardo.loot.AppleDrLootConditions;
@@ -69,7 +68,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 	public static final UUID APPLEDR_UUID = UUID.fromString("3bd4c790-aea5-47da-8963-7f907539889c");
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static final String OPENAI_API_KEY = AppleDrConfig.getValue("OPENAI_API_KEY", Codec.STRING, "");
-	public static final List<ReplacedPlayer> REPLACED_PLAYERS = AppleDrConfig.getValue("REPLACED_PLAYERS", ReplacedPlayer.CODEC.listOf(), List.of(new ReplacedPlayer(APPLEDR_UUID, AppleDrEntity.DEFAULT_PATTERN, AppleDrEntity.DEFAULT_CONTEXT)));
+	public static final List<ReplacedPlayer> REPLACED_PLAYERS = AppleDrConfig.getValue("REPLACED_PLAYERS", ReplacedPlayer.CODEC.listOf(), List.of(new ReplacedPlayer(APPLEDR_UUID, AppleDrEntity.DEFAULT_PATTERN, String.format(AppleDrEntity.DEFAULT_CONTEXT, "player"))));
 
 	@Override
 	public void onInitializeServer() {
@@ -138,12 +137,17 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 
 		ServerMessageEvents.CHAT_MESSAGE.register((message, sender, params) -> {
 			if (message.isSenderMissing() || sender instanceof FakePlayer) return;
-			AppleDrEntity.find(sender.getServer(), appleDr -> (appleDr.getAssociatedPlayerUuid() == null || !appleDr.getAssociatedPlayerUuid().equals(sender.getUuid())) && appleDr.getPattern().matcher(message.getContent().getString()).find() || (appleDr.getWorld() == sender.getServerWorld() && sender.distanceTo(appleDr) <= 32.0f))
-					.forEach(appleDr -> appleDr.replyTo(message));
+			AppleDrEntity.find(sender.getServer(), aiEntity -> {
+				boolean reachesEntity = aiEntity.getPattern().matcher(message.getContent().getString()).find() || (aiEntity.getWorld() == sender.getServerWorld() && sender.distanceTo(aiEntity) <= 32.0f);
+				if (aiEntity instanceof AppleDrEntity appleDr) {
+					return reachesEntity && (appleDr.getAssociatedPlayerUuid() == null || !appleDr.getAssociatedPlayerUuid().equals(sender.getUuid()));
+				}
+				return reachesEntity;
+			}).forEach(appleDr -> appleDr.replyTo(message));
 		});
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appledr")
+			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("ai")
 					.requires(source -> source.hasPermissionLevel(2))
 					.executes(c -> {
 						ServerPlayerEntity player = c.getSource().getPlayerOrThrow();
@@ -152,17 +156,46 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 						c.getSource().getWorld().spawnEntity(appleDr);
 						return Command.SINGLE_SUCCESS;
 					})
-					.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("pattern", StringArgumentType.string())
-							.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("context", StringArgumentType.greedyString())
-									.executes(c -> {
-										ServerPlayerEntity player = c.getSource().getPlayerOrThrow();
-										AppleDrEntity appleDr = new AppleDrEntity(player.getServerWorld(), player);
-										appleDr.setAssociatedPlayerUuid(null);
-										appleDr.setPattern(StringArgumentType.getString(c, "pattern"));
-										appleDr.setInitialMessageContext(StringArgumentType.getString(c, "context"));
-										c.getSource().getWorld().spawnEntity(appleDr);
-										return Command.SINGLE_SUCCESS;
-									}))));
+					.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("entity", EntityArgumentType.entity())
+							.executes(c -> {
+								Entity entity = EntityArgumentType.getEntity(c, "entity");
+								if (!(entity instanceof LivingEntity livingEntity)) {
+									c.getSource().sendError(Text.translatable("commands.ai.error"));
+									return 0;
+								}
+								AIEntity aiEntity;
+								if (entity instanceof ServerPlayerEntity player) {
+									aiEntity = new AppleDrEntity(player.getServerWorld(), player);
+									((AppleDrEntity) aiEntity).setAssociatedPlayerUuid(null);
+								} else {
+									aiEntity = new AIEntity(c.getSource().getWorld(), livingEntity);
+								}
+								aiEntity.getAttributes().setFrom(livingEntity.getAttributes());
+								c.getSource().getWorld().spawnEntity(aiEntity);
+								c.getSource().sendMessage(Text.translatable("commands.ai.success"));
+								return Command.SINGLE_SUCCESS;
+							})
+							.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("pattern", StringArgumentType.string())
+									.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("context", StringArgumentType.greedyString())
+											.executes(c -> {
+												Entity entity = EntityArgumentType.getEntity(c, "entity");
+												if (!(entity instanceof LivingEntity livingEntity)) {
+													c.getSource().sendError(Text.translatable("commands.ai.error"));
+													return 0;
+												}
+												AIEntity aiEntity;
+												if (entity instanceof ServerPlayerEntity player) {
+													aiEntity = new AppleDrEntity(player.getServerWorld(), player);
+													((AppleDrEntity) aiEntity).setAssociatedPlayerUuid(null);
+												} else {
+													aiEntity = new AIEntity(c.getSource().getWorld(), livingEntity);
+												}
+												aiEntity.getAttributes().setFrom(livingEntity.getAttributes());
+												aiEntity.setPattern(StringArgumentType.getString(c, "pattern"));
+												aiEntity.setInitialMessageContext(StringArgumentType.getString(c, "context"));
+												c.getSource().getWorld().spawnEntity(aiEntity);
+												return Command.SINGLE_SUCCESS;
+											})))));
 		});
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

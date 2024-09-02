@@ -6,6 +6,8 @@
   "commands.appleend.success.overworld": "Teleported %s to the Overworld",
   "commands.appleend.success": "Teleported %s to the Apple End",
   "commands.appleend.error": "The absolute value of %s's Appledrness is too low",
+  "commands.ai.error": "Entity selector includes a non-living entity",
+  "commands.ai.success": "Created AI entity",
   "appledrmod.appledr_the_appledrful": "AppleDr, the Appledrful",
   "level.appledrmod.antiappledr": "AntiappleDr",
   "level.appledrmod.antiappledrmaster": "Antiappledrmaster",

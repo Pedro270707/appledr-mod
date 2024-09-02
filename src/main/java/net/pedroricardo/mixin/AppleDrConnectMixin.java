@@ -7,9 +7,8 @@ import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.pedroricardo.AppleDrMod;
 import net.pedroricardo.content.entity.AppleDrEntity;
-import net.pedroricardo.content.entity.FakeAppleDrPlayer;
+import net.pedroricardo.content.entity.FakeAIEntityPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,7 +24,7 @@ public class AppleDrConnectMixin {
     private void appledrmod$cancelJoinBroadcast(PlayerManager instance, Text message, boolean overlay, Operation<Void> original, @Local(ordinal = 0, argsOnly = true) ServerPlayerEntity player) {
         this.foundAppleDr = false;
         if (!(player instanceof FakePlayer)) {
-            AppleDrEntity.find(instance.getServer(), appleDr -> appleDr.getAssociatedPlayerUuid() != null && appleDr.getAssociatedPlayerUuid().equals(player.getUuid())).forEach(appleDr -> {
+            AppleDrEntity.find(instance.getServer(), aiEntity -> aiEntity instanceof AppleDrEntity appleDr && appleDr.getAssociatedPlayerUuid() != null && appleDr.getAssociatedPlayerUuid().equals(player.getUuid())).forEach(appleDr -> {
                 player.copyPositionAndRotation(appleDr);
                 player.setHeadYaw(appleDr.getHeadYaw());
                 player.setPitch(appleDr.getPitch());
@@ -40,7 +39,7 @@ public class AppleDrConnectMixin {
 
     @WrapOperation(method = "disconnectDuplicateLogins", at = @At(value = "INVOKE", target = "Ljava/util/Set;add(Ljava/lang/Object;)Z"))
     private boolean appledrmod$letBrotherAppleJoin(Set instance, Object e, Operation<Boolean> original) {
-        if (e instanceof FakeAppleDrPlayer appleDr) {
+        if (e instanceof FakeAIEntityPlayer appleDr) {
             return false;
         }
         return original.call(instance, e);
