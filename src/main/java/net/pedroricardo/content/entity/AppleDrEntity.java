@@ -399,7 +399,6 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
 
         @Tool("Gets the Appledrness of a player and the corresponding level.")
         String getAppledrness(String playerName) {
-            System.out.println("Ran getAppledrness");
             ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(playerName);
             if (player == null) {
                 return playerName + " is not online";
@@ -432,6 +431,26 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
             }
             player.giveItemStack(new ItemStack(AppleDrItems.CORE));
             return "Gave " + playerName + " 1 * Core";
+        }
+
+        @Tool("Gets your coordinates")
+        String getCoordinates() {
+            return "You are in " + this.appleDr.getBlockPos().toShortString();
+        }
+
+        @Tool("Gets the player's coordinates. Only use if the player themselves ask for it or if you need it.")
+        String getPlayerCoordinates(@P("The player who asked for their own coordinates") String playerName) {
+            ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(playerName);
+            if (player == null) {
+                return playerName + " is not online";
+            }
+            return playerName + " is in " + player.getBlockPos().toShortString();
+        }
+
+        @Tool("Makes you walk somewhere")
+        String walkTo(@P("X coordinate") int x, @P("Y coordinate") int y, @P("Z coordinate") int z) {
+            this.appleDr.getNavigation().startMovingAlong(this.appleDr.getNavigation().findPathTo(new BlockPos(x, y, z), 64), 1.0);
+            return "Walking to " + x + ", " + y + ", " + z;
         }
     }
 }
