@@ -260,7 +260,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
 
     @Override
     public boolean shouldSave() {
-        return false;
+        return this.getAssociatedPlayerUuid() == null;
     }
 
     @Override
