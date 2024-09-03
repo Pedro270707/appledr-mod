@@ -41,6 +41,7 @@ public class ResourcePackUtil {
         item(AppleDrItems.APPLECAXE_VIII);
         item(AppleDrItems.APPLECAXE_IX);
         item(AppleDrItems.APPLECAXE_X);
+        item(AppleDrItems.AI_CHIP);
 
         blockWithItem(AppleDrBlocks.APPLE_BRICKS);
         blockWithItem(AppleDrBlocks.IRON_LOCK_APPLE_BRICKS);
