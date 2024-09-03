@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "n": {
+      "item": "minecraft:nether_star"
+    },
+    "a": {
+      "item": "minecraft:enchanted_golden_apple"
+    },
+    "p": {
+      "item": "minecraft:ender_pearl"
+    },
+    "r": {
+      "item": "minecraft:redstone_block"
+    },
+    "t": {
+      "item": "minecraft:netherite_block"
+    },
+    "b": {
+      "item": "minecraft:beacon"
+    },
+    "o": {
+      "item": "minecraft:observer"
+    }
+  },
+  "pattern": [
+    "nbp",
+    "rar",
+    "oto"
+  ],
+  "result": {
+    "count": 1,
+    "id": "appledrmod:ai_chip"
+  }
+}
