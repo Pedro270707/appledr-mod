@@ -76,6 +76,7 @@ public class AppleDrItems {
             entries.add(APPLECAXE_VIII);
             entries.add(APPLECAXE_IX);
             entries.add(APPLECAXE_X);
+            entries.add(AI_CHIP);
         }).build());
         registerItemGroup("appledrmod.operator", PolymerItemGroupUtils.builder().special().icon(() -> new ItemStack(APPLE_GREATHELM)).displayName(Text.translatable("itemGroup.appledrmod.operator")).entries((ctx, entries) -> {
             entries.add(APPLE_GREATHELM);
