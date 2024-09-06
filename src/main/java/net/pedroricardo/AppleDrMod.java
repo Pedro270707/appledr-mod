@@ -158,7 +158,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 			if (message.isSenderMissing() || sender instanceof FakePlayer) return;
 			AppleDrAI.findAIEntities(sender.getServer(), entity -> {
 				if (message.getContent().getString().startsWith(AppleDrConfig.aiIgnorePrefix)) return false;
-				boolean reachesEntity = entity.getComponent(AppleDrAI.COMPONENT).getPattern().matcher(message.getContent().getString()).find() || (entity.getComponent(AppleDrAI.COMPONENT).respondWhenNear() && entity.getWorld() == sender.getServerWorld() && sender.distanceTo(entity) <= 32.0f);
+				boolean reachesEntity = entity.getComponent(AIEntityComponent.COMPONENT).getPattern().matcher(message.getContent().getString()).find() || (entity.getComponent(AIEntityComponent.COMPONENT).respondWhenNear() && entity.getWorld() == sender.getServerWorld() && sender.distanceTo(entity) <= 32.0f);
 				if (entity instanceof AppleDrEntity appleDr) {
 					return reachesEntity && (appleDr.getAssociatedPlayerUuid() == null || !appleDr.getAssociatedPlayerUuid().equals(sender.getUuid()));
 				}

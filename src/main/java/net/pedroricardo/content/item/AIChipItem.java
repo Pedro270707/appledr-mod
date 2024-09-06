@@ -17,7 +17,7 @@ public class AIChipItem extends AppleDrItem {
 
     @Override
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-        if (!entity.getComponent(AppleDrAI.COMPONENT).shouldRespond()) {
+        if (!entity.getComponent(AIEntityComponent.COMPONENT).shouldRespond()) {
             AppleDrAI.create(entity, AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, AIEntityComponent.DEFAULT_RESPOND_WHEN_NEAR);
             stack.decrementUnlessCreative(1, user);
             if (entity instanceof MobEntity mob) mob.setPersistent();

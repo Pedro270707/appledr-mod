@@ -3,12 +3,18 @@ package net.pedroricardo.content.entity;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.Identifier;
+import net.pedroricardo.AppleDrMod;
 import org.ladysnake.cca.api.v3.component.Component;
+import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.ComponentRegistry;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class AIEntityComponent implements Component {
+    public static final ComponentKey<AIEntityComponent> COMPONENT = ComponentRegistry.getOrCreate(Identifier.of(AppleDrMod.MOD_ID, "ai"), AIEntityComponent.class);
+
     public static final boolean DEFAULT_RESPOND_WHEN_NEAR = false;
     public static final Pattern DEFAULT_PATTERN = Pattern.compile(".*", Pattern.CASE_INSENSITIVE);
     public static final String DEFAULT_CONTEXT = "You're a typical %type in Minecraft named %name. Your messages should contain at most 120 characters.";

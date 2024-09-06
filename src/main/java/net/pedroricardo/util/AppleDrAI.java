@@ -18,29 +18,23 @@ import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.pedroricardo.AppleDrMod;
 import net.pedroricardo.content.entity.AIEntity;
 import net.pedroricardo.content.entity.AIEntityComponent;
 import net.pedroricardo.content.entity.AppleDrEntity;
 import net.pedroricardo.mixin.EntityManagerAccessor;
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.component.ComponentRegistry;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 public class AppleDrAI {
-    public static final ComponentKey<AIEntityComponent> COMPONENT = ComponentRegistry.getOrCreate(Identifier.of(AppleDrMod.MOD_ID, "ai"), AIEntityComponent.class);
-
     public static final Map<Entity, ChatMemory> CHAT_MEMORY_MAP = new HashMap<>();
     public static final OpenAiChatModel MODEL = OpenAiChatModel.builder().apiKey(AppleDrConfig.openAIApiKey).modelName(OpenAiChatModelName.GPT_4_O_MINI).build();
 
     public static AiMessage respondSilently(MinecraftServer server, ChatMessage message, Entity entity) {
         final ChatMemory memory = CHAT_MEMORY_MAP.computeIfAbsent(entity, e -> new TokenWindowChatMemory.Builder().maxTokens(100000, new OpenAiTokenizer()).build());
         memory.add(message);
-        List<ChatMessage> list = Lists.newArrayList(SystemMessage.systemMessage(entity.getComponent(COMPONENT).getContext()));
+        List<ChatMessage> list = Lists.newArrayList(SystemMessage.systemMessage(entity.getComponent(AIEntityComponent.COMPONENT).getContext()));
         list.addAll(memory.messages());
         Object tools = entity instanceof AIEntity aiEntity ? aiEntity.getTools(server) : null;
         AiMessage aiMessage;
@@ -78,7 +72,7 @@ public class AppleDrAI {
     }
 
     public static void reply(Entity entity, SignedMessage message) {
-        if (!entity.getComponent(COMPONENT).shouldRespond()) return;
+        if (!entity.getComponent(AIEntityComponent.COMPONENT).shouldRespond()) return;
         new Thread(() -> {
             ServerPlayerEntity player = entity.getServer().getPlayerManager().getPlayer(message.getSender());
             String name;
@@ -96,7 +90,7 @@ public class AppleDrAI {
         List<Entity> list = new ArrayList<>();
         server.getWorlds().forEach(world -> {
             for (Entity entity : ((EntityManagerAccessor) world).entityManager().getLookup().iterate()) {
-                if (entity.getComponent(COMPONENT).shouldRespond() && predicate.test(entity)) {
+                if (entity.getComponent(AIEntityComponent.COMPONENT).shouldRespond() && predicate.test(entity)) {
                     list.add(entity);
                 }
             }
@@ -108,7 +102,7 @@ public class AppleDrAI {
         if (entity instanceof ServerPlayerEntity serverPlayer) {
             entity = new AppleDrEntity(serverPlayer.getServerWorld(), serverPlayer);
         }
-        AIEntityComponent component = entity.getComponent(COMPONENT);
+        AIEntityComponent component = entity.getComponent(AIEntityComponent.COMPONENT);
         component.setRespondWhenNear(respondWhenNear);
         component.setPattern(pattern);
         component.setContext(context);
@@ -116,6 +110,6 @@ public class AppleDrAI {
     }
 
     public static void removeAI(Entity entity) {
-        entity.getComponent(COMPONENT).setShouldRespond(false);
+        entity.getComponent(AIEntityComponent.COMPONENT).setShouldRespond(false);
     }
 }
