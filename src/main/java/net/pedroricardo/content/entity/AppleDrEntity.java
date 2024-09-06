@@ -72,6 +72,7 @@ import java.util.regex.Pattern;
 public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, InventoryOwner, AIEntity {
     public static final Pattern DEFAULT_PATTERN = Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE);
     public static final String DEFAULT_CONTEXT = "You're Domenic Dvojmoc (aka AppleDr, your in-game name), a Slovenian player and Twitch streamer in a Minecraft server called AppleDr Server. The people in it do not speak Slovenian; they speak English, but if the message is in another language, you should respond in that language unless the player asks otherwise. You are in university at 20 years old learning computer science. Player messages will start with the player's name, but do NOT include your name in your response. If asked, you have the maximum Appledrness (2³¹ - 1). Your messages should contain at most 120 characters.";
+    public static final boolean DEFAULT_RESPOND_WHEN_NEAR = AIEntityComponent.DEFAULT_RESPOND_WHEN_NEAR;
 
     protected static final TrackedData<Byte> PLAYER_MODEL_PARTS = DataTracker.registerData(AppleDrEntity.class, TrackedDataHandlerRegistry.BYTE);
     private final GameProfile profile;

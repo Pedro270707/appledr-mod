@@ -59,7 +59,7 @@ public class AppleDrConfig {
 
     public static void reload() {
         openAIApiKey = AppleDrConfig.getValue("OPENAI_API_KEY", Codec.STRING, "");
-        replacedPlayers = AppleDrConfig.getValue("REPLACED_PLAYERS", ReplacedPlayer.CODEC.listOf(), List.of(new ReplacedPlayer(AppleDrMod.APPLEDR_UUID, AppleDrEntity.DEFAULT_PATTERN, AppleDrEntity.DEFAULT_CONTEXT)));
+        replacedPlayers = AppleDrConfig.getValue("REPLACED_PLAYERS", ReplacedPlayer.CODEC.listOf(), List.of(new ReplacedPlayer(AppleDrMod.APPLEDR_UUID, AppleDrEntity.DEFAULT_PATTERN, AppleDrEntity.DEFAULT_CONTEXT, AppleDrEntity.DEFAULT_RESPOND_WHEN_NEAR)));
         appleEndAppledrness = AppleDrConfig.getValue("APPLE_END_APPLEDRNESS", Codec.INT, 200);
         aiIgnorePrefix = AppleDrConfig.getValue("AI_IGNORE_PREFIX", Codec.STRING, "AI:");
     }
