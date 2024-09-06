@@ -139,6 +139,15 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 							})));
 		});
 
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("reload_appledr_settings")
+					.requires(c -> c.hasPermissionLevel(2))
+					.executes(c -> {
+						AppleDrConfig.reload();
+						return Command.SINGLE_SUCCESS;
+					}));
+		});
+
 		ServerMessageEvents.CHAT_MESSAGE.register((message, sender, params) -> {
 			if (message.isSenderMissing() || sender instanceof FakePlayer) return;
 			AppleDrAI.findAIEntities(sender.getServer(), entity -> {
