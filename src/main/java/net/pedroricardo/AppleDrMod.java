@@ -59,7 +59,6 @@ import net.pedroricardo.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -68,11 +67,11 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 	public static final String MOD_ID = "appledrmod";
 	public static final UUID APPLEDR_UUID = UUID.fromString("3bd4c790-aea5-47da-8963-7f907539889c");
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static final String OPENAI_API_KEY = AppleDrConfig.getValue("OPENAI_API_KEY", Codec.STRING, "");
-	public static final List<ReplacedPlayer> REPLACED_PLAYERS = AppleDrConfig.getValue("REPLACED_PLAYERS", ReplacedPlayer.CODEC.listOf(), List.of(new ReplacedPlayer(APPLEDR_UUID, AppleDrEntity.DEFAULT_PATTERN, String.format(AppleDrEntity.DEFAULT_CONTEXT, "player"))));
 
 	@Override
 	public void onInitializeServer() {
+		AppleDrConfig.reload();
+
 		AppleDrLootConditions.init();
 		AppleDrItems.init();
 		AppleDrEntityTypes.init();
@@ -81,6 +80,8 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 		Appledrness.register("having_apple_in_name", (world, player) -> player.getName().getString().toLowerCase(Locale.ROOT).contains("apple") ? 50 : 0);
 		Appledrness.register("being_appledr", (world, player) -> player.getName().getString().equals("AppleDr") ? 100 : 0);
 		Appledrness.register("having_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE) * 5);
+		Appledrness.register("having_golden_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE) * 20);
+		Appledrness.register("having_enchanted_golden_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE) * 30);
 		Appledrness.register("wearing_apple_greathelm", (world, player) -> {
 			if (player.getInventory().getArmorStack(EquipmentSlot.HEAD.getEntitySlotId()).isIn(AppleDrTags.Items.APPLE_GREATHELMS)) {
 				return 250;
@@ -88,6 +89,8 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 			return 0;
 		});
 		Appledrness.register("eating_apples", (world, player) -> player.getStatHandler().getStat(Stats.USED, Items.APPLE));
+		Appledrness.register("eating_golden_apples", (world, player) -> player.getStatHandler().getStat(Stats.USED, Items.GOLDEN_APPLE) * 5);
+		Appledrness.register("eating_enchanted_golden_apples", (world, player) -> player.getStatHandler().getStat(Stats.USED, Items.ENCHANTED_GOLDEN_APPLE) * 20);
 		Appledrness.register("having_appledrs_grace", (world, player) -> player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRS_GRACE)) * 50);
 		Appledrness.register("being_in_apple_end", (world, player) -> player.getWorld().getRegistryKey() == AppleDrDimension.WORLD ? 50 : 0);
 		Appledrness.register("accepting_appledraltar_offers", (world, player) -> player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRALTAR_OFFERS_ACCEPTED)) * 10);

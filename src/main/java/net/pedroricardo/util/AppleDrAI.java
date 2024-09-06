@@ -35,7 +35,7 @@ public class AppleDrAI {
     public static final ComponentKey<AIEntityComponent> COMPONENT = ComponentRegistry.getOrCreate(Identifier.of(AppleDrMod.MOD_ID, "ai"), AIEntityComponent.class);
 
     public static final Map<Entity, ChatMemory> CHAT_MEMORY_MAP = new HashMap<>();
-    public static final OpenAiChatModel MODEL = OpenAiChatModel.builder().apiKey(AppleDrMod.OPENAI_API_KEY).modelName(OpenAiChatModelName.GPT_4_O_MINI).build();
+    public static final OpenAiChatModel MODEL = OpenAiChatModel.builder().apiKey(AppleDrConfig.openAIApiKey).modelName(OpenAiChatModelName.GPT_4_O_MINI).build();
 
     public static AiMessage respondSilently(MinecraftServer server, ChatMessage message, Entity entity) {
         final ChatMemory memory = CHAT_MEMORY_MAP.computeIfAbsent(entity, e -> new TokenWindowChatMemory.Builder().maxTokens(100000, new OpenAiTokenizer()).build());
