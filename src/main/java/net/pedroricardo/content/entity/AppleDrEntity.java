@@ -109,13 +109,14 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
 
     public static AppleDrEntity create(ServerPlayerEntity player) {
         AppleDrEntity appleDr = new AppleDrEntity(player.getServerWorld(), player);
-        AppleDrAI.create(appleDr, AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT);
+        AppleDrAI.create(appleDr, AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, AIEntityComponent.DEFAULT_RESPOND_WHEN_NEAR);
         return appleDr;
     }
 
-    public static AppleDrEntity create(ServerPlayerEntity player, Pattern pattern, String context) {
+    public static AppleDrEntity create(ServerPlayerEntity player, Pattern pattern, String context, boolean respondWhenNear) {
         AppleDrEntity appleDr = create(player);
         AIEntityComponent component = appleDr.getComponent(AppleDrAI.COMPONENT);
+        component.setRespondWhenNear(respondWhenNear);
         component.setPattern(pattern);
         component.setContext(context);
         return appleDr;

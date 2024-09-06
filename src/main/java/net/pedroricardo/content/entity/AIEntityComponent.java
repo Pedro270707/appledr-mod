@@ -9,11 +9,13 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class AIEntityComponent implements Component {
+    public static final boolean DEFAULT_RESPOND_WHEN_NEAR = false;
     public static final Pattern DEFAULT_PATTERN = Pattern.compile(".*", Pattern.CASE_INSENSITIVE);
     public static final String DEFAULT_CONTEXT = "You're a typical %type in Minecraft named %name. Your messages should contain at most 120 characters.";
 
     private final Entity entity;
     private boolean shouldRespond = false;
+    private boolean respondWhenNear = DEFAULT_RESPOND_WHEN_NEAR;
     private Pattern pattern = DEFAULT_PATTERN;
     private String context = DEFAULT_CONTEXT;
 
@@ -23,6 +25,7 @@ public class AIEntityComponent implements Component {
 
     @Override
     public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        this.respondWhenNear = tag.getBoolean("respond_when_near");
         this.pattern = Pattern.compile(tag.getString("pattern"), Pattern.CASE_INSENSITIVE);
         this.context = tag.getString("context");
         this.shouldRespond = tag.getBoolean("should_respond");
@@ -30,6 +33,7 @@ public class AIEntityComponent implements Component {
 
     @Override
     public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        tag.putBoolean("respond_when_near", this.respondWhenNear());
         tag.putString("pattern", this.getPattern().pattern());
         tag.putString("context", this.getContext());
         tag.putBoolean("should_respond", this.shouldRespond());
@@ -58,6 +62,14 @@ public class AIEntityComponent implements Component {
 
     public void setShouldRespond(boolean shouldRespond) {
         this.shouldRespond = shouldRespond;
+    }
+
+    public boolean respondWhenNear() {
+        return this.respondWhenNear;
+    }
+
+    public void setRespondWhenNear(boolean respondWhenNear) {
+        this.respondWhenNear = respondWhenNear;
     }
 
     public Entity getEntity() {

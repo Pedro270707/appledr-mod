@@ -1,11 +1,11 @@
 package net.pedroricardo;
 
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import com.mojang.serialization.Codec;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -156,22 +156,28 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 					.then(LiteralArgumentBuilder.<ServerCommandSource>literal("set")
 							.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("entity", EntityArgumentType.entity())
 									.executes(c -> {
-										AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT);
+										AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, AIEntityComponent.DEFAULT_RESPOND_WHEN_NEAR);
 										c.getSource().sendMessage(Text.translatable("commands.ai.create.success"));
 										return Command.SINGLE_SUCCESS;
 									})
-									.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("pattern", StringArgumentType.string())
+									.then(RequiredArgumentBuilder.<ServerCommandSource, Boolean>argument("respondWhenNear", BoolArgumentType.bool())
 											.executes(c -> {
-												AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), AIEntityComponent.DEFAULT_CONTEXT);
+												AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
 												c.getSource().sendMessage(Text.translatable("commands.ai.create.success"));
 												return Command.SINGLE_SUCCESS;
 											})
-											.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("context", StringArgumentType.greedyString())
+											.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("pattern", StringArgumentType.string())
 													.executes(c -> {
-														AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), StringArgumentType.getString(c, "context"));
+														AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
 														c.getSource().sendMessage(Text.translatable("commands.ai.create.success"));
 														return Command.SINGLE_SUCCESS;
-													})))))
+													})
+													.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("context", StringArgumentType.greedyString())
+															.executes(c -> {
+																AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), StringArgumentType.getString(c, "context"), BoolArgumentType.getBool(c, "respondWhenNear"));
+																c.getSource().sendMessage(Text.translatable("commands.ai.create.success"));
+																return Command.SINGLE_SUCCESS;
+															}))))))
 					.then(LiteralArgumentBuilder.<ServerCommandSource>literal("remove")
 							.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("entity", EntityArgumentType.entity())
 									.executes(c -> {
@@ -190,20 +196,27 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 						c.getSource().getWorld().spawnEntity(appleDr);
 						return Command.SINGLE_SUCCESS;
 					})
-					.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("pattern", StringArgumentType.string())
+					.then(RequiredArgumentBuilder.<ServerCommandSource, Boolean>argument("respondWhenNear", BoolArgumentType.bool())
 							.executes(c -> {
-								AppleDrEntity appleDr = AppleDrEntity.create(c.getSource().getPlayerOrThrow(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), AIEntityComponent.DEFAULT_CONTEXT);
+								AppleDrEntity appleDr = AppleDrEntity.create(c.getSource().getPlayerOrThrow(), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
 								appleDr.setAssociatedPlayerUuid(null);
 								c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
 								return Command.SINGLE_SUCCESS;
 							})
-							.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("context", StringArgumentType.greedyString())
+							.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("pattern", StringArgumentType.string())
 									.executes(c -> {
-										AppleDrEntity appleDr = AppleDrEntity.create(c.getSource().getPlayerOrThrow(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), StringArgumentType.getString(c, "context"));
+										AppleDrEntity appleDr = AppleDrEntity.create(c.getSource().getPlayerOrThrow(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
 										appleDr.setAssociatedPlayerUuid(null);
 										c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
 										return Command.SINGLE_SUCCESS;
-									}))));
+									})
+									.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("context", StringArgumentType.greedyString())
+											.executes(c -> {
+												AppleDrEntity appleDr = AppleDrEntity.create(c.getSource().getPlayerOrThrow(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), StringArgumentType.getString(c, "context"), BoolArgumentType.getBool(c, "respondWhenNear"));
+												appleDr.setAssociatedPlayerUuid(null);
+												c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
+												return Command.SINGLE_SUCCESS;
+											})))));
 		});
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

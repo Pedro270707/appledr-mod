@@ -104,11 +104,12 @@ public class AppleDrAI {
         return list;
     }
 
-    public static void create(Entity entity, Pattern pattern, String context) {
+    public static void create(Entity entity, Pattern pattern, String context, boolean respondWhenNear) {
         if (entity instanceof ServerPlayerEntity serverPlayer) {
             entity = new AppleDrEntity(serverPlayer.getServerWorld(), serverPlayer);
         }
         AIEntityComponent component = entity.getComponent(COMPONENT);
+        component.setRespondWhenNear(respondWhenNear);
         component.setPattern(pattern);
         component.setContext(context);
         component.setShouldRespond(true);
