@@ -9,12 +9,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.stat.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import net.pedroricardo.content.AppleDrItems;
+import net.pedroricardo.content.AppleDrStatistics;
 
 public class ApplePieBlock extends SimpleModelBlock {
     public ApplePieBlock(Settings settings, BlockState polymerState) {
@@ -38,6 +40,7 @@ public class ApplePieBlock extends SimpleModelBlock {
         world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, stack), pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0.0, 0.05, 0.0);
         AppleDrItems.APPLE_PIE.finishUsing(stack, world, player);
         player.eatFood(world, stack, AppleDrItems.APPLE_PIE.getComponents().getOrDefault(DataComponentTypes.FOOD, FoodComponents.PUMPKIN_PIE));
+        player.incrementStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLE_PIES_EATEN));
         return ActionResult.SUCCESS;
     }
 }

@@ -79,6 +79,11 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 
 		Appledrness.register("having_apple_in_name", (world, player) -> player.getName().getString().toLowerCase(Locale.ROOT).contains("apple") ? 50 : 0);
 		Appledrness.register("being_appledr", (world, player) -> player.getName().getString().equals("AppleDr") ? 100 : 0);
+		Appledrness.register("being_near_appledr", (world, player) -> {
+			PlayerEntity appleDrPlayer = world.getPlayerByUuid(APPLEDR_UUID);
+			if (appleDrPlayer == null) return 0;
+			return player.distanceTo(appleDrPlayer) <= 50 ? 100 : 0;
+		});
 		Appledrness.register("having_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE) * 5);
 		Appledrness.register("having_golden_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE) * 20);
 		Appledrness.register("having_enchanted_golden_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE) * 30);
@@ -91,6 +96,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 		Appledrness.register("eating_apples", (world, player) -> player.getStatHandler().getStat(Stats.USED, Items.APPLE));
 		Appledrness.register("eating_golden_apples", (world, player) -> player.getStatHandler().getStat(Stats.USED, Items.GOLDEN_APPLE) * 5);
 		Appledrness.register("eating_enchanted_golden_apples", (world, player) -> player.getStatHandler().getStat(Stats.USED, Items.ENCHANTED_GOLDEN_APPLE) * 20);
+		Appledrness.register("eating_apple_pies", (world, player) -> player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLE_PIES_EATEN)) * 20);
 		Appledrness.register("having_appledrs_grace", (world, player) -> player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRS_GRACE)) * 50);
 		Appledrness.register("being_in_apple_end", (world, player) -> player.getWorld().getRegistryKey() == AppleDrDimension.WORLD ? 50 : 0);
 		Appledrness.register("accepting_appledraltar_offers", (world, player) -> player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRALTAR_OFFERS_ACCEPTED)) * 10);
