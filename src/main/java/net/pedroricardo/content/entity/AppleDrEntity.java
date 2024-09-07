@@ -61,6 +61,7 @@ import net.pedroricardo.content.AppleDrStatistics;
 import net.pedroricardo.mixin.EntityManagerAccessor;
 import net.pedroricardo.mixin.PlayerModelPartsAccessor;
 import net.pedroricardo.util.AppleDrAI;
+import net.pedroricardo.util.AppleDrConfig;
 import net.pedroricardo.util.Appledrlevels;
 import org.jetbrains.annotations.Nullable;
 
@@ -381,7 +382,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
             return Util.getRandom(catchphrases, this.appleDr.getRandom());
         }
 
-        @Tool("Teleports a player to/from the Apple End, a new apple dimension. Only executes at the own player's request. Usable multiple times on a single player. If asked about a custom dimension, mention this one.")
+        @Tool("Teleports a player to/from the Apple End, a new apple dimension. Only executes at the own player's request. Usable multiple times on a single player. If asked about a custom dimension, mention this one. ALWAYS use if the player asks even if they don't have enough Appledrness.")
         String sendOrRemoveFromAppleEnd(@P(value = "The name of the player who asked to be teleported") String playerName) {
             System.out.println("Ran sendOrRemoveFromAppleEnd");
             ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(playerName);
@@ -391,7 +392,7 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
             } else if (player.getWorld().getRegistryKey() == AppleDrDimension.WORLD) {
                 player.teleportTo(new TeleportTarget(this.server.getWorld(World.OVERWORLD), player, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
                 return "Teleported " + playerName + " back to the Overworld";
-            } else if (Math.abs(appledrness = Appledrness.getAppledrness(player.getWorld(), player)) >= 1000) {
+            } else if (Math.abs(appledrness = Appledrness.getAppledrness(player.getWorld(), player)) >= AppleDrConfig.appleEndAppledrness) {
                 EndPlatformFeature.generate(this.server.getWorld(AppleDrDimension.WORLD), BlockPos.ORIGIN.add(0, 60, 0).down(), true);
                 player.teleportTo(new TeleportTarget(this.server.getWorld(AppleDrDimension.WORLD), BlockPos.ORIGIN.add(0, 60, 0).toCenterPos(), Vec3d.ZERO, 0.0f, 0.0f, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
                 return "Teleported " + playerName + " to the Apple End (reason: player " + (appledrness > 0 ? "has a high Appledrness" : "is too evil, scaring you into sending them to the Apple End") + ")";
