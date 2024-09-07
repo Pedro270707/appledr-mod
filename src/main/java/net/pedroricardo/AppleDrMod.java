@@ -294,7 +294,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 									player.teleportTo(new TeleportTarget(c.getSource().getServer().getWorld(World.OVERWORLD), player, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
 									c.getSource().sendMessage(Text.translatable("commands.appleend.success.overworld", player.getName()));
 									return Command.SINGLE_SUCCESS;
-								} else if (Math.abs(Appledrness.getAppledrness(player.getWorld(), player)) >= 1000) {
+								} else if (Math.abs(Appledrness.getAppledrness(player.getWorld(), player)) >= AppleDrConfig.appleEndAppledrness) {
 									EndPlatformFeature.generate(c.getSource().getServer().getWorld(AppleDrDimension.WORLD), BlockPos.ORIGIN.add(0, 60, 0).down(), true);
 									player.teleportTo(new TeleportTarget(c.getSource().getServer().getWorld(AppleDrDimension.WORLD), BlockPos.ORIGIN.add(0, 60, 0).toCenterPos(), Vec3d.ZERO, 0.0f, 0.0f, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
 									c.getSource().sendMessage(Text.translatable("commands.appleend.success", player.getName()));
