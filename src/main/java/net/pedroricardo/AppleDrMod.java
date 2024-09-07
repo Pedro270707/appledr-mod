@@ -277,7 +277,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("unstuck")
 					.executes(c -> {
 						ServerPlayerEntity player = c.getSource().getPlayerOrThrow();
-						if (player.getWorld().getRegistryKey() == AppleDrDimension.WORLD && player.getWorld().getRegistryKey() == AppleDrDimension.WORLD_1E8BF29C9C6240B2A7AAE7D226DF8486) {
+						if (player.getWorld().getRegistryKey() == AppleDrDimension.WORLD || player.getWorld().getRegistryKey() == AppleDrDimension.WORLD_1E8BF29C9C6240B2A7AAE7D226DF8486) {
 							player.teleportTo(new TeleportTarget(c.getSource().getServer().getWorld(World.OVERWORLD), player, TeleportTarget.SEND_TRAVEL_THROUGH_PORTAL_PACKET.then(TeleportTarget.ADD_PORTAL_CHUNK_TICKET)));
 						}
 						return Command.SINGLE_SUCCESS;
