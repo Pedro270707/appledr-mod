@@ -267,7 +267,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 									return 0;
 								} else {
 									player.incrementStat(Stats.CUSTOM.getOrCreateStat(AppleDrStatistics.APPLEDRS_GRACE));
-									c.getSource().sendMessage(Text.translatable("commands.grace.success"));
+									c.getSource().sendMessage(Text.translatable("commands.grace.success", player.getName()));
 									return Command.SINGLE_SUCCESS;
 								}
 							})));
