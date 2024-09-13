@@ -384,7 +384,6 @@ public class AppleDrEntity extends PathAwareEntity implements PolymerEntity, Inv
 
         @Tool("Teleports a player to/from the Apple End, a new apple dimension. Only executes at the own player's request. Usable multiple times on a single player. If asked about a custom dimension, mention this one. ALWAYS use if the player asks even if they don't have enough Appledrness.")
         String sendOrRemoveFromAppleEnd(@P(value = "The name of the player who asked to be teleported") String playerName) {
-            System.out.println("Ran sendOrRemoveFromAppleEnd");
             ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(playerName);
             int appledrness;
             if (player == null) {
