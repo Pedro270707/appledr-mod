@@ -1,0 +1,10 @@
+{
+  "sound_event": {
+    "sound_id": "appledrmod:music_disc.the_video"
+  },
+  "description": {
+    "translate": "jukebox_song.appledrmod.the_video"
+  },
+  "comparator_output": 15,
+  "length_in_seconds": 62
+}

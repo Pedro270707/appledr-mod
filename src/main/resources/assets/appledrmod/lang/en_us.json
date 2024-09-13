@@ -66,5 +66,9 @@
   "block.appledrmod.netherite_lock_apple_bricks": "Netherite Lock Apple Bricks",
   "block.appledrmod.apple_stone": "Apple Stone",
   "block.appledrmod.pitch_black_block": "Pitch Black Block",
-  "block.appledrmod.core": "Core"
+  "block.appledrmod.core": "Core",
+  "item.appledrmod.music_disc_skibidi": "Music Disc",
+  "item.appledrmod.music_disc_the_video": "Music Disc",
+  "jukebox_song.appledrmod.skibidi": "DaFuq!?Boom! - Skibidi Toilet",
+  "jukebox_song.appledrmod.the_video": "Domenic Dvojmoc - The Video"
 }

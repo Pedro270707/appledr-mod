@@ -1,0 +1,10 @@
+{
+  "sound_event": {
+    "sound_id": "appledrmod:music_disc.skibidi"
+  },
+  "description": {
+    "translate": "jukebox_song.appledrmod.skibidi"
+  },
+  "comparator_output": 15,
+  "length_in_seconds": 151.022585
+}

@@ -1,0 +1,18 @@
+{
+  "music_disc.skibidi": {
+    "sounds": [
+      {
+        "name": "appledrmod:music_disc/skibidi",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.the_video": {
+    "sounds": [
+      {
+        "name": "appledrmod:music_disc/the_video",
+        "stream": true
+      }
+    ]
+  }
+}

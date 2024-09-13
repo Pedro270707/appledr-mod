@@ -42,6 +42,8 @@ public class ResourcePackUtil {
         item(AppleDrItems.APPLECAXE_IX);
         item(AppleDrItems.APPLECAXE_X);
         item(AppleDrItems.AI_CHIP);
+        item(AppleDrItems.MUSIC_DISC_SKIBIDI);
+        item(AppleDrItems.MUSIC_DISC_THE_VIDEO);
 
         blockWithItem(AppleDrBlocks.APPLE_BRICKS);
         blockWithItem(AppleDrBlocks.IRON_LOCK_APPLE_BRICKS);

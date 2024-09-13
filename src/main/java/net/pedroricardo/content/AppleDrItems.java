@@ -1,7 +1,9 @@
 package net.pedroricardo.content;
 
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FoodComponents;
+import net.minecraft.component.type.JukeboxPlayableComponent;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -40,6 +42,8 @@ public class AppleDrItems {
     public static final Item APPLECAXE_X = register("applecaxe_x", new AppleDrItem(new Item.Settings().rarity(Rarity.EPIC).food(FoodComponents.APPLE).maxCount(1), Items.PAPER));
     public static final Item CORE = register("core", new AppleDrBlockItem(AppleDrBlocks.CORE, new Item.Settings(), Items.STONE));
     public static final Item AI_CHIP = register("ai_chip", new AIChipItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1), Items.PAPER));
+    public static final Item MUSIC_DISC_SKIBIDI = register("music_disc_skibidi", new AppleDrItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC).jukeboxPlayable(AppleDrJukeboxSongs.MUSIC_DISC_SKIBIDI), Items.PAPER));
+    public static final Item MUSIC_DISC_THE_VIDEO = register("music_disc_the_video", new AppleDrItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC).jukeboxPlayable(AppleDrJukeboxSongs.MUSIC_DISC_THE_VIDEO), Items.PAPER));
 
     public static void registerItemGroup(String id, ItemGroup group) {
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(AppleDrMod.MOD_ID, id), group);
@@ -77,6 +81,8 @@ public class AppleDrItems {
             entries.add(APPLECAXE_IX);
             entries.add(APPLECAXE_X);
             entries.add(AI_CHIP);
+            entries.add(MUSIC_DISC_SKIBIDI);
+            entries.add(MUSIC_DISC_THE_VIDEO);
         }).build());
         registerItemGroup("appledrmod.operator", PolymerItemGroupUtils.builder().special().icon(() -> new ItemStack(APPLE_GREATHELM)).displayName(Text.translatable("itemGroup.appledrmod.operator")).entries((ctx, entries) -> {
             entries.add(APPLE_GREATHELM);
