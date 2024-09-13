@@ -85,8 +85,8 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 			return player.distanceTo(appleDrPlayer) <= 50 ? 100 : 0;
 		});
 		Appledrness.register("having_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE) * 5);
-		Appledrness.register("having_golden_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE) * 20);
-		Appledrness.register("having_enchanted_golden_apples_in_inventory", (world, player) -> player.getInventory().count(Items.APPLE) * 30);
+		Appledrness.register("having_golden_apples_in_inventory", (world, player) -> player.getInventory().count(Items.GOLDEN_APPLE) * 20);
+		Appledrness.register("having_enchanted_golden_apples_in_inventory", (world, player) -> player.getInventory().count(Items.ENCHANTED_GOLDEN_APPLE) * 30);
 		Appledrness.register("wearing_apple_greathelm", (world, player) -> {
 			if (player.getInventory().getArmorStack(EquipmentSlot.HEAD.getEntitySlotId()).isIn(AppleDrTags.Items.APPLE_GREATHELMS)) {
 				return 250;
