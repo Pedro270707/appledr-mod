@@ -1,0 +1,10 @@
+{
+  "sound_event": {
+    "sound_id": "appledrmod:music_disc.drip"
+  },
+  "description": {
+    "translate": "jukebox_song.appledrmod.drip"
+  },
+  "comparator_output": 15,
+  "length_in_seconds": 72
+}

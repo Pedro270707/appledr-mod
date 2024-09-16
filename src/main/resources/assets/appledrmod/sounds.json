@@ -14,5 +14,37 @@
         "stream": true
       }
     ]
+  },
+  "music_disc.drinking_song": {
+    "sounds": [
+      {
+        "name": "appledrmod:music_disc/drinking_song",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.drip": {
+    "sounds": [
+      {
+        "name": "appledrmod:music_disc/drip",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.steamed_hams_blizzcon": {
+    "sounds": [
+      {
+        "name": "appledrmod:music_disc/steamed_hams_blizzcon",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.warm_cats": {
+    "sounds": [
+      {
+        "name": "appledrmod:music_disc/warm_cats",
+        "stream": true
+      }
+    ]
   }
 }

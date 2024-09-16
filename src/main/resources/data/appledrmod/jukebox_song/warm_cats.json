@@ -1,0 +1,10 @@
+{
+  "sound_event": {
+    "sound_id": "appledrmod:music_disc.warm_cats"
+  },
+  "description": {
+    "translate": "jukebox_song.appledrmod.warm_cats"
+  },
+  "comparator_output": 15,
+  "length_in_seconds": 254
+}

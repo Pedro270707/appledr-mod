@@ -44,6 +44,10 @@ public class AppleDrItems {
     public static final Item AI_CHIP = register("ai_chip", new AIChipItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1), Items.PAPER));
     public static final Item MUSIC_DISC_SKIBIDI = register("music_disc_skibidi", new AppleDrItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC).jukeboxPlayable(AppleDrJukeboxSongs.MUSIC_DISC_SKIBIDI), Items.PAPER));
     public static final Item MUSIC_DISC_THE_VIDEO = register("music_disc_the_video", new AppleDrItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC).jukeboxPlayable(AppleDrJukeboxSongs.MUSIC_DISC_THE_VIDEO), Items.PAPER));
+    public static final Item MUSIC_DISC_DRINKING_SONG = register("music_disc_drinking_song", new AppleDrItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC).jukeboxPlayable(AppleDrJukeboxSongs.MUSIC_DISC_DRINKING_SONG), Items.PAPER));
+    public static final Item MUSIC_DISC_DRIP = register("music_disc_drip", new AppleDrItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC).jukeboxPlayable(AppleDrJukeboxSongs.MUSIC_DISC_DRIP), Items.PAPER));
+    public static final Item MUSIC_DISC_STEAMED_HAMS_BLIZZCON = register("music_disc_steamed_hams_blizzcon", new AppleDrItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC).jukeboxPlayable(AppleDrJukeboxSongs.MUSIC_DISC_STEAMED_HAMS_BLIZZCON), Items.PAPER));
+    public static final Item MUSIC_DISC_WARM_CATS = register("music_disc_warm_cats", new AppleDrItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC).jukeboxPlayable(AppleDrJukeboxSongs.MUSIC_DISC_WARM_CATS), Items.PAPER));
 
     public static void registerItemGroup(String id, ItemGroup group) {
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(AppleDrMod.MOD_ID, id), group);
@@ -83,6 +87,10 @@ public class AppleDrItems {
             entries.add(AI_CHIP);
             entries.add(MUSIC_DISC_SKIBIDI);
             entries.add(MUSIC_DISC_THE_VIDEO);
+            entries.add(MUSIC_DISC_DRINKING_SONG);
+            entries.add(MUSIC_DISC_DRIP);
+            entries.add(MUSIC_DISC_STEAMED_HAMS_BLIZZCON);
+            entries.add(MUSIC_DISC_WARM_CATS);
         }).build());
         registerItemGroup("appledrmod.operator", PolymerItemGroupUtils.builder().special().icon(() -> new ItemStack(APPLE_GREATHELM)).displayName(Text.translatable("itemGroup.appledrmod.operator")).entries((ctx, entries) -> {
             entries.add(APPLE_GREATHELM);

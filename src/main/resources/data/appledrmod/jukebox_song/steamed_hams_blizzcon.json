@@ -1,0 +1,10 @@
+{
+  "sound_event": {
+    "sound_id": "appledrmod:music_disc.steamed_hams_blizzcon"
+  },
+  "description": {
+    "translate": "jukebox_song.appledrmod.steamed_hams_blizzcon"
+  },
+  "comparator_output": 15,
+  "length_in_seconds": 168
+}

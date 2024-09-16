@@ -44,6 +44,10 @@ public class ResourcePackUtil {
         item(AppleDrItems.AI_CHIP);
         item(AppleDrItems.MUSIC_DISC_SKIBIDI);
         item(AppleDrItems.MUSIC_DISC_THE_VIDEO);
+        item(AppleDrItems.MUSIC_DISC_DRINKING_SONG);
+        item(AppleDrItems.MUSIC_DISC_DRIP);
+        item(AppleDrItems.MUSIC_DISC_STEAMED_HAMS_BLIZZCON);
+        item(AppleDrItems.MUSIC_DISC_WARM_CATS);
 
         blockWithItem(AppleDrBlocks.APPLE_BRICKS);
         blockWithItem(AppleDrBlocks.IRON_LOCK_APPLE_BRICKS);
