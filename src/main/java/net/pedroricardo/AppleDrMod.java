@@ -210,12 +210,14 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 						AppleDrEntity appleDr = AppleDrEntity.create(c.getSource().getPlayerOrThrow());
 						appleDr.setAssociatedPlayerUuid(null);
 						c.getSource().getWorld().spawnEntity(appleDr);
+						c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
 						return Command.SINGLE_SUCCESS;
 					})
 					.then(RequiredArgumentBuilder.<ServerCommandSource, Boolean>argument("respondWhenNear", BoolArgumentType.bool())
 							.executes(c -> {
 								AppleDrEntity appleDr = AppleDrEntity.create(c.getSource().getPlayerOrThrow(), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
 								appleDr.setAssociatedPlayerUuid(null);
+								c.getSource().getWorld().spawnEntity(appleDr);
 								c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
 								return Command.SINGLE_SUCCESS;
 							})
@@ -223,6 +225,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 									.executes(c -> {
 										AppleDrEntity appleDr = AppleDrEntity.create(c.getSource().getPlayerOrThrow(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
 										appleDr.setAssociatedPlayerUuid(null);
+										c.getSource().getWorld().spawnEntity(appleDr);
 										c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
 										return Command.SINGLE_SUCCESS;
 									})
@@ -230,6 +233,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 											.executes(c -> {
 												AppleDrEntity appleDr = AppleDrEntity.create(c.getSource().getPlayerOrThrow(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), StringArgumentType.getString(c, "context"), BoolArgumentType.getBool(c, "respondWhenNear"));
 												appleDr.setAssociatedPlayerUuid(null);
+												c.getSource().getWorld().spawnEntity(appleDr);
 												c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
 												return Command.SINGLE_SUCCESS;
 											})))));
