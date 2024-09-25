@@ -39,7 +39,7 @@ public class AppleDrConnectMixin {
 
     @WrapOperation(method = "disconnectDuplicateLogins", at = @At(value = "INVOKE", target = "Ljava/util/Set;add(Ljava/lang/Object;)Z"))
     private boolean appledrmod$letBrotherAppleJoin(Set instance, Object e, Operation<Boolean> original) {
-        if (e instanceof FakeAIEntityPlayer appleDr) {
+        if (e instanceof FakeAIEntityPlayer) {
             return false;
         }
         return original.call(instance, e);

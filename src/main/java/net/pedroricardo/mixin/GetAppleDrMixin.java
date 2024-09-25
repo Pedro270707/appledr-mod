@@ -40,15 +40,4 @@ public class GetAppleDrMixin {
         }
         return original;
     }
-
-    @ModifyReturnValue(method = "getPlayerList", at = @At("RETURN"))
-    private List<ServerPlayerEntity> appledrmod$addAppleDrs(List<ServerPlayerEntity> original) {
-        List<AppleDrEntity> list = AppleDrEntity.find(((PlayerManager)(Object) this).getServer(), appleDr -> appleDr.getAssociatedPlayerUuid() != null);
-        List<ServerPlayerEntity> newList = new ArrayList<>(original);
-        for (AppleDrEntity appleDr : list) {
-            if (original.stream().map(Entity::getUuid).collect(Collectors.toSet()).contains(appleDr.getAssociatedPlayerUuid())) continue;
-            newList.add(appleDr.getAsPlayer());
-        }
-        return newList;
-    }
 }
