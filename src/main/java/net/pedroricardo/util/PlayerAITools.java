@@ -8,10 +8,14 @@ import dev.langchain4j.agent.tool.Tool;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
+import net.minecraft.text.Text;
+import net.minecraft.util.Language;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -23,6 +27,8 @@ import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.content.AppleDrDimension;
 import net.pedroricardo.content.AppleDrItems;
 import net.pedroricardo.content.AppleDrStatistics;
+import xyz.nucleoid.server.translations.api.Localization;
+import xyz.nucleoid.server.translations.api.language.ServerLanguage;
 
 public class PlayerAITools extends AITools {
     private final MinecraftServer server;
@@ -150,23 +156,41 @@ public class PlayerAITools extends AITools {
         }
     }
 
-    @Tool("Gets the item in your hand.")
-    String getHandStacks() {
-        return "Main: " + this.player.getMainHandStack().toString() + "; Off: " + this.player.getOffHandStack().toString();
-    }
-
-    @Tool("Gets your equipped items.")
-    String getEquippedItems() {
-        String helmet = "Helmet: " + this.player.getEquippedStack(EquipmentSlot.HEAD) + "; ";
-        String chestplate = "Chestplate: " + this.player.getEquippedStack(EquipmentSlot.CHEST) + "; ";
-        String leggings = "Leggings: " + this.player.getEquippedStack(EquipmentSlot.LEGS) + "; ";
-        String boots = "Boots: " + this.player.getEquippedStack(EquipmentSlot.FEET);
-        return helmet + chestplate + leggings + boots;
-    }
-
-    @Tool("Gets every item in your inventory.")
+    @Tool("Gets every item in your str.")
     String getInventoryItems() {
-        return this.player.getInventory().toString();
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < this.player.getInventory().size(); i++) {
+            ItemStack stack = this.player.getInventory().getStack(i);
+            if (stack.isEmpty()) continue;
+            String indexText;
+            if (i == 40) {
+                indexText = "[OFFHAND]: ";
+            } else if (i >= 36) {
+                indexText = switch (i) {
+                    case 36 -> "[HEAD]: ";
+                    case 37 -> "[BODY]: ";
+                    case 38 -> "[LEGS]: ";
+                    default -> "[FEET]: ";
+                };
+            } else {
+                indexText = this.player.getMainHandStack() == stack ? "[MAINHAND]: " : String.format("[%s]: ", i);
+            }
+
+            StringBuilder tooltip = new StringBuilder();
+            for (Text text : stack.getTooltip(Item.TooltipContext.DEFAULT, this.player, TooltipType.BASIC)) {
+                String translated = Localization.text(text, ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString();
+                if (translated.isEmpty()) continue;
+                tooltip.append(translated).append(" / ");
+            }
+
+            str.append(indexText);
+            if (stack.getCount() > 1) {
+                str.append("(").append(stack.getCount()).append(") ");
+            }
+
+            str.append(tooltip.length() >= 3 ? tooltip.substring(0, tooltip.length() - 3) : tooltip.toString()).append("; ");
+        }
+        return str.length() >= 2 ? str.substring(0, str.length() - 2) : str.toString();
     }
 
     @Tool("Teleports a player to/from the Apple End, a new apple dimension. Only executes at the own player's request. Usable multiple times on a single player. If asked about a custom dimension, mention this one. ALWAYS use if the player asks even if they don't have enough Appledrness.")

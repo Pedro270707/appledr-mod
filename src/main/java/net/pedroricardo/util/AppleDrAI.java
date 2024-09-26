@@ -59,7 +59,7 @@ public class AppleDrAI {
         }
         List<ToolSpecification> toolSpecifications = ToolSpecifications.toolSpecificationsFrom(tools);
         aiMessage = MODEL.generate(list, toolSpecifications).content();
-        if (aiMessage.hasToolExecutionRequests()) {
+        while (aiMessage.hasToolExecutionRequests()) {
             List<ToolExecutionRequest> toolExecutionRequests = aiMessage.toolExecutionRequests();
             memory.add(aiMessage);
             list.add(aiMessage);
@@ -71,6 +71,8 @@ public class AppleDrAI {
                 memory.add(toolExecutionResultMessages);
                 list.add(toolExecutionResultMessages);
             });
+
+            aiMessage = MODEL.generate(list, toolSpecifications).content();
         }
         AiMessage finalResponse = MODEL.generate(list).content();
         memory.add(finalResponse);
