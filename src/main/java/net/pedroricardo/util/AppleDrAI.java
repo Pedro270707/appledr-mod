@@ -1,5 +1,7 @@
 package net.pedroricardo.util;
 
+import carpet.patches.EntityPlayerMPFake;
+import carpet.patches.FakeClientConnection;
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
 import dev.langchain4j.agent.tool.*;
@@ -12,16 +14,30 @@ import dev.langchain4j.model.openai.OpenAiTokenizer;
 import dev.langchain4j.service.tool.DefaultToolExecutor;
 import dev.langchain4j.service.tool.ToolExecutor;
 import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.network.NetworkSide;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SignedMessage;
+import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
+import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntitySetHeadYawS2CPacket;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.UserCache;
+import net.minecraft.util.Uuids;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameMode;
+import net.minecraft.world.World;
 import net.pedroricardo.content.entity.AIEntity;
 import net.pedroricardo.content.entity.AIEntityComponent;
-import net.pedroricardo.content.entity.AppleDrEntity;
+import net.pedroricardo.mixin.EntityAccessor;
 import net.pedroricardo.mixin.EntityManagerAccessor;
+import net.pedroricardo.mixin.PlayerModelPartsAccessor;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -31,12 +47,15 @@ public class AppleDrAI {
     public static final Map<Entity, ChatMemory> CHAT_MEMORY_MAP = new HashMap<>();
     public static final OpenAiChatModel MODEL = OpenAiChatModel.builder().apiKey(AppleDrConfig.openAIApiKey).modelName(OpenAiChatModelName.GPT_4_O_MINI).build();
 
-    public static AiMessage respondSilently(MinecraftServer server, ChatMessage message, Entity entity) {
+    public static AiMessage respondSilently(ChatMessage message, Entity entity) {
+        return respondSilently(message, entity, null);
+    }
+
+    public static AiMessage respondSilently(ChatMessage message, Entity entity, AITools tools) {
         final ChatMemory memory = CHAT_MEMORY_MAP.computeIfAbsent(entity, e -> new TokenWindowChatMemory.Builder().maxTokens(100000, new OpenAiTokenizer()).build());
         memory.add(message);
         List<ChatMessage> list = Lists.newArrayList(SystemMessage.systemMessage(entity.getComponent(AIEntityComponent.COMPONENT).getContext()));
         list.addAll(memory.messages());
-        Object tools = entity instanceof AIEntity aiEntity ? aiEntity.getTools(server) : null;
         AiMessage aiMessage;
         if (tools == null) {
             aiMessage = MODEL.generate(list).content();
@@ -63,8 +82,8 @@ public class AppleDrAI {
         return finalResponse;
     }
 
-    public static AiMessage respond(MinecraftServer server, ChatMessage message, Entity entity) {
-        AiMessage response = respondSilently(server, message, entity);
+    public static AiMessage respond(MinecraftServer server, ChatMessage message, Entity entity, AITools tools) {
+        AiMessage response = respondSilently(message, entity, tools);
         String str = response.text();
         FakePlayer player = entity instanceof AIEntity aiEntity ? aiEntity.getAsPlayer() : FakePlayer.get((ServerWorld) entity.getWorld(), new GameProfile(entity.getUuid(), entity.getName().getString()));
         server.getPlayerManager().broadcast(SignedMessage.ofUnsigned(str), player, MessageType.params(MessageType.CHAT, player));
@@ -82,7 +101,7 @@ public class AppleDrAI {
                 name = String.format("%s: ", player.getName().getString());
             }
 
-            AppleDrAI.respond(entity.getServer(), UserMessage.userMessage(name + message.getContent().getString()), entity);
+            AppleDrAI.respond(entity.getServer(), UserMessage.userMessage(name + message.getContent().getString()), entity, entity instanceof EntityPlayerMPFake ? new PlayerAITools((EntityPlayerMPFake) entity, entity.getServer()) : null);
         }).start();
     }
 
@@ -98,18 +117,54 @@ public class AppleDrAI {
         return list;
     }
 
-    public static void create(Entity entity, Pattern pattern, String context, boolean respondWhenNear) {
-        if (entity instanceof ServerPlayerEntity serverPlayer) {
-            entity = new AppleDrEntity(serverPlayer.getServerWorld(), serverPlayer);
+    public static Entity create(Entity entity, Pattern pattern, String context, boolean respondWhenNear) {
+        if (entity instanceof ServerPlayerEntity && !(entity instanceof EntityPlayerMPFake)) {
+            throw new IllegalArgumentException("Entity must not be a player! Use createPlayer for players.");
         }
         AIEntityComponent component = entity.getComponent(AIEntityComponent.COMPONENT);
         component.setRespondWhenNear(respondWhenNear);
         component.setPattern(pattern);
         component.setContext(context);
         component.setShouldRespond(true);
+        return entity;
     }
 
     public static void removeAI(Entity entity) {
         entity.getComponent(AIEntityComponent.COMPONENT).setShouldRespond(false);
+    }
+
+    public static void createPlayer(final ServerPlayerEntity player, MinecraftServer server, Pattern pattern, String context, boolean respondWhenNear) {
+        ServerWorld worldIn = server.getWorld(player.getServerWorld().getRegistryKey());
+        UserCache.setUseRemote(false);
+        GameProfile gameprofile;
+        try {
+            gameprofile = server.getUserCache().findByName(player.getGameProfile().getName()).orElse(null);
+        } finally {
+            UserCache.setUseRemote(server.isDedicated() && server.isOnlineMode());
+        }
+        if (gameprofile == null) {
+            gameprofile = new GameProfile(Uuids.getOfflinePlayerUuid(player.getGameProfile().getName()), player.getGameProfile().getName());
+        }
+        GameProfile finalGP = gameprofile;
+        SkullBlockEntity.fetchProfileByName(gameprofile.getName()).thenAcceptAsync(p -> {
+            GameProfile current = finalGP;
+            if (p.isPresent()) {
+                current = p.get();
+            }
+            EntityPlayerMPFake instance = EntityPlayerMPFake.respawnFake(server, worldIn, current, player.getClientOptions());
+            instance.getAttributes().setFrom(player.getAttributes());
+            instance.fixStartingPosition = () -> instance.refreshPositionAndAngles(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
+            server.getPlayerManager().onPlayerConnect(new FakeClientConnection(NetworkSide.SERVERBOUND), instance, new ConnectedClientData(current, 0, instance.getClientOptions(), false));
+            instance.teleport(worldIn, player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
+            instance.setHealth(player.getHealth());
+            ((EntityAccessor) instance).invokeUnsetRemoved();
+            instance.getAttributeInstance(EntityAttributes.GENERIC_STEP_HEIGHT).setBaseValue(0.6F);
+            instance.interactionManager.changeGameMode(player.interactionManager.getGameMode());
+            server.getPlayerManager().sendToDimension(new EntitySetHeadYawS2CPacket(instance, (byte) (instance.headYaw * 256 / 360)), player.getServerWorld().getRegistryKey());
+            server.getPlayerManager().sendToDimension(new EntityPositionS2CPacket(instance), player.getServerWorld().getRegistryKey());
+//            instance.getDataTracker().set(PlayerModelPartsAccessor.playerModelParts(), player.getDataTracker().get(PlayerModelPartsAccessor.playerModelParts()));
+            instance.getAbilities().flying = player.getAbilities().flying;
+            create(instance, pattern, context, respondWhenNear);
+        }, server);
     }
 }

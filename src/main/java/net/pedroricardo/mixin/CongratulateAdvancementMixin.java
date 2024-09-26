@@ -1,12 +1,13 @@
 package net.pedroricardo.mixin;
 
+import carpet.patches.EntityPlayerMPFake;
 import dev.langchain4j.data.message.SystemMessage;
 import net.minecraft.advancement.AdvancementDisplay;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.pedroricardo.content.entity.AppleDrEntity;
 import net.pedroricardo.util.AppleDrAI;
+import net.pedroricardo.util.PlayerAITools;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,9 +26,8 @@ public class CongratulateAdvancementMixin {
     private void appledrmod$tellAppleAboutAdvancement(AdvancementEntry advancementEntry, AdvancementDisplay display, CallbackInfo ci) {
         final ServerPlayerEntity owner = ((OwnerAccessor) this).owner();
         new Thread(() -> {
-            AppleDrEntity.find(owner.getServer()).forEach(aiEntity -> {
-                if (!(aiEntity instanceof AppleDrEntity appleDr)) return;
-                AppleDrAI.respond(owner.getServer(), SystemMessage.systemMessage(String.format("The player %s received the advancement with ID %s. You should congratulate them using the name of the advancement (not the ID).", owner.getDisplayName().getString(), advancementEntry.id().toString())), appleDr);
+            AppleDrAI.findAIEntities(owner.getServer(), entity -> entity instanceof EntityPlayerMPFake).forEach(aiEntity -> {
+                AppleDrAI.respond(owner.getServer(), SystemMessage.systemMessage(String.format("The player %s received the advancement with ID %s. You should congratulate them using the name of the advancement (not the ID).", owner.getDisplayName().getString(), advancementEntry.id().toString())), aiEntity, new PlayerAITools((EntityPlayerMPFake) aiEntity, aiEntity.getServer()));
             });
         }).start();
     }

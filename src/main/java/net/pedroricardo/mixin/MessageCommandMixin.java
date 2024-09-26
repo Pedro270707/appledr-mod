@@ -1,5 +1,6 @@
 package net.pedroricardo.mixin;
 
+import carpet.patches.EntityPlayerMPFake;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -13,6 +14,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.pedroricardo.content.entity.FakeAIEntityPlayer;
 import net.pedroricardo.util.AppleDrAI;
+import net.pedroricardo.util.PlayerAITools;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,9 +31,9 @@ public class MessageCommandMixin {
 
     @WrapOperation(method = "execute", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;sendChatMessage(Lnet/minecraft/network/message/SentMessage;ZLnet/minecraft/network/message/MessageType$Parameters;)V"))
     private static void appledrmod$sendChatMessageToAppleDrEntity(ServerPlayerEntity instance, SentMessage message, boolean filterMaskEnabled, MessageType.Parameters params, Operation<Void> original, @Local(argsOnly = true) ServerCommandSource source) {
-        if (instance instanceof FakeAIEntityPlayer fakePlayer) {
+        if (instance instanceof EntityPlayerMPFake fakePlayer) {
             new Thread(() -> {
-                AiMessage aiMessage = AppleDrAI.respondSilently(source.getServer(), UserMessage.userMessage(params.name() + " whispers to you: " + message.content().getString()), fakePlayer.getAIEntity());
+                AiMessage aiMessage = AppleDrAI.respondSilently(UserMessage.userMessage(params.name() + " whispers to you: " + message.content().getString()), fakePlayer, new PlayerAITools(fakePlayer, source.getServer()));
                 MessageType.Parameters parameters = MessageType.params(MessageType.MSG_COMMAND_INCOMING, fakePlayer);
                 source.sendChatMessage(SentMessage.of(SignedMessage.ofUnsigned(aiMessage.text())), source.getPlayer() != null && source.shouldFilterText(source.getPlayer()), parameters);
             }).start();

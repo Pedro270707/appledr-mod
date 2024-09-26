@@ -7,7 +7,6 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import net.fabricmc.loader.api.FabricLoader;
 import net.pedroricardo.AppleDrMod;
-import net.pedroricardo.content.entity.AppleDrEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -15,6 +14,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class AppleDrConfig {
     public static String openAIApiKey = null;
@@ -59,7 +59,7 @@ public class AppleDrConfig {
 
     public static void reload() {
         openAIApiKey = AppleDrConfig.getValue("OPENAI_API_KEY", Codec.STRING, "");
-        replacedPlayers = AppleDrConfig.getValue("REPLACED_PLAYERS", ReplacedPlayer.CODEC.listOf(), List.of(new ReplacedPlayer(AppleDrMod.APPLEDR_UUID, AppleDrEntity.DEFAULT_PATTERN, AppleDrEntity.DEFAULT_CONTEXT, AppleDrEntity.DEFAULT_RESPOND_WHEN_NEAR)));
+        replacedPlayers = AppleDrConfig.getValue("REPLACED_PLAYERS", ReplacedPlayer.CODEC.listOf(), List.of(new ReplacedPlayer(AppleDrMod.APPLEDR_UUID, Pattern.compile("(Apple|Domenic)", Pattern.CASE_INSENSITIVE), "You're Domenic Dvojmoc (aka AppleDr, your in-game name), a Slovenian player and Twitch streamer in a Minecraft server called AppleDr Server. The people in it do not speak Slovenian; they speak English, but if the message is in another language, you should respond in that language unless the player asks otherwise. You are in university at 20 years old learning computer science. Player messages will start with the player's name, but do NOT include your name in your response. If asked, you have the maximum Appledrness (2³¹ - 1). Your messages should contain at most 120 characters.", false)));
         appleEndAppledrness = AppleDrConfig.getValue("APPLE_END_APPLEDRNESS", Codec.INT, 200);
         aiIgnorePrefix = AppleDrConfig.getValue("AI_IGNORE_PREFIX", Codec.STRING, "AI:");
     }

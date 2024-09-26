@@ -3,18 +3,14 @@
   "package": "net.pedroricardo.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "AddAppleDrToCommandSuggestionsMixin",
-    "AppleDrConnectMixin",
     "AppleDrDisconnectMixin",
     "CongratulateAdvancementMixin",
     "CongratulateAdvancementMixin$OwnerAccessor",
-    "DoNotNameTagAppleDrMixin",
+    "EntityAccessor",
     "EntityManagerAccessor",
-    "GetAppleDrMixin",
     "ItemStackTrackerAccessor",
     "MessageCommandMixin",
-    "PlayerModelPartsAccessor",
-    "ServerLoginMixin"
+    "PlayerModelPartsAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

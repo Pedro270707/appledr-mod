@@ -1,5 +1,6 @@
 package net.pedroricardo;
 
+import carpet.helpers.EntityPlayerActionPack;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -47,11 +48,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.EndPlatformFeature;
 import net.pedroricardo.appledrness.Appledrness;
 import net.pedroricardo.content.AppleDrDimension;
-import net.pedroricardo.content.AppleDrEntityTypes;
 import net.pedroricardo.content.AppleDrItems;
 import net.pedroricardo.content.AppleDrStatistics;
 import net.pedroricardo.content.entity.AIEntityComponent;
-import net.pedroricardo.content.entity.AppleDrEntity;
 import net.pedroricardo.content.worldgen.TheAppleEndBiomeSource;
 import net.pedroricardo.loot.AppleDrLootConditions;
 import net.pedroricardo.loot.AppledrnessLootConditionType;
@@ -74,7 +73,6 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 
 		AppleDrLootConditions.init();
 		AppleDrItems.init();
-		AppleDrEntityTypes.init();
 		AppleDrStatistics.init();
 
 		Appledrness.register("having_apple_in_name", (world, player) -> player.getName().getString().toLowerCase(Locale.ROOT).contains("apple") ? 50 : 0);
@@ -158,11 +156,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 			if (message.isSenderMissing() || sender instanceof FakePlayer) return;
 			AppleDrAI.findAIEntities(sender.getServer(), entity -> {
 				if (message.getContent().getString().startsWith(AppleDrConfig.aiIgnorePrefix)) return false;
-				boolean reachesEntity = entity.getComponent(AIEntityComponent.COMPONENT).getPattern().matcher(message.getContent().getString()).find() || (entity.getComponent(AIEntityComponent.COMPONENT).respondWhenNear() && entity.getWorld() == sender.getServerWorld() && sender.distanceTo(entity) <= 32.0f);
-				if (entity instanceof AppleDrEntity appleDr) {
-					return reachesEntity && (appleDr.getAssociatedPlayerUuid() == null || !appleDr.getAssociatedPlayerUuid().equals(sender.getUuid()));
-				}
-				return reachesEntity;
+				return entity.getComponent(AIEntityComponent.COMPONENT).getPattern().matcher(message.getContent().getString()).find() || (entity.getComponent(AIEntityComponent.COMPONENT).respondWhenNear() && entity.getWorld() == sender.getServerWorld() && sender.distanceTo(entity) <= 32.0f);
 			}).forEach(entity -> AppleDrAI.reply(entity, message));
 		});
 
@@ -172,24 +166,52 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 					.then(LiteralArgumentBuilder.<ServerCommandSource>literal("set")
 							.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("entity", EntityArgumentType.entity())
 									.executes(c -> {
+										Entity entity = EntityArgumentType.getEntity(c, "entity");
+										if (entity instanceof ServerPlayerEntity player) {
+											AppleDrAI.createPlayer(player, c.getSource().getServer(), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, AIEntityComponent.DEFAULT_RESPOND_WHEN_NEAR);
+											c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
+											return Command.SINGLE_SUCCESS;
+										}
+
 										AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, AIEntityComponent.DEFAULT_RESPOND_WHEN_NEAR);
 										c.getSource().sendMessage(Text.translatable("commands.ai.create.success"));
 										return Command.SINGLE_SUCCESS;
 									})
 									.then(RequiredArgumentBuilder.<ServerCommandSource, Boolean>argument("respondWhenNear", BoolArgumentType.bool())
 											.executes(c -> {
+												Entity entity = EntityArgumentType.getEntity(c, "entity");
+												if (entity instanceof ServerPlayerEntity player) {
+													AppleDrAI.createPlayer(player, c.getSource().getServer(), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
+													c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
+													return Command.SINGLE_SUCCESS;
+												}
+
 												AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
 												c.getSource().sendMessage(Text.translatable("commands.ai.create.success"));
 												return Command.SINGLE_SUCCESS;
 											})
 											.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("pattern", StringArgumentType.string())
 													.executes(c -> {
+														Entity entity = EntityArgumentType.getEntity(c, "entity");
+														if (entity instanceof ServerPlayerEntity player) {
+															AppleDrAI.createPlayer(player, c.getSource().getServer(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
+															c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
+															return Command.SINGLE_SUCCESS;
+														}
+
 														AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
 														c.getSource().sendMessage(Text.translatable("commands.ai.create.success"));
 														return Command.SINGLE_SUCCESS;
 													})
 													.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("context", StringArgumentType.greedyString())
 															.executes(c -> {
+																Entity entity = EntityArgumentType.getEntity(c, "entity");
+																if (entity instanceof ServerPlayerEntity player) {
+																	AppleDrAI.createPlayer(player, c.getSource().getServer(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), StringArgumentType.getString(c, "context"), BoolArgumentType.getBool(c, "respondWhenNear"));
+																	c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
+																	return Command.SINGLE_SUCCESS;
+																}
+
 																AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), StringArgumentType.getString(c, "context"), BoolArgumentType.getBool(c, "respondWhenNear"));
 																c.getSource().sendMessage(Text.translatable("commands.ai.create.success"));
 																return Command.SINGLE_SUCCESS;
@@ -201,42 +223,6 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 										c.getSource().sendMessage(Text.translatable("commands.ai.remove.success"));
 										return Command.SINGLE_SUCCESS;
 									}))));
-		});
-
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("appledr")
-					.requires(source -> source.hasPermissionLevel(2))
-					.executes(c -> {
-						AppleDrEntity appleDr = AppleDrEntity.create(c.getSource().getPlayerOrThrow());
-						appleDr.setAssociatedPlayerUuid(null);
-						c.getSource().getWorld().spawnEntity(appleDr);
-						c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
-						return Command.SINGLE_SUCCESS;
-					})
-					.then(RequiredArgumentBuilder.<ServerCommandSource, Boolean>argument("respondWhenNear", BoolArgumentType.bool())
-							.executes(c -> {
-								AppleDrEntity appleDr = AppleDrEntity.create(c.getSource().getPlayerOrThrow(), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
-								appleDr.setAssociatedPlayerUuid(null);
-								c.getSource().getWorld().spawnEntity(appleDr);
-								c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
-								return Command.SINGLE_SUCCESS;
-							})
-							.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("pattern", StringArgumentType.string())
-									.executes(c -> {
-										AppleDrEntity appleDr = AppleDrEntity.create(c.getSource().getPlayerOrThrow(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
-										appleDr.setAssociatedPlayerUuid(null);
-										c.getSource().getWorld().spawnEntity(appleDr);
-										c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
-										return Command.SINGLE_SUCCESS;
-									})
-									.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("context", StringArgumentType.greedyString())
-											.executes(c -> {
-												AppleDrEntity appleDr = AppleDrEntity.create(c.getSource().getPlayerOrThrow(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), StringArgumentType.getString(c, "context"), BoolArgumentType.getBool(c, "respondWhenNear"));
-												appleDr.setAssociatedPlayerUuid(null);
-												c.getSource().getWorld().spawnEntity(appleDr);
-												c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
-												return Command.SINGLE_SUCCESS;
-											})))));
 		});
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
