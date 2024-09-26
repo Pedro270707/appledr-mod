@@ -35,62 +35,62 @@ public class PlayerAITools extends AITools {
 
     @Tool("Makes you jump once")
     String action(@P("The action") ActionType type) {
-        ((ServerPlayerInterface) player).getActionPack().start(type.getActionType(), EntityPlayerActionPack.Action.once());
+        ((ServerPlayerInterface) this.player).getActionPack().start(type.getActionType(), EntityPlayerActionPack.Action.once());
         return "Jumped!";
     }
 
     @Tool("Makes you jump continuously")
     String continuousAction(@P("The action") ActionType type) {
-        ((ServerPlayerInterface) player).getActionPack().start(type.getActionType(), EntityPlayerActionPack.Action.continuous());
+        ((ServerPlayerInterface) this.player).getActionPack().start(type.getActionType(), EntityPlayerActionPack.Action.continuous());
         return "Jumping!";
     }
 
     @Tool("Makes you jump for an interval of time")
     String intervalAction(@P("The action") ActionType type, @P("The interval in ticks") int interval, @P("The interval offset in ticks") int offset) {
-        ((ServerPlayerInterface) player).getActionPack().start(type.getActionType(), EntityPlayerActionPack.Action.interval(interval, offset));
+        ((ServerPlayerInterface) this.player).getActionPack().start(type.getActionType(), EntityPlayerActionPack.Action.interval(interval, offset));
         return offset == 0 ? "Executing action " + type.name() : "Executing action " + type.name() + " in " + offset + " ticks!";
     }
 
     @Tool("Sets the selected slot in your hotbar")
     String setSlot(@P("Slot index, between 1 and 9") int slot) {
         slot = (slot - 1) % 9 + 1;
-        ((ServerPlayerInterface) player).getActionPack().setSlot(slot);
+        ((ServerPlayerInterface) this.player).getActionPack().setSlot(slot);
         return "Set slot to " + slot;
     }
 
     @Tool("Sets if you are sneaking or not")
     String setSneak(boolean sneaking) {
-        ((ServerPlayerInterface) player).getActionPack().setSneaking(sneaking);
+        ((ServerPlayerInterface) this.player).getActionPack().setSneaking(sneaking);
         return "Set sneaking to " + sneaking;
     }
 
     @Tool("Sets if you are sprinting or not")
     String setSprinting(boolean sprinting) {
-        ((ServerPlayerInterface) player).getActionPack().setSprinting(sprinting);
+        ((ServerPlayerInterface) this.player).getActionPack().setSprinting(sprinting);
         return "Set sprinting to " + sprinting;
     }
 
     @Tool("Stops everything you are doing")
     String stop() {
-        ((ServerPlayerInterface) player).getActionPack().stopAll();
+        ((ServerPlayerInterface) this.player).getActionPack().stopAll();
         return "Stopping every action!";
     }
 
     @Tool("Makes you stop moving")
     String stopMovement() {
-        ((ServerPlayerInterface) player).getActionPack().stopMovement();
+        ((ServerPlayerInterface) this.player).getActionPack().stopMovement();
         return "Movement stopped!";
     }
 
     @Tool("Looks in a direction")
     String lookAtDirection(Direction direction) {
-        ((ServerPlayerInterface) player).getActionPack().look(direction);
+        ((ServerPlayerInterface) this.player).getActionPack().look(direction);
         return "Looking at " + direction.getName();
     }
 
     @Tool("Looks at a position")
     String lookAtPosition(double x, double y, double z) {
-        ((ServerPlayerInterface) player).getActionPack().lookAt(new Vec3d(x, y, z));
+        ((ServerPlayerInterface) this.player).getActionPack().lookAt(new Vec3d(x, y, z));
         return "Looking at x=" + x + "; y=" + y + "; z=" + z;
     }
 
@@ -100,27 +100,27 @@ public class PlayerAITools extends AITools {
         if (player == null) {
             return playerName + " is not online";
         }
-        ((ServerPlayerInterface) player).getActionPack().lookAt(EntityAnchorArgumentType.EntityAnchor.EYES.positionAt(player));
+        ((ServerPlayerInterface) this.player).getActionPack().lookAt(EntityAnchorArgumentType.EntityAnchor.EYES.positionAt(player));
         return "Looked at " + playerName;
     }
 
     @Tool("Turns a certain amount of degrees")
     String turn(@P("The yaw in degrees") float yaw, @P("The pitch in degrees") float pitch) {
-        ((ServerPlayerInterface) player).getActionPack().turn(yaw, pitch);
+        ((ServerPlayerInterface) this.player).getActionPack().turn(yaw, pitch);
         return "Turned " + yaw + "° in yaw and " + pitch + "° in pitch";
     }
 
     @Tool("Moves forward (or backward if negative)")
     String setForward(@P("The amount from -1.0 to 1.0, with -1 being backward and 1 being forward") float amount) {
         amount = MathHelper.clamp(amount, -1.0f, 1.0f);
-        ((ServerPlayerInterface) player).getActionPack().setForward(amount);
+        ((ServerPlayerInterface) this.player).getActionPack().setForward(amount);
         return "Moving " + (amount < 0.0f ? "backward" : "forward");
     }
 
     @Tool("Moves to the left (or right if negative)")
     String setStrafing(@P("The amount from -1.0 to 1.0, with -1 being right and 1 being left") float amount) {
         amount = MathHelper.clamp(amount, -1.0f, 1.0f);
-        ((ServerPlayerInterface) player).getActionPack().setStrafing(amount);
+        ((ServerPlayerInterface) this.player).getActionPack().setStrafing(amount);
         return "Moving " + (amount < 0.0f ? "right" : "left");
     }
 

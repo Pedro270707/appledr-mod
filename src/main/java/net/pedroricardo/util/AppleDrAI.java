@@ -20,24 +20,19 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SignedMessage;
-import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
 import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySetHeadYawS2CPacket;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.UserCache;
 import net.minecraft.util.Uuids;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameMode;
-import net.minecraft.world.World;
 import net.pedroricardo.content.entity.AIEntity;
 import net.pedroricardo.content.entity.AIEntityComponent;
 import net.pedroricardo.mixin.EntityAccessor;
 import net.pedroricardo.mixin.EntityManagerAccessor;
-import net.pedroricardo.mixin.PlayerModelPartsAccessor;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -133,23 +128,29 @@ public class AppleDrAI {
         entity.getComponent(AIEntityComponent.COMPONENT).setShouldRespond(false);
     }
 
-    public static void createPlayer(final ServerPlayerEntity player, MinecraftServer server, Pattern pattern, String context, boolean respondWhenNear) {
+    public static void createPlayer(final ServerPlayerEntity player, MinecraftServer server, Pattern pattern, String context, boolean respondWhenNear, @Nullable UUID uuid) {
         ServerWorld worldIn = server.getWorld(player.getServerWorld().getRegistryKey());
         UserCache.setUseRemote(false);
-        GameProfile gameprofile;
+        GameProfile profile;
         try {
-            gameprofile = server.getUserCache().findByName(player.getGameProfile().getName()).orElse(null);
+            profile = server.getUserCache().findByName(player.getGameProfile().getName()).orElse(null);
         } finally {
             UserCache.setUseRemote(server.isDedicated() && server.isOnlineMode());
         }
-        if (gameprofile == null) {
-            gameprofile = new GameProfile(Uuids.getOfflinePlayerUuid(player.getGameProfile().getName()), player.getGameProfile().getName());
+        if (profile == null) {
+            profile = new GameProfile(Uuids.getOfflinePlayerUuid(player.getGameProfile().getName()), player.getGameProfile().getName());
         }
-        GameProfile finalGP = gameprofile;
-        SkullBlockEntity.fetchProfileByName(gameprofile.getName()).thenAcceptAsync(p -> {
+        GameProfile finalGP = profile;
+        SkullBlockEntity.fetchProfileByName(profile.getName()).thenAcceptAsync(p -> {
             GameProfile current = finalGP;
             if (p.isPresent()) {
                 current = p.get();
+            }
+            if (uuid != null) {
+                GameProfile newProfile = new GameProfile(uuid, current.getName());
+                newProfile.getProperties().clear();
+                current.getProperties().forEach((s, property) -> newProfile.getProperties().put(s, property));
+                current = newProfile;
             }
             EntityPlayerMPFake instance = EntityPlayerMPFake.respawnFake(server, worldIn, current, player.getClientOptions());
             instance.getAttributes().setFrom(player.getAttributes());
@@ -166,5 +167,9 @@ public class AppleDrAI {
             instance.getAbilities().flying = player.getAbilities().flying;
             create(instance, pattern, context, respondWhenNear);
         }, server);
+    }
+
+    public static void createPlayer(final ServerPlayerEntity player, MinecraftServer server, Pattern pattern, String context, boolean respondWhenNear) {
+        createPlayer(player, server, pattern, context, respondWhenNear, null);
     }
 }

@@ -1,6 +1,6 @@
 package net.pedroricardo;
 
-import carpet.helpers.EntityPlayerActionPack;
+import carpet.patches.EntityPlayerMPFake;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -167,8 +167,8 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 							.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("entity", EntityArgumentType.entity())
 									.executes(c -> {
 										Entity entity = EntityArgumentType.getEntity(c, "entity");
-										if (entity instanceof ServerPlayerEntity player) {
-											AppleDrAI.createPlayer(player, c.getSource().getServer(), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, AIEntityComponent.DEFAULT_RESPOND_WHEN_NEAR);
+										if (entity instanceof ServerPlayerEntity player && !(entity instanceof EntityPlayerMPFake)) {
+											AppleDrAI.createPlayer(player, c.getSource().getServer(), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, AIEntityComponent.DEFAULT_RESPOND_WHEN_NEAR, UUID.randomUUID());
 											c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
 											return Command.SINGLE_SUCCESS;
 										}
@@ -180,8 +180,8 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 									.then(RequiredArgumentBuilder.<ServerCommandSource, Boolean>argument("respondWhenNear", BoolArgumentType.bool())
 											.executes(c -> {
 												Entity entity = EntityArgumentType.getEntity(c, "entity");
-												if (entity instanceof ServerPlayerEntity player) {
-													AppleDrAI.createPlayer(player, c.getSource().getServer(), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
+												if (entity instanceof ServerPlayerEntity player && !(entity instanceof EntityPlayerMPFake)) {
+													AppleDrAI.createPlayer(player, c.getSource().getServer(), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"), UUID.randomUUID());
 													c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
 													return Command.SINGLE_SUCCESS;
 												}
@@ -193,8 +193,8 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 											.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("pattern", StringArgumentType.string())
 													.executes(c -> {
 														Entity entity = EntityArgumentType.getEntity(c, "entity");
-														if (entity instanceof ServerPlayerEntity player) {
-															AppleDrAI.createPlayer(player, c.getSource().getServer(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
+														if (entity instanceof ServerPlayerEntity player && !(entity instanceof EntityPlayerMPFake)) {
+															AppleDrAI.createPlayer(player, c.getSource().getServer(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"), UUID.randomUUID());
 															c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
 															return Command.SINGLE_SUCCESS;
 														}
@@ -206,8 +206,8 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 													.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("context", StringArgumentType.greedyString())
 															.executes(c -> {
 																Entity entity = EntityArgumentType.getEntity(c, "entity");
-																if (entity instanceof ServerPlayerEntity player) {
-																	AppleDrAI.createPlayer(player, c.getSource().getServer(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), StringArgumentType.getString(c, "context"), BoolArgumentType.getBool(c, "respondWhenNear"));
+																if (entity instanceof ServerPlayerEntity player && !(entity instanceof EntityPlayerMPFake)) {
+																	AppleDrAI.createPlayer(player, c.getSource().getServer(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), StringArgumentType.getString(c, "context"), BoolArgumentType.getBool(c, "respondWhenNear"), UUID.randomUUID());
 																	c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
 																	return Command.SINGLE_SUCCESS;
 																}
