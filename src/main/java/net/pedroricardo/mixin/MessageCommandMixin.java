@@ -4,15 +4,13 @@ import carpet.patches.EntityPlayerMPFake;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.UserMessage;
+import io.github.sashirestela.openai.domain.chat.ChatMessage;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SentMessage;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.command.MessageCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.pedroricardo.content.entity.FakeAIEntityPlayer;
 import net.pedroricardo.util.AppleDrAI;
 import net.pedroricardo.util.PlayerAITools;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,9 +31,9 @@ public class MessageCommandMixin {
     private static void appledrmod$sendChatMessageToAppleDrEntity(ServerPlayerEntity instance, SentMessage message, boolean filterMaskEnabled, MessageType.Parameters params, Operation<Void> original, @Local(argsOnly = true) ServerCommandSource source) {
         if (instance instanceof EntityPlayerMPFake fakePlayer) {
             new Thread(() -> {
-                AiMessage aiMessage = AppleDrAI.respondSilently(UserMessage.userMessage(params.name() + " whispers to you: " + message.content().getString()), fakePlayer, new PlayerAITools(fakePlayer, source.getServer()));
+                ChatMessage.ResponseMessage aiMessage = AppleDrAI.respondSilently(ChatMessage.UserMessage.of(params.name() + " whispers to you: " + message.content().getString()), fakePlayer, new PlayerAITools(fakePlayer, source.getServer()));
                 MessageType.Parameters parameters = MessageType.params(MessageType.MSG_COMMAND_INCOMING, fakePlayer);
-                source.sendChatMessage(SentMessage.of(SignedMessage.ofUnsigned(aiMessage.text())), source.getPlayer() != null && source.shouldFilterText(source.getPlayer()), parameters);
+                source.sendChatMessage(SentMessage.of(SignedMessage.ofUnsigned(aiMessage.getContent())), source.getPlayer() != null && source.shouldFilterText(source.getPlayer()), parameters);
             }).start();
         } else {
             original.call(instance, message, filterMaskEnabled, params);

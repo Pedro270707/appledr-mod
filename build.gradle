@@ -54,11 +54,9 @@ dependencies {
 	modImplementation include("eu.pb4:polymer-blocks:${project.polymer_version}")
 	modImplementation include('eu.pb4:factorytools:0.3.1+1.21')
 
-	// langchain (AppleDr AI)
-	implementation 'dev.langchain4j:langchain4j-open-ai:0.33.0'
-	shadow 'dev.langchain4j:langchain4j-open-ai:0.33.0'
-	implementation 'dev.langchain4j:langchain4j:0.33.0'
-	shadow 'dev.langchain4j:langchain4j:0.33.0'
+	// simple-openai (AppleDr AI)
+	implementation "io.github.sashirestela:simple-openai:${project.simple_openai_version}"
+	shadow "io.github.sashirestela:simple-openai:${project.simple_openai_version}"
 
 	// Cardinal Components API
 	modImplementation include("org.ladysnake.cardinal-components-api:cardinal-components-base:${project.cca_version}")

@@ -2,17 +2,13 @@ package net.pedroricardo.util;
 
 import carpet.patches.EntityPlayerMPFake;
 import carpet.patches.FakeClientConnection;
-import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
-import dev.langchain4j.agent.tool.*;
-import dev.langchain4j.data.message.*;
-import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.memory.chat.TokenWindowChatMemory;
-import dev.langchain4j.model.openai.OpenAiChatModel;
-import dev.langchain4j.model.openai.OpenAiChatModelName;
-import dev.langchain4j.model.openai.OpenAiTokenizer;
-import dev.langchain4j.service.tool.DefaultToolExecutor;
-import dev.langchain4j.service.tool.ToolExecutor;
+import io.github.sashirestela.openai.SimpleOpenAI;
+import io.github.sashirestela.openai.common.function.FunctionExecutor;
+import io.github.sashirestela.openai.common.tool.Tool;
+import io.github.sashirestela.openai.domain.chat.Chat;
+import io.github.sashirestela.openai.domain.chat.ChatMessage;
+import io.github.sashirestela.openai.domain.chat.ChatRequest;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.entity.Entity;
@@ -38,50 +34,51 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ReferenceToMixin")
 public class AppleDrAI {
-    public static final Map<Entity, ChatMemory> CHAT_MEMORY_MAP = new HashMap<>();
-    public static final OpenAiChatModel MODEL = OpenAiChatModel.builder().apiKey(AppleDrConfig.openAIApiKey).modelName(OpenAiChatModelName.GPT_4_O_MINI).build();
+    public static final Map<Entity, List<ChatMessage>> CHAT_MEMORY_MAP = new HashMap<>();
+    public static final SimpleOpenAI openAI = SimpleOpenAI.builder().apiKey(AppleDrConfig.openAIApiKey).build();
 
-    public static AiMessage respondSilently(ChatMessage message, Entity entity) {
+    public static ChatMessage.ResponseMessage respondSilently(ChatMessage message, Entity entity) {
         return respondSilently(message, entity, null);
     }
 
-    public static AiMessage respondSilently(ChatMessage message, Entity entity, AITools tools) {
-        final ChatMemory memory = CHAT_MEMORY_MAP.computeIfAbsent(entity, e -> new TokenWindowChatMemory.Builder().maxTokens(100000, new OpenAiTokenizer()).build());
+    public static ChatMessage.ResponseMessage respondSilently(ChatMessage message, Entity entity, AITools tools) {
+        final List<ChatMessage> memory = CHAT_MEMORY_MAP.computeIfAbsent(entity, e -> new ArrayList<>());
         memory.add(message);
-        List<ChatMessage> list = Lists.newArrayList(SystemMessage.systemMessage(entity.getComponent(AIEntityComponent.COMPONENT).getContext()));
-        list.addAll(memory.messages());
-        AiMessage aiMessage;
-        if (tools == null) {
-            aiMessage = MODEL.generate(list).content();
-            memory.add(aiMessage);
-            return aiMessage;
+        FunctionExecutor functionExecutor = new FunctionExecutor();
+        if (tools != null) {
+            functionExecutor.enrollFunctions(tools.getTools());
         }
-        List<ToolSpecification> toolSpecifications = ToolSpecifications.toolSpecificationsFrom(tools);
-        aiMessage = MODEL.generate(list, toolSpecifications).content();
-        while (aiMessage.hasToolExecutionRequests()) {
-            List<ToolExecutionRequest> toolExecutionRequests = aiMessage.toolExecutionRequests();
-            memory.add(aiMessage);
-            list.add(aiMessage);
+        List<Tool> toolList = functionExecutor.getToolFunctions();
+        Chat chat = openAI.chatCompletions().create(ChatRequest.builder()
+                .model("gpt-4o-mini")
+                .message(ChatMessage.SystemMessage.of(entity.getComponent(AIEntityComponent.COMPONENT).getContext()))
+                .messages(memory)
+                .tools(toolList)
+                .build()).join();
 
-            toolExecutionRequests.forEach(toolExecutionRequest -> {
-                ToolExecutor toolExecutor = new DefaultToolExecutor(tools, toolExecutionRequest);
-                String result = toolExecutor.execute(toolExecutionRequest, UUID.randomUUID().toString());
-                ToolExecutionResultMessage toolExecutionResultMessages = ToolExecutionResultMessage.from(toolExecutionRequest, result);
-                memory.add(toolExecutionResultMessages);
-                list.add(toolExecutionResultMessages);
+        ChatMessage.ResponseMessage response = chat.firstMessage();
+        if (response.getToolCalls() != null) {
+            memory.add(response);
+            response.getToolCalls().forEach(call -> {
+                var result = functionExecutor.execute(call.getFunction());
+                memory.add(ChatMessage.ToolMessage.of(result.toString(), call.getId()));
             });
-
-            aiMessage = MODEL.generate(list, toolSpecifications).content();
         }
-        AiMessage finalResponse = MODEL.generate(list).content();
+        chat = openAI.chatCompletions().create(ChatRequest.builder()
+                .model("gpt-4o-mini")
+                .message(ChatMessage.SystemMessage.of(entity.getComponent(AIEntityComponent.COMPONENT).getContext()))
+                .messages(memory)
+                .build()).join();
+        ChatMessage.ResponseMessage finalResponse = chat.firstMessage();
         memory.add(finalResponse);
         return finalResponse;
     }
 
-    public static AiMessage respond(MinecraftServer server, ChatMessage message, Entity entity, AITools tools) {
-        AiMessage response = respondSilently(message, entity, tools);
-        String str = response.text();
+    public static ChatMessage.ResponseMessage respond(MinecraftServer server, ChatMessage message, Entity entity, AITools tools) {
+        ChatMessage.ResponseMessage response = respondSilently(message, entity, tools);
+        String str = response.getContent();
         FakePlayer player = entity instanceof AIEntity aiEntity ? aiEntity.getAsPlayer() : FakePlayer.get((ServerWorld) entity.getWorld(), new GameProfile(entity.getUuid(), entity.getName().getString()));
         server.getPlayerManager().broadcast(SignedMessage.ofUnsigned(str), player, MessageType.params(MessageType.CHAT, player));
         return response;
@@ -98,7 +95,7 @@ public class AppleDrAI {
                 name = String.format("%s: ", player.getName().getString());
             }
 
-            AppleDrAI.respond(entity.getServer(), UserMessage.userMessage(name + message.getContent().getString()), entity, entity instanceof EntityPlayerMPFake ? new PlayerAITools((EntityPlayerMPFake) entity, entity.getServer()) : null);
+            AppleDrAI.respond(entity.getServer(), ChatMessage.UserMessage.of(name + message.getContent().getString()), entity, entity instanceof EntityPlayerMPFake ? new PlayerAITools((EntityPlayerMPFake) entity, entity.getServer()) : null);
         }).start();
     }
 

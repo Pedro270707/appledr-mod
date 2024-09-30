@@ -1,12 +1,11 @@
 package net.pedroricardo.mixin;
 
 import carpet.patches.EntityPlayerMPFake;
-import dev.langchain4j.data.message.SystemMessage;
+import io.github.sashirestela.openai.domain.chat.ChatMessage;
 import net.minecraft.advancement.AdvancementDisplay;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.Language;
 import net.pedroricardo.util.AppleDrAI;
 import net.pedroricardo.util.PlayerAITools;
@@ -32,7 +31,7 @@ public class CongratulateAdvancementMixin {
         if (advancementEntry.value().display().isEmpty() || advancementEntry.value().name().isEmpty() || owner.getServer() == null) return;
         new Thread(() -> {
             AppleDrAI.findAIEntities(owner.getServer(), entity -> entity instanceof EntityPlayerMPFake).forEach(aiEntity -> {
-                AppleDrAI.respond(owner.getServer(), SystemMessage.systemMessage(String.format("The player %s received the advancement %s (description: %s). You should " + (owner == aiEntity ? "celebrate, since you got the advancement." : "congratulate them using the name of the advancement."), owner.getDisplayName().getString(), Localization.text(advancementEntry.value().name().get(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString(), Localization.text(advancementEntry.value().display().get().getDescription(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString())), aiEntity, new PlayerAITools((EntityPlayerMPFake) aiEntity, aiEntity.getServer()));
+                AppleDrAI.respond(owner.getServer(), ChatMessage.SystemMessage.of(String.format("The player %s received the advancement %s (description: %s). You should " + (owner == aiEntity ? "celebrate, since you got the advancement." : "congratulate them using the name of the advancement."), owner.getDisplayName().getString(), Localization.text(advancementEntry.value().name().get(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString(), Localization.text(advancementEntry.value().display().get().getDescription(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString())), aiEntity, new PlayerAITools((EntityPlayerMPFake) aiEntity, aiEntity.getServer()));
             });
         }).start();
     }
