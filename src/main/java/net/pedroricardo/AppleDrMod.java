@@ -167,36 +167,63 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 							.then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>argument("entity", EntityArgumentType.entity())
 									.executes(c -> {
 										Entity entity = EntityArgumentType.getEntity(c, "entity");
-										if (entity instanceof ServerPlayerEntity player && !(entity instanceof EntityPlayerMPFake)) {
-											AppleDrAI.createPlayer(player, c.getSource().getServer(), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, AIEntityComponent.DEFAULT_RESPOND_WHEN_NEAR, UUID.randomUUID());
-											c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
-											return Command.SINGLE_SUCCESS;
+										Pattern pattern = AIEntityComponent.DEFAULT_PATTERN;
+										String context = AIEntityComponent.DEFAULT_CONTEXT;
+										boolean respondWhenNear = AIEntityComponent.DEFAULT_RESPOND_WHEN_NEAR;
+										if (entity instanceof ServerPlayerEntity player) {
+											if (AppleDrConfig.replacedPlayers.containsKey(player.getUuid())) {
+												ReplacedPlayer replacedPlayer = AppleDrConfig.replacedPlayers.get(player.getUuid());
+												pattern = replacedPlayer.pattern();
+												context = replacedPlayer.context();
+												respondWhenNear = replacedPlayer.respondWhenNear();
+											}
+											if (!(entity instanceof EntityPlayerMPFake)) {
+												AppleDrAI.createPlayer(player, c.getSource().getServer(), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, AIEntityComponent.DEFAULT_RESPOND_WHEN_NEAR, UUID.randomUUID());
+												c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
+												return Command.SINGLE_SUCCESS;
+											}
 										}
 
-										AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, AIEntityComponent.DEFAULT_RESPOND_WHEN_NEAR);
+										AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), pattern, context, respondWhenNear);
 										c.getSource().sendMessage(Text.translatable("commands.ai.create.success"));
 										return Command.SINGLE_SUCCESS;
 									})
 									.then(RequiredArgumentBuilder.<ServerCommandSource, Boolean>argument("respondWhenNear", BoolArgumentType.bool())
 											.executes(c -> {
 												Entity entity = EntityArgumentType.getEntity(c, "entity");
-												if (entity instanceof ServerPlayerEntity player && !(entity instanceof EntityPlayerMPFake)) {
-													AppleDrAI.createPlayer(player, c.getSource().getServer(), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"), UUID.randomUUID());
-													c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
-													return Command.SINGLE_SUCCESS;
+												Pattern pattern = AIEntityComponent.DEFAULT_PATTERN;
+												String context = AIEntityComponent.DEFAULT_CONTEXT;
+												if (entity instanceof ServerPlayerEntity player) {
+													if (AppleDrConfig.replacedPlayers.containsKey(player.getUuid())) {
+														ReplacedPlayer replacedPlayer = AppleDrConfig.replacedPlayers.get(player.getUuid());
+														pattern = replacedPlayer.pattern();
+														context = replacedPlayer.context();
+													}
+													if (!(entity instanceof EntityPlayerMPFake)) {
+														AppleDrAI.createPlayer(player, c.getSource().getServer(), pattern, context, BoolArgumentType.getBool(c, "respondWhenNear"), UUID.randomUUID());
+														c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
+														return Command.SINGLE_SUCCESS;
+													}
 												}
 
-												AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));
+												AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), pattern, context, BoolArgumentType.getBool(c, "respondWhenNear"));
 												c.getSource().sendMessage(Text.translatable("commands.ai.create.success"));
 												return Command.SINGLE_SUCCESS;
 											})
 											.then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("pattern", StringArgumentType.string())
 													.executes(c -> {
 														Entity entity = EntityArgumentType.getEntity(c, "entity");
-														if (entity instanceof ServerPlayerEntity player && !(entity instanceof EntityPlayerMPFake)) {
-															AppleDrAI.createPlayer(player, c.getSource().getServer(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"), UUID.randomUUID());
-															c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
-															return Command.SINGLE_SUCCESS;
+														String context = AIEntityComponent.DEFAULT_CONTEXT;
+														if (entity instanceof ServerPlayerEntity player) {
+															if (AppleDrConfig.replacedPlayers.containsKey(player.getUuid())) {
+																ReplacedPlayer replacedPlayer = AppleDrConfig.replacedPlayers.get(player.getUuid());
+																context = replacedPlayer.context();
+															}
+															if (!(entity instanceof EntityPlayerMPFake)) {
+																AppleDrAI.createPlayer(player, c.getSource().getServer(), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), context, BoolArgumentType.getBool(c, "respondWhenNear"), UUID.randomUUID());
+																c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
+																return Command.SINGLE_SUCCESS;
+															}
 														}
 
 														AppleDrAI.create(EntityArgumentType.getEntity(c, "entity"), Pattern.compile(StringArgumentType.getString(c, "pattern"), Pattern.CASE_INSENSITIVE), AIEntityComponent.DEFAULT_CONTEXT, BoolArgumentType.getBool(c, "respondWhenNear"));

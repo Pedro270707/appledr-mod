@@ -24,7 +24,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.UserCache;
 import net.minecraft.util.Uuids;
-import net.pedroricardo.content.entity.AIEntity;
 import net.pedroricardo.content.entity.AIEntityComponent;
 import net.pedroricardo.mixin.EntityAccessor;
 import net.pedroricardo.mixin.EntityManagerAccessor;
@@ -79,7 +78,7 @@ public class AppleDrAI {
     public static ChatMessage.ResponseMessage respond(MinecraftServer server, ChatMessage message, Entity entity, AITools tools) {
         ChatMessage.ResponseMessage response = respondSilently(message, entity, tools);
         String str = response.getContent();
-        FakePlayer player = entity instanceof AIEntity aiEntity ? aiEntity.getAsPlayer() : FakePlayer.get((ServerWorld) entity.getWorld(), new GameProfile(entity.getUuid(), entity.getName().getString()));
+        FakePlayer player = FakePlayer.get((ServerWorld) entity.getWorld(), new GameProfile(entity.getUuid(), entity.getName().getString()));
         server.getPlayerManager().broadcast(SignedMessage.ofUnsigned(str), player, MessageType.params(MessageType.CHAT, player));
         return response;
     }
