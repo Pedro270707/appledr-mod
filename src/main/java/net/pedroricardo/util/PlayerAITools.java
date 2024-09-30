@@ -10,6 +10,7 @@ import io.github.sashirestela.openai.common.function.Functional;
 import io.github.sashirestela.slimvalidator.constraints.Range;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -38,6 +39,7 @@ import xyz.nucleoid.server.translations.api.language.ServerLanguage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 
 public class PlayerAITools extends AITools {
     public static EntityPlayerMPFake player;
@@ -47,203 +49,6 @@ public class PlayerAITools extends AITools {
         player = pPlayer;
         server = pServer;
     }
-
-//    @Tool("Makes you use (press right click) once")
-//    String use() {
-//        ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.USE, EntityPlayerActionPack.Action.once());
-//        AppleDrMod.LOGGER.info("Running action USE on " + PlayerAITools.player.getGameProfile().getName() + " (o)");
-//        return "Used!";
-//    }
-//
-//    @Tool("Makes you attack (press left click) once")
-//    String attack() {
-//        ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.ATTACK, EntityPlayerActionPack.Action.once());
-//        AppleDrMod.LOGGER.info("Running action ATTACK on " + PlayerAITools.player.getGameProfile().getName() + " (o)");
-//        return "Attacked!";
-//    }
-//
-//    @Tool("Makes you jump once")
-//    String jump() {
-//        ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.JUMP, EntityPlayerActionPack.Action.once());
-//        AppleDrMod.LOGGER.info("Running action JUMP on " + PlayerAITools.player.getGameProfile().getName() + " (o)");
-//        return "Jumped!";
-//    }
-//
-//    @Tool("Makes you drop an item (press Q) once")
-//    String dropItem() {
-//        ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.DROP_ITEM, EntityPlayerActionPack.Action.once());
-//        AppleDrMod.LOGGER.info("Running action DROP_ITEM on " + PlayerAITools.player.getGameProfile().getName() + " (o)");
-//        return "Dropped item!";
-//    }
-//
-//    @Tool("Makes you drop a stack (press Ctrl + Q) once")
-//    String dropStack() {
-//        ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.DROP_STACK, EntityPlayerActionPack.Action.once());
-//        AppleDrMod.LOGGER.info("Running action DROP_STACK on " + PlayerAITools.player.getGameProfile().getName() + " (o)");
-//        return "Dropped stack!";
-//    }
-//
-//    @Tool("Makes you swap your hand items (press F) once")
-//    String swapHands() {
-//        ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.SWAP_HANDS, EntityPlayerActionPack.Action.once());
-//        AppleDrMod.LOGGER.info("Running action SWAP_HANDS on " + PlayerAITools.player.getGameProfile().getName() + " (o)");
-//        return "Swapped hands!";
-//    }
-//
-//    @Tool("Makes you use (hold right click) continuously")
-//    String useContinuously() {
-//        ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.USE, EntityPlayerActionPack.Action.continuous());
-//        AppleDrMod.LOGGER.info("Running action USE on " + PlayerAITools.player.getGameProfile().getName() + " (c)");
-//        return "Using!";
-//    }
-//
-//    @Tool("Makes you attack (hold left click) continuously")
-//    String attackContinuously() {
-//        ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.ATTACK, EntityPlayerActionPack.Action.continuous());
-//        AppleDrMod.LOGGER.info("Running action ATTACK on " + PlayerAITools.player.getGameProfile().getName() + " (c)");
-//        return "Attacking!";
-//    }
-//
-//    @Tool("Makes you jump continuously")
-//    String jumpContinuously() {
-//        ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.JUMP, EntityPlayerActionPack.Action.continuous());
-//        AppleDrMod.LOGGER.info("Running action JUMP on " + PlayerAITools.player.getGameProfile().getName() + " (c)");
-//        return "Jumping!";
-//    }
-//
-//    @Tool("Makes you drop an item (hold Q) continuously")
-//    String dropItemContinuously() {
-//        ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.DROP_ITEM, EntityPlayerActionPack.Action.continuous());
-//        AppleDrMod.LOGGER.info("Running action DROP_ITEM on " + PlayerAITools.player.getGameProfile().getName() + " (c)");
-//        return "Dropping item!";
-//    }
-//
-//    @Tool("Makes you drop a stack (hold Ctrl + Q) continuously")
-//    String dropStackContinuously() {
-//        ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.DROP_STACK, EntityPlayerActionPack.Action.continuous());
-//        AppleDrMod.LOGGER.info("Running action DROP_STACK on " + PlayerAITools.player.getGameProfile().getName() + " (c)");
-//        return "Dropping stack!";
-//    }
-
-//    private static class DropStackContinuously implements Functional {
-//        @Override
-//        public Object execute() {
-//            ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.SWAP_HANDS, EntityPlayerActionPack.Action.continuous());
-//            AppleDrMod.LOGGER.info("Running action SWAP_HANDS on " + PlayerAITools.player.getGameProfile().getName() + " (c)");
-//            return "Swapping hands!";
-//        }
-//    }
-//
-//    private static class SwapHandsContinuously implements Functional {
-//        @Override
-//        public Object execute() {
-//            ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.SWAP_HANDS, EntityPlayerActionPack.Action.continuous());
-//            AppleDrMod.LOGGER.info("Running action SWAP_HANDS on " + PlayerAITools.player.getGameProfile().getName() + " (c)");
-//            return "Swapping hands!";
-//        }
-//    }
-//
-//    private static class UseForInterval implements Functional {
-//        @JsonPropertyDescription("The interval in ticks")
-//        @JsonProperty(required = true)
-//        int interval;
-//
-//        @JsonPropertyDescription("The interval offset in ticks")
-//        @JsonProperty(required = true)
-//        int offset;
-//
-//        @Override
-//        public Object execute() {
-//            ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.USE, EntityPlayerActionPack.Action.interval(interval, offset));
-//            AppleDrMod.LOGGER.info("Running action USE on " + PlayerAITools.player.getGameProfile().getName() + " (interval: " + interval + ", offset: " + offset + ")");
-//            return offset == 0 ? "Swapping hands!" : "Swapping hands in " + offset + " ticks!";
-//        }
-//    }
-//
-//    private static class AttackForInterval implements Functional {
-//        @JsonPropertyDescription("The interval in ticks")
-//        @JsonProperty(required = true)
-//        int interval;
-//
-//        @JsonPropertyDescription("The interval offset in ticks")
-//        @JsonProperty(required = true)
-//        int offset;
-//
-//        @Override
-//        public Object execute() {
-//            ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.ATTACK, EntityPlayerActionPack.Action.interval(interval, offset));
-//            AppleDrMod.LOGGER.info("Running action ATTACK on " + PlayerAITools.player.getGameProfile().getName() + " (interval: " + interval + ", offset: " + offset + ")");
-//            return offset == 0 ? "Swapping hands!" : "Swapping hands in " + offset + " ticks!";
-//        }
-//    }
-//
-//    private static class JumpForInterval implements Functional {
-//        @JsonPropertyDescription("The interval in ticks")
-//        @JsonProperty(required = true)
-//        int interval;
-//
-//        @JsonPropertyDescription("The interval offset in ticks")
-//        @JsonProperty(required = true)
-//        int offset;
-//
-//        @Override
-//        public Object execute() {
-//            ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.JUMP, EntityPlayerActionPack.Action.interval(interval, offset));
-//            AppleDrMod.LOGGER.info("Running action JUMP on " + PlayerAITools.player.getGameProfile().getName() + " (interval: " + interval + ", offset: " + offset + ")");
-//            return offset == 0 ? "Swapping hands!" : "Swapping hands in " + offset + " ticks!";
-//        }
-//    }
-//
-//    private static class DropItemForInterval implements Functional {
-//        @JsonPropertyDescription("The interval in ticks")
-//        @JsonProperty(required = true)
-//        int interval;
-//
-//        @JsonPropertyDescription("The interval offset in ticks")
-//        @JsonProperty(required = true)
-//        int offset;
-//
-//        @Override
-//        public Object execute() {
-//            ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.DROP_ITEM, EntityPlayerActionPack.Action.interval(interval, offset));
-//            AppleDrMod.LOGGER.info("Running action DROP_ITEM on " + PlayerAITools.player.getGameProfile().getName() + " (interval: " + interval + ", offset: " + offset + ")");
-//            return offset == 0 ? "Swapping hands!" : "Swapping hands in " + offset + " ticks!";
-//        }
-//    }
-//
-//    private static class DropStackForInterval implements Functional {
-//        @JsonPropertyDescription("The interval in ticks")
-//        @JsonProperty(required = true)
-//        int interval;
-//
-//        @JsonPropertyDescription("The interval offset in ticks")
-//        @JsonProperty(required = true)
-//        int offset;
-//
-//        @Override
-//        public Object execute() {
-//            ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.DROP_STACK, EntityPlayerActionPack.Action.interval(interval, offset));
-//            AppleDrMod.LOGGER.info("Running action DROP_STACK on " + PlayerAITools.player.getGameProfile().getName() + " (interval: " + interval + ", offset: " + offset + ")");
-//            return offset == 0 ? "Swapping hands!" : "Swapping hands in " + offset + " ticks!";
-//        }
-//    }
-//
-//    private static class SwapHandsForInterval implements Functional {
-//        @JsonPropertyDescription("The interval in ticks")
-//        @JsonProperty(required = true)
-//        int interval;
-//
-//        @JsonPropertyDescription("The interval offset in ticks")
-//        @JsonProperty(required = true)
-//        int offset;
-//
-//        @Override
-//        public Object execute() {
-//            ((ServerPlayerInterface) PlayerAITools.player).getActionPack().start(EntityPlayerActionPack.ActionType.SWAP_HANDS, EntityPlayerActionPack.Action.interval(interval, offset));
-//            AppleDrMod.LOGGER.info("Running action SWAP_HANDS on " + PlayerAITools.player.getGameProfile().getName() + " (interval: " + interval + ", offset: " + offset + ")");
-//            return offset == 0 ? "Swapping hands!" : "Swapping hands in " + offset + " ticks!";
-//        }
-//    }
 
     private static class DoActionOnce implements Functional {
         @JsonPropertyDescription("The action: USE, ATTACK, JUMP, DROP_ITEM, DROP_STACK, or SWAP_HANDS")
@@ -384,7 +189,7 @@ public class PlayerAITools extends AITools {
     }
 
     private static class LookAtPlayer implements Functional {
-        @JsonPropertyDescription("The name of the player to look at")
+        @JsonPropertyDescription("The stackName of the player to look at")
         @JsonProperty(required = true)
         String playerName;
 
@@ -447,7 +252,7 @@ public class PlayerAITools extends AITools {
     }
 
     private static class GiveAppledrnessToPlayer implements Functional {
-        @JsonPropertyDescription("The name of the player to give Appledrness to")
+        @JsonPropertyDescription("The stackName of the player to give Appledrness to")
         @JsonProperty(required = true)
         String playerName;
 
@@ -469,7 +274,7 @@ public class PlayerAITools extends AITools {
     }
 
     private static class TeleportToPlayer implements Functional {
-        @JsonPropertyDescription("The name of the player to teleport to")
+        @JsonPropertyDescription("The stackName of the player to teleport to")
         @JsonProperty(required = true)
         String playerName;
 
@@ -514,10 +319,15 @@ public class PlayerAITools extends AITools {
                 }
 
                 StringBuilder tooltip = new StringBuilder();
-                for (Text text : stack.getTooltip(Item.TooltipContext.DEFAULT, PlayerAITools.player, TooltipType.BASIC)) {
-                    String translated = Localization.text(text, ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString();
+                List<Text> lines = stack.getTooltip(Item.TooltipContext.DEFAULT, PlayerAITools.player, TooltipType.BASIC);
+                for (int line = 0; line < lines.size(); line++) {
+                    String translated = Localization.text(lines.get(line), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString();
                     if (translated.isEmpty()) continue;
-                    tooltip.append(translated).append(" / ");
+                    tooltip.append(translated);
+                    if (line == 0 && stack.contains(DataComponentTypes.CUSTOM_NAME)) {
+                        tooltip.append(" (").append(Localization.text(stack.getItem().getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString()).append(")");
+                    }
+                    tooltip.append(" / ");
                 }
 
                 str.append(indexText);
@@ -530,6 +340,60 @@ public class PlayerAITools extends AITools {
             String inventory = str.length() >= 2 ? str.substring(0, str.length() - 2) : str.toString();
             AppleDrMod.LOGGER.info(PlayerAITools.player.getGameProfile().getName() + " checked their inventory: \n" + inventory);
             return "Your inventory: " + inventory;
+        }
+    }
+
+    private static class DropStack implements Functional {
+        @JsonPropertyDescription("This is the slot where the item currently is (the item you want to drop). Imagine it as \"Where is the item right now?\"")
+        @JsonProperty(required = true)
+        int slot;
+
+        @JsonPropertyDescription("Whether to drop all (true) or just one (false)")
+        @JsonProperty(required = true)
+        boolean dropAll;
+
+        @Override
+        public Object execute() {
+            ((ServerPlayerInterface) PlayerAITools.player).getActionPack().drop(slot, dropAll);
+            AppleDrMod.LOGGER.info(PlayerAITools.player.getGameProfile().getName() + " dropped item in slot " + slot);
+            return "Dropping item in slot " + slot + "\n" + new GetInventoryItems().execute();
+        }
+    }
+
+    private static class DropStackById implements Functional {
+        @JsonPropertyDescription("The item's ID (e.g., `minecraft:netherite_boots`, `netherite_boots`, or `Netherite Boots`)")
+        @JsonProperty(required = true)
+        String id;
+
+        @JsonPropertyDescription("Whether to drop all (true) or just one (false)")
+        @JsonProperty(required = true)
+        boolean dropAll;
+
+        @Override
+        public Object execute() {
+            DropStack dropStack = new DropStack();
+            dropStack.dropAll = dropAll;
+            OptionalInt contains = OptionalInt.empty();
+            for (int i = 0; i < PlayerAITools.player.getInventory().size(); i++) {
+                ItemStack stack = PlayerAITools.player.getInventory().getStack(i);
+                Identifier identifier = Identifier.tryParse(id);
+                String stackName = Localization.text(stack.getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString();
+                String itemName = Localization.text(stack.getItem().getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString();
+                if (Registries.ITEM.getId(stack.getItem()).equals(identifier) || stackName.equals(id) || itemName.equals(id)) {
+                    dropStack.slot = i;
+                    return dropStack.execute();
+                } else if (stackName.contains(id) || itemName.contains(id)) {
+                    contains = OptionalInt.of(i);
+                } else if (contains.isEmpty() && (stackName + " (" + itemName + ")").contains(id)) {
+                    contains = OptionalInt.of(i);
+                }
+            }
+            if (contains.isPresent()) {
+                dropStack.slot = contains.getAsInt();
+                return dropStack.execute();
+            }
+            AppleDrMod.LOGGER.info(PlayerAITools.player.getGameProfile().getName() + " tried to drop " + id + ", but the item does not exist or could not be found");
+            return "Could not find " + id;
         }
     }
 
@@ -555,8 +419,8 @@ public class PlayerAITools extends AITools {
                 return "Target slot does not exist!";
             }
 
-            ItemStack originStack = PlayerAITools.player.getInventory().getStack(from);
-            ItemStack targetStack = PlayerAITools.player.getInventory().getStack(to);
+            ItemStack originStack = PlayerAITools.player.getInventory().getStack(from).copyAndEmpty();
+            ItemStack targetStack = PlayerAITools.player.getInventory().getStack(to).copyAndEmpty();
 
             if (to < PlayerAITools.player.getInventory().main.size() || to >= PlayerAITools.player.getInventory().main.size() + PlayerAITools.player.getInventory().armor.size() || EQUIPMENT_SLOTS[to - PlayerAITools.player.getInventory().main.size()] == PlayerAITools.player.getPreferredEquipmentSlot(originStack)) {
                 PlayerAITools.player.getInventory().setStack(to, originStack);
@@ -592,16 +456,27 @@ public class PlayerAITools extends AITools {
 
         @Override
         public Object execute() {
+            MoveStack moveStack = new MoveStack();
+            moveStack.to = target;
+            OptionalInt contains = OptionalInt.empty();
             for (int i = 0; i < PlayerAITools.player.getInventory().size(); i++) {
                 if (i == target) continue;
                 ItemStack stack = PlayerAITools.player.getInventory().getStack(i);
                 Identifier identifier = Identifier.tryParse(id);
-                if (Registries.ITEM.getId(stack.getItem()).equals(identifier) || Localization.text(stack.getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString().equals(id)) {
-                    MoveStack moveStack = new MoveStack();
-                    moveStack.to = target;
+                String stackName = Localization.text(stack.getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString();
+                String itemName = Localization.text(stack.getItem().getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString();
+                if (Registries.ITEM.getId(stack.getItem()).equals(identifier) || stackName.equals(id) || itemName.equals(id)) {
                     moveStack.from = i;
                     return moveStack.execute();
+                } else if (stackName.contains(id) || itemName.contains(id)) {
+                    contains = OptionalInt.of(i);
+                } else if (contains.isEmpty() && (stackName + " (" + itemName + ")").contains(id)) {
+                    contains = OptionalInt.of(i);
                 }
+            }
+            if (contains.isPresent()) {
+                moveStack.from = contains.getAsInt();
+                return moveStack.execute();
             }
             AppleDrMod.LOGGER.info(PlayerAITools.player.getGameProfile().getName() + " tried to move " + id + " to slot " + target + ", but the item does not exist or could not be found");
             return "Could not find " + id;
@@ -609,7 +484,7 @@ public class PlayerAITools extends AITools {
     }
 
     private static class SendOrRemoveFromAppleEnd implements Functional {
-        @JsonPropertyDescription("The name of the player who asked to be teleported")
+        @JsonPropertyDescription("The stackName of the player who asked to be teleported")
         @JsonProperty(required = true)
         String playerName;
 
@@ -636,7 +511,7 @@ public class PlayerAITools extends AITools {
     }
 
     private static class GetAppledrness implements Functional {
-        @JsonPropertyDescription("The name of the player to give Appledrness to")
+        @JsonPropertyDescription("The stackName of the player to give Appledrness to")
         @JsonProperty(required = true)
         String playerName;
 
@@ -656,7 +531,7 @@ public class PlayerAITools extends AITools {
     }
     
     private static class SendOrRemoveFrom1e8bf29c9c6240b2a7aae7d226df8486 implements Functional {
-        @JsonPropertyDescription("The name of the player who said the sequence of characters")
+        @JsonPropertyDescription("The stackName of the player who said the sequence of characters")
         @JsonProperty(required = true)
         String playerName;
         
@@ -679,7 +554,7 @@ public class PlayerAITools extends AITools {
     }
 
     private static class GiveCore implements Functional {
-        @JsonPropertyDescription("The name of the player who said the sequence of characters")
+        @JsonPropertyDescription("The stackName of the player who said the sequence of characters")
         @JsonProperty(required = true)
         String playerName;
 
@@ -724,78 +599,6 @@ public class PlayerAITools extends AITools {
     @Override
     public List<FunctionDef> getTools() {
         List<FunctionDef> list = new ArrayList<>();
-//        list.add(FunctionDef.builder()
-//                .name("use_continuously")
-//                .description("Makes you use (hold right click) continuously.")
-//                .functionalClass(UseContinuously.class)
-//                .strict(true)
-//                .build());
-//        list.add(FunctionDef.builder()
-//                .name("attack_continuously")
-//                .description("Makes you attack (hold left click) continuously.")
-//                .functionalClass(AttackContinuously.class)
-//                .strict(true)
-//                .build());
-//        list.add(FunctionDef.builder()
-//                .name("jump_continuously")
-//                .description("Makes you jump continuously.")
-//                .functionalClass(JumpContinuously.class)
-//                .strict(true)
-//                .build());
-//        list.add(FunctionDef.builder()
-//                .name("drop_item_continuously")
-//                .description("Makes you drop an item (hold Q) continuously.")
-//                .functionalClass(DropContinuously.class)
-//                .strict(true)
-//                .build());
-//        list.add(FunctionDef.builder()
-//                .name("drop_stack_continuously")
-//                .description("Makes you drop a stack (hold Ctrl + Q) continuously.")
-//                .functionalClass(DropContinuously.class)
-//                .strict(true)
-//                .build());
-//        list.add(FunctionDef.builder()
-//                .name("swap_hands_continuously")
-//                .description("Makes you swap your hand items (hold F) continuously.")
-//                .functionalClass(SwapContinuously.class)
-//                .strict(true)
-//                .build());
-//        list.add(FunctionDef.builder()
-//                .name("use_for_interval")
-//                .description("Makes you use (hold right click) for an interval of time.")
-//                .functionalClass(UseForInterval.class)
-//                .strict(true)
-//                .build());
-//        list.add(FunctionDef.builder()
-//                .name("attack_for_interval")
-//                .description("Makes you attack (hold left click) for an interval of time.")
-//                .functionalClass(AttackForInterval.class)
-//                .strict(true)
-//                .build());
-//        list.add(FunctionDef.builder()
-//                .name("jump_for_interval")
-//                .description("Makes you jump for an interval of time.")
-//                .functionalClass(JumpForInterval.class)
-//                .strict(true)
-//                .build());
-//        list.add(FunctionDef.builder()
-//                .name("drop_item_for_interval")
-//                .description("Makes you drop an item (hold Q) for an interval of time.")
-//                .functionalClass(DropItemForInterval.class)
-//                .strict(true)
-//                .build());
-//        list.add(FunctionDef.builder()
-//                .name("drop_stack_for_interval")
-//                .description("Makes you drop a stack (hold Ctrl + Q) for an interval of time.")
-//                .functionalClass(DropStackForInterval.class)
-//                .strict(true)
-//                .build());
-//        list.add(FunctionDef.builder()
-//                .name("swap_hands_for_interval")
-//                .description("Makes you swap your hand items (hold F) for an interval of time.")
-//                .functionalClass(SwapHandsForInterval.class)
-//                .strict(true)
-//                .build());
         list.add(FunctionDef.builder()
                 .name("do_action_once")
                 .description("Does an action (USE, ATTACK, JUMP, DROP ITEM(S), DROP STACK(S), or SWAP HANDS) once.")
@@ -896,6 +699,18 @@ public class PlayerAITools extends AITools {
                 .name("get_inventory_items")
                 .description("Gets every item in your inventory. Use EVERY TIME you need to know information about your items, as previous uses may be outdated.")
                 .functionalClass(GetInventoryItems.class)
+                .strict(true)
+                .build());
+        list.add(FunctionDef.builder()
+                .name("drop_stack_in_slot")
+                .description("Drops an item or item stack from a slot. Cheat sheet: slot 36: feet; slot 37: legs; slot 38: body; slot 39: head; slot 40: off-hand.")
+                .functionalClass(DropStack.class)
+                .strict(true)
+                .build());
+        list.add(FunctionDef.builder()
+                .name("drop_stack")
+                .description("Drops an item or item stack from your inventory. Cheat sheet: slot 36: feet; slot 37: legs; slot 38: body; slot 39: head; slot 40: off-hand.")
+                .functionalClass(DropStackById.class)
                 .strict(true)
                 .build());
         list.add(FunctionDef.builder()

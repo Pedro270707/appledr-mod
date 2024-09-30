@@ -178,7 +178,7 @@ public class AppleDrMod implements DedicatedServerModInitializer {
 												respondWhenNear = replacedPlayer.respondWhenNear();
 											}
 											if (!(entity instanceof EntityPlayerMPFake)) {
-												AppleDrAI.createPlayer(player, c.getSource().getServer(), AIEntityComponent.DEFAULT_PATTERN, AIEntityComponent.DEFAULT_CONTEXT, AIEntityComponent.DEFAULT_RESPOND_WHEN_NEAR, UUID.randomUUID());
+												AppleDrAI.createPlayer(player, c.getSource().getServer(), pattern, context, respondWhenNear, UUID.randomUUID());
 												c.getSource().sendMessage(Text.translatable("commands.appledr.create.success"));
 												return Command.SINGLE_SUCCESS;
 											}
