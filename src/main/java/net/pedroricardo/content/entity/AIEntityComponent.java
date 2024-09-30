@@ -4,10 +4,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Language;
 import net.pedroricardo.AppleDrMod;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistry;
+import xyz.nucleoid.server.translations.api.Localization;
+import xyz.nucleoid.server.translations.api.language.ServerLanguage;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -54,8 +57,8 @@ public class AIEntityComponent implements Component {
     }
 
     public String getContext() {
-        return this.context.replaceAll("%type", this.entity.getType().toString())
-                .replaceAll("%name", this.entity.getName().getString());
+        return this.context.replaceAll("%type", Localization.text(this.entity.getType().getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString())
+                .replaceAll("%name", Localization.text(this.entity.getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString());
     }
 
     public void setContext(String context) {
