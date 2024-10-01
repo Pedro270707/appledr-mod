@@ -1,6 +1,8 @@
 package net.pedroricardo.content.entity;
 
+import carpet.patches.EntityPlayerMPFake;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
