@@ -439,7 +439,7 @@ public class PlayerAITools extends AITools {
                 AppleDrMod.LOGGER.info(PlayerAITools.player.getGameProfile().getName() + " moved " + Localization.text(originStack.getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString() + " (slot " + from + ") to slot " + to);
                 return "Moved " + Localization.text(originStack.getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString() + " to slot " + to + "\n" + new GetInventoryItems().execute();
             } else {
-                AppleDrMod.LOGGER.info(PlayerAITools.player.getGameProfile().getName() + " switched " + Localization.text(originStack.getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString() + " (slot " + from + " with " + Localization.text(targetStack.getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString() + " (slot " + to + ")");
+                AppleDrMod.LOGGER.info(PlayerAITools.player.getGameProfile().getName() + " switched " + Localization.text(originStack.getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString() + " (slot " + from + ") with " + Localization.text(targetStack.getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString() + " (slot " + to + ")");
                 return "Switched " + Localization.text(originStack.getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString() + " with " + Localization.text(targetStack.getName(), ServerLanguage.getLanguage(Language.DEFAULT_LANGUAGE)).getString() + "\n" + new GetInventoryItems().execute();
             }
         }
